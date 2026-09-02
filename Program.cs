@@ -36,7 +36,16 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        // Yêu cầu trình duyệt luôn kiểm tra phiên bản mới của file tĩnh (CSS/JS)
+        ctx.Context.Response.Headers.Append("Cache-Control", "no-cache, no-store, must-revalidate");
+        ctx.Context.Response.Headers.Append("Pragma", "no-cache");
+        ctx.Context.Response.Headers.Append("Expires", "0");
+    }
+});
 
 app.UseRouting();
 
