@@ -276,7 +276,7 @@ input { font-family: inherit; }
     animation: pulse 1.5s infinite;
     margin-right: 4px;
 }
-@@keyframes pulse {
+@keyframes pulse {
     0% { box-shadow: 0 0 0 0 rgba(56, 239, 125, 0.7); }
     70% { box-shadow: 0 0 0 8px rgba(56, 239, 125, 0); }
     100% { box-shadow: 0 0 0 0 rgba(56, 239, 125, 0); }
@@ -603,7 +603,7 @@ input { font-family: inherit; }
 }
 .badge-top-right { top: 12%; right: 4%; animation-delay: 0s; }
 .badge-bottom-left { bottom: 12%; left: 4%; animation-delay: 2s; }
-@@keyframes float {
+@keyframes float {
     0% { transform: translateY(0px); }
     100% { transform: translateY(-8px); }
 }
@@ -697,9 +697,6 @@ input { font-family: inherit; }
     color: #334155;
 }
 .demo-credentials strong { color: var(--primary); }
-    color: #6b7280;
-    margin: 20px 0 0;
-}
 
 /* ---------- Responsive ---------- */
 @media (max-width: 1200px) {

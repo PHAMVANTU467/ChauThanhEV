@@ -266,5 +266,8 @@
             activeUsers:  { today: @Html.Raw(ViewBag.ActiveUsersTodayJson), d7: @Html.Raw(ViewBag.ActiveUsers7DaysJson), d30: @Html.Raw(ViewBag.ActiveUsers30DaysJson) },
             doughnut:     @Html.Raw(ViewBag.DoughnutJson)
         };
+        if (typeof window.initDashboardCharts === 'function') {
+            window.initDashboardCharts();
+        }
     </script>
 }

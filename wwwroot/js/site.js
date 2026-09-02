@@ -383,8 +383,10 @@ function initDashboardCharts() {
             });
         });
     });
+    window.initDashboardCharts = initDashboardCharts;
 }
 
+window.initDashboardCharts = initDashboardCharts;
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initDashboardCharts);
 } else {
