@@ -382,8 +382,7 @@ input { font-family: inherit; }
     max-width: 560px;
     height: auto;
     object-fit: contain;
-    filter: drop-shadow(0 12px 28px rgba(0, 40, 120, 0.08));
-    mix-blend-mode: multiply;
+    filter: drop-shadow(0 14px 28px rgba(0, 70, 180, 0.1));
 }
 
 .login-panel {
