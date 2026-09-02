@@ -1,0 +1,143 @@
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Trang chủ";
+}
+
+<h2 class="section-title">Trạng thái trụ sạc xe điện</h2>
+<div class="stat-grid">
+    @foreach (var stat in Model.StationStats)
+    {
+        <div class="stat-card">
+            <span class="stat-icon bg-@stat.IconBg">
+                @await Html.PartialAsync("_Icon", stat.IconKey)
+            </span>
+            <div class="stat-body">
+                <p class="stat-title">@stat.Title</p>
+                <p class="stat-value">@stat.Value</p>
+                <p class="stat-unit">@stat.Unit</p>
+            </div>
+        </div>
+    }
+</div>
+
+<h2 class="section-title">Tổng quan hôm nay</h2>
+<div class="overview-grid">
+    <div class="gmv-card">
+        <div class="gmv-head">
+            <span class="stat-icon bg-blue">@await Html.PartialAsync("_Icon", "wallet2")</span>
+            <div>
+                <p class="stat-title">Tổng giá trị giao dịch (GMV)</p>
+                <p class="gmv-value">@Model.TodayGmvValue</p>
+            </div>
+            <div class="gmv-compare">
+                <span>So với hôm qua</span>
+                <p>@Model.TodayGmvCompare</p>
+                <span class="change @(Model.TodayGmvChange >= 0 ? "positive" : "negative")">@(Model.TodayGmvChange >= 0 ? "▲" : "▼") @Math.Abs(Model.TodayGmvChange).ToString("0.00", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))%</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="mini-grid">
+        @foreach (var card in Model.TodayOverview)
+        {
+            <div class="mini-card">
+                <span class="stat-icon bg-@card.IconBg">@await Html.PartialAsync("_Icon", card.IconKey)</span>
+                <div class="mini-body">
+                    <p class="stat-title">@card.Title</p>
+                    <p class="mini-value">@card.Value</p>
+                </div>
+                <div class="mini-compare">
+                    <span>So với hôm qua</span>
+                    <p>@card.CompareLabel</p>
+                    <span class="change @(card.IsPositive ? "positive" : "negative")">@(card.IsPositive ? "▲" : "▼") @Math.Abs(card.ChangePercent).ToString("0.00", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))%</span>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<h2 class="section-title">Tổng quan tháng này</h2>
+<div class="overview-grid">
+    <div class="gmv-card">
+        <div class="gmv-head">
+            <span class="stat-icon bg-blue">@await Html.PartialAsync("_Icon", "wallet2")</span>
+            <div>
+                <p class="stat-title">Tổng giá trị giao dịch (GMV)</p>
+                <p class="gmv-value">@Model.MonthGmvValue</p>
+            </div>
+            <div class="gmv-compare">
+                <span>So với tháng trước</span>
+                <p>@Model.MonthGmvCompare</p>
+                <span class="change @(Model.MonthGmvChange >= 0 ? "positive" : "negative")">@(Model.MonthGmvChange >= 0 ? "▲" : "▼") @Math.Abs(Model.MonthGmvChange).ToString("0.00", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))%</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="mini-grid">
+        @foreach (var card in Model.MonthOverview)
+        {
+            <div class="mini-card">
+                <span class="stat-icon bg-@card.IconBg">@await Html.PartialAsync("_Icon", card.IconKey)</span>
+                <div class="mini-body">
+                    <p class="stat-title">@card.Title</p>
+                    <p class="mini-value">@card.Value</p>
+                </div>
+                <div class="mini-compare">
+                    <span>So với tháng trước</span>
+                    <p>@card.CompareLabel</p>
+                    <span class="change @(card.IsPositive ? "positive" : "negative")">@(card.IsPositive ? "▲" : "▼") @Math.Abs(card.ChangePercent).ToString("0.00", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))%</span>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="bottom-grid three-col">
+    <div class="chart-card span-2">
+        <div class="chart-card-head">
+            <h3><span class="stat-icon bg-blue small">@await Html.PartialAsync("_Icon", "wallet2")</span> Doanh thu</h3>
+            <div class="range-tabs" data-target="revenue">
+                <button type="button" class="active" data-range="today">Hôm nay</button>
+                <button type="button" data-range="7d">7 ngày qua</button>
+                <button type="button" data-range="30d">30 ngày qua</button>
+            </div>
+        </div>
+        <div class="chart-canvas-wrap"><canvas id="revenueChart"></canvas></div>
+    </div>
+
+    <div class="chart-card">
+        <div class="chart-card-head">
+            <h3><span class="stat-icon bg-purple small">@await Html.PartialAsync("_Icon", "bolt")</span> Trạng thái cổng sạc</h3>
+        </div>
+        <div class="chart-canvas-wrap chart-canvas-wrap-sm"><canvas id="connectorDoughnut"></canvas></div>
+        <ul class="legend-list">
+            <li><span class="dot bg-green"></span> Available: <strong>@Model.AvailableConnectors</strong></li>
+            <li><span class="dot bg-blue"></span> Charging: <strong>@Model.ChargingConnectors</strong></li>
+            <li><span class="dot bg-red"></span> Fault: <strong>@Model.FaultConnectors</strong></li>
+        </ul>
+    </div>
+</div>
+
+<div class="bottom-grid">
+    <div class="chart-card">
+        <div class="chart-card-head">
+            <h3><span class="stat-icon bg-purple small">@await Html.PartialAsync("_Icon", "users")</span> Người dùng hoạt động</h3>
+            <div class="range-tabs" data-target="users">
+                <button type="button" class="active" data-range="today">Hôm nay</button>
+                <button type="button" data-range="7d">7 ngày qua</button>
+                <button type="button" data-range="30d">30 ngày qua</button>
+            </div>
+        </div>
+        <div class="chart-canvas-wrap"><canvas id="activeUserChart"></canvas></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        window.__dashboardData = {
+            revenue:      { today: @Html.Raw(ViewBag.RevenueTodayJson), d7: @Html.Raw(ViewBag.Revenue7DaysJson), d30: @Html.Raw(ViewBag.Revenue30DaysJson) },
+            activeUsers:  { today: @Html.Raw(ViewBag.ActiveUsersTodayJson), d7: @Html.Raw(ViewBag.ActiveUsers7DaysJson), d30: @Html.Raw(ViewBag.ActiveUsers30DaysJson) },
+            doughnut:     @Html.Raw(ViewBag.DoughnutJson)
+        };
+    </script>
+}

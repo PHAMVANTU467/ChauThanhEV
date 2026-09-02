@@ -1,0 +1,75 @@
+@model ChauThanhEV.Models.ModulePlaceholderViewModel
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="page-heading">
+    <div>
+        <h2 class="section-title">@Model.Title</h2>
+        <p class="page-description">@Model.Description</p>
+    </div>
+    <span class="mock-label">Dữ liệu mô phỏng</span>
+</div>
+
+<div class="list-toolbar">
+    <form method="get" class="search-box">
+        @await Html.PartialAsync("_Icon", "search")
+        <input type="search" name="keyword" placeholder="Tìm kiếm..." aria-label="Tìm kiếm" />
+    </form>
+    <select class="filter-select" aria-label="Lọc trạng thái">
+        <option>Tất cả trạng thái</option>
+        @foreach (var status in Model.Statuses)
+        {
+            <option>@status</option>
+        }
+    </select>
+    <div class="toolbar-actions">
+        <button type="button" class="btn btn-outline" data-export-csv="moduleTable" data-export-name="@Model.Title.ToLowerInvariant().Replace(' ', '-')">
+            @await Html.PartialAsync("_Icon", "download") Xuất dữ liệu
+        </button>
+    </div>
+</div>
+
+<div class="table-card">
+    <div class="table-scroll">
+        <table class="data-table" id="moduleTable">
+            <thead><tr>
+                @foreach (var column in Model.Columns) { <th>@column</th> }
+                <th>Trạng thái</th>
+                <th class="no-export">Hành động</th>
+            </tr></thead>
+            <tbody>
+                @foreach (var row in Model.Rows)
+                {
+                    var cells = row.Split('|');
+                    <tr>
+                        @for (var index = 0; index < Model.Columns.Length; index++)
+                        {
+                            <td>@(index < cells.Length ? cells[index] : "-")</td>
+                        }
+                        <td><span class="pill @(cells.Length > Model.Columns.Length && cells[^1].Contains("Thành công") || cells.Length > Model.Columns.Length && cells[^1].Contains("Hoàn thành") || cells.Length > Model.Columns.Length && cells[^1].Contains("Đã phát hành") ? "pill-green" : "pill-blue")">@(cells.Length > Model.Columns.Length ? cells[^1] : "Đang theo dõi")</span></td>
+                        <td class="no-export"><button type="button" class="btn btn-ghost btn-sm" data-open-modal="module-detail-@Array.IndexOf(Model.Rows, row)">@await Html.PartialAsync("_Icon", "eye")</button></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="pagination"><span class="pagination-info">Hiển thị @Model.Rows.Length bản ghi</span><div class="pagination-links"><span class="active">1</span><span class="disabled">2</span></div></div>
+</div>
+
+@for (var index = 0; index < Model.Rows.Length; index++)
+{
+    <div class="modal-overlay" id="module-detail-@index">
+        <div class="modal-box">
+            <div class="modal-header"><h3>Chi tiết @Model.Title.ToLowerInvariant()</h3><button type="button" class="modal-close" data-close-modal>&times;</button></div>
+            <div class="modal-body"><div class="detail-grid">
+                @for (var cellIndex = 0; cellIndex < Model.Columns.Length; cellIndex++)
+                {
+                    var details = Model.Rows[index].Split('|');
+                    <div class="detail-item"><label>@Model.Columns[cellIndex]</label><p>@(cellIndex < details.Length ? details[cellIndex] : "-")</p></div>
+                }
+            </div></div>
+            <div class="modal-footer"><button type="button" class="btn btn-outline" data-close-modal>Đóng</button></div>
+        </div>
+    </div>
+}

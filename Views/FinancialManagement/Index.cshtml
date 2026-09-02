@@ -1,0 +1,118 @@
+@model FinancialViewModel
+@{
+    ViewData["Title"] = "Financial Management";
+}
+
+<div class="overview-grid">
+    <div class="mini-card">
+        <span class="stat-icon bg-green">@await Html.PartialAsync("_Icon", "wallet")</span>
+        <div class="mini-body">
+            <p class="stat-title">Total Income</p>
+            <p class="mini-value">@ChauThanhEV.Services.MockDataService.FormatCurrency(Model.Overview.TotalIncome)</p>
+        </div>
+    </div>
+    <div class="mini-card">
+        <span class="stat-icon bg-blue">@await Html.PartialAsync("_Icon", "doc")</span>
+        <div class="mini-body">
+            <p class="stat-title">Today</p>
+            <p class="mini-value">@ChauThanhEV.Services.MockDataService.FormatCurrency(Model.Overview.TodayIncome)</p>
+        </div>
+    </div>
+    <div class="mini-card">
+        <span class="stat-icon bg-orange">@await Html.PartialAsync("_Icon", "bolt2")</span>
+        <div class="mini-body">
+            <p class="stat-title">This Month</p>
+            <p class="mini-value">@ChauThanhEV.Services.MockDataService.FormatCurrency(Model.Overview.ThisMonthIncome)</p>
+        </div>
+    </div>
+    <div class="mini-card">
+        <span class="stat-icon bg-purple">@await Html.PartialAsync("_Icon", "wallet2")</span>
+        <div class="mini-body">
+            <p class="stat-title">Available Balance</p>
+            <p class="mini-value">@ChauThanhEV.Services.MockDataService.FormatCurrency(Model.Overview.AvailableBalance)</p>
+        </div>
+    </div>
+</div>
+
+<div class="list-toolbar" style="margin-top: 24px;">
+    <form method="get" class="search-box">
+        @await Html.PartialAsync("_Icon", "search")
+        <input type="text" name="keyword" value="@Model.Keyword" placeholder="Tìm theo mã giao dịch / loại giao dịch..." />
+    </form>
+    <div class="toolbar-actions">
+        <button type="button" class="btn btn-primary-sm" data-open-modal="modal-withdraw">
+            @await Html.PartialAsync("_Icon", "refund") Rút tiền
+        </button>
+    </div>
+</div>
+
+<div class="table-card">
+    <div class="table-scroll">
+        <table class="data-table" id="financialTable">
+            <thead>
+                <tr>
+                    <th>Transaction ID</th>
+                    <th>Date Time</th>
+                    <th>Transaction Type</th>
+                    <th>Amount</th>
+                    <th>Balance After Transaction</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Transactions.Items.Any())
+                {
+                    <tr class="empty-row"><td colspan="5">Không có giao dịch nào.</td></tr>
+                }
+                @foreach (var tx in Model.Transactions.Items)
+                {
+                    <tr>
+                        <td><strong>@tx.TransactionId</strong></td>
+                        <td>@tx.TransactionTime.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@tx.TransactionType</td>
+                        <td>@ChauThanhEV.Services.MockDataService.FormatCurrency(tx.Amount)</td>
+                        <td>@ChauThanhEV.Services.MockDataService.FormatCurrency(tx.BalanceAfter)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @await Html.PartialAsync("_Pager", new PagerViewModel
+    {
+        Page = Model.Transactions.Page,
+        TotalPages = Model.Transactions.TotalPages,
+        TotalItems = Model.Transactions.TotalItems,
+        PageSize = Model.Transactions.PageSize,
+        Controller = "FinancialManagement",
+        Action = "Index",
+        RouteValues = new Dictionary<string, string>()
+    })
+</div>
+
+<div class="modal-overlay" id="modal-withdraw">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>Rút tiền</h3>
+            <button type="button" class="modal-close" data-close-modal>&times;</button>
+        </div>
+        <form asp-controller="FinancialManagement" asp-action="Withdraw" method="post">
+            @Html.AntiForgeryToken()
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-field full">
+                        <label>Amount</label>
+                        <input type="number" name="amount" min="0" step="1000" required />
+                    </div>
+                    <div class="form-field full">
+                        <label>Bank Account</label>
+                        <input type="text" name="bankAccount" placeholder="Tên ngân hàng / số tài khoản" required />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" data-close-modal>Cancel</button>
+                <button type="submit" class="btn btn-primary-sm">Confirm</button>
+            </div>
+        </form>
+    </div>
+</div>

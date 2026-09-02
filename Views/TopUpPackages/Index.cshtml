@@ -1,0 +1,150 @@
+@model TopUpPackageListViewModel
+@{
+    ViewData["Title"] = "TOP UP Packages";
+    var routeValues = new Dictionary<string, string>();
+    if (!string.IsNullOrWhiteSpace(Model.Keyword)) routeValues["keyword"] = Model.Keyword;
+    if (!string.IsNullOrWhiteSpace(Model.StatusFilter)) routeValues["status"] = Model.StatusFilter;
+}
+
+<div class="list-toolbar">
+    <form method="get" class="search-box">
+        @await Html.PartialAsync("_Icon", "search")
+        <input type="text" name="keyword" value="@Model.Keyword" placeholder="Tìm theo tên gói..." />
+    </form>
+
+    <form method="get" class="filter-select-form">
+        @if (!string.IsNullOrWhiteSpace(Model.Keyword))
+        {
+            <input type="hidden" name="keyword" value="@Model.Keyword" />
+        }
+        <select name="status" class="filter-select" onchange="this.form.submit()">
+            <option value="all" selected="@(string.IsNullOrEmpty(Model.StatusFilter) || Model.StatusFilter == "all")">Tất cả trạng thái</option>
+            <option value="Active" selected="@(Model.StatusFilter == "Active")">Active</option>
+            <option value="Inactive" selected="@(Model.StatusFilter == "Inactive")">Inactive</option>
+        </select>
+    </form>
+
+    <div class="toolbar-actions">
+        <button type="button" class="btn btn-primary-sm" data-open-modal="modal-create-package">
+            @await Html.PartialAsync("_Icon", "plus") Add
+        </button>
+    </div>
+</div>
+
+<div class="table-card">
+    <div class="table-scroll">
+        <table class="data-table" id="packageTable">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Package Name</th>
+                    <th>Amount</th>
+                    <th>Bonus / Discount</th>
+                    <th>Status</th>
+                    <th class="no-export">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Result.Items.Any())
+                {
+                    <tr class="empty-row"><td colspan="6">Không có gói nạp tiền nào.</td></tr>
+                }
+                @for (int i = 0; i < Model.Result.Items.Count; i++)
+                {
+                    var pkg = Model.Result.Items[i];
+                    <tr>
+                        <td>@((Model.Result.Page - 1) * Model.Result.PageSize + i + 1)</td>
+                        <td><strong>@pkg.Name</strong></td>
+                        <td>@ChauThanhEV.Services.MockDataService.FormatCurrency(pkg.Amount)</td>
+                        <td>@ChauThanhEV.Services.MockDataService.FormatCurrency(pkg.Bonus)</td>
+                        <td>
+                            <span class="pill @(pkg.Active ? "pill-green" : "pill-gray")">@(pkg.Active ? "Active" : "Inactive")</span>
+                        </td>
+                        <td class="no-export">
+                            <div class="cell-actions">
+                                <button type="button" class="btn btn-ghost btn-sm" data-open-modal="modal-edit-package-@pkg.Id" title="Sửa">@await Html.PartialAsync("_Icon", "edit")</button>
+                                <form asp-action="Delete" asp-controller="TopUpPackages" method="post" data-confirm="Xóa gói @pkg.Name?">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@pkg.Id" />
+                                    <button type="submit" class="btn btn-ghost btn-sm" title="Xóa">@await Html.PartialAsync("_Icon", "trash")</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @await Html.PartialAsync("_Pager", new PagerViewModel
+    {
+        Page = Model.Result.Page,
+        TotalPages = Model.Result.TotalPages,
+        TotalItems = Model.Result.TotalItems,
+        PageSize = Model.Result.PageSize,
+        Controller = "TopUpPackages",
+        Action = "Index",
+        RouteValues = routeValues
+    })
+</div>
+
+<div class="modal-overlay" id="modal-create-package">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>Thêm gói nạp tiền</h3>
+            <button type="button" class="modal-close" data-close-modal>&times;</button>
+        </div>
+        <form asp-controller="TopUpPackages" asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-field full"><label>Name</label><input type="text" name="Name" required /></div>
+                    <div class="form-field"><label>Amount</label><input type="number" name="Amount" value="0" min="0" step="1000" required /></div>
+                    <div class="form-field"><label>Bonus</label><input type="number" name="Bonus" value="0" min="0" step="1000" /></div>
+                    <div class="form-field full">
+                        <label>Status</label>
+                        <select name="Active">
+                            <option value="true">Active</option>
+                            <option value="false">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" data-close-modal>Cancel</button>
+                <button type="submit" class="btn btn-primary-sm">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@foreach (var pkg in Model.Result.Items)
+{
+    <div class="modal-overlay" id="modal-edit-package-@pkg.Id">
+        <div class="modal-box">
+            <div class="modal-header"><h3>Sửa gói @pkg.Name</h3><button type="button" class="modal-close" data-close-modal>&times;</button></div>
+            <form asp-controller="TopUpPackages" asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="Id" value="@pkg.Id" />
+                <div class="modal-body">
+                    <div class="form-grid">
+                        <div class="form-field full"><label>Name</label><input type="text" name="Name" value="@pkg.Name" required /></div>
+                        <div class="form-field"><label>Amount</label><input type="number" name="Amount" value="@((long)pkg.Amount)" min="0" step="1000" required /></div>
+                        <div class="form-field"><label>Bonus</label><input type="number" name="Bonus" value="@((long)pkg.Bonus)" min="0" step="1000" /></div>
+                        <div class="form-field full">
+                            <label>Status</label>
+                            <select name="Active">
+                                <option value="true" selected="@(pkg.Active)">Active</option>
+                                <option value="false" selected="@(!pkg.Active)">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" data-close-modal>Cancel</button>
+                    <button type="submit" class="btn btn-primary-sm">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}

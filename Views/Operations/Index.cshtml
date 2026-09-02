@@ -1,0 +1,335 @@
+@model OperationsViewModel
+@{
+    ViewData["Title"] = "Vận hành & bảo trì nền tảng";
+
+    string SeverityLabel(FaultSeverity s) => s switch
+    {
+        FaultSeverity.High => "Cao",
+        FaultSeverity.Medium => "Trung bình",
+        _ => "Thấp"
+    };
+    string SeverityClass(FaultSeverity s) => s switch
+    {
+        FaultSeverity.High => "pill-red",
+        FaultSeverity.Medium => "pill-orange",
+        _ => "pill-gray"
+    };
+    string AbnormalTypeLabel(AbnormalOrderType t) => t switch
+    {
+        AbnormalOrderType.TransactionStuck => "Giao dịch bị treo",
+        AbnormalOrderType.WrongAmount => "Sai số tiền",
+        AbnormalOrderType.PaymentFailed => "Trừ tiền nhưng thất bại",
+        AbnormalOrderType.DuplicateCharge => "Trừ tiền hai lần",
+        _ => "Khác"
+    };
+}
+
+<div class="page-tabs">
+    <a class="@(Model.Tab == "faults" ? "active" : "")" asp-action="Index" asp-route-tab="faults">Lịch sử lỗi</a>
+    <a class="@(Model.Tab == "offline" ? "active" : "")" asp-action="Index" asp-route-tab="offline">Trụ Offline</a>
+    <a class="@(Model.Tab == "abnormal" ? "active" : "")" asp-action="Index" asp-route-tab="abnormal">Đơn hàng bất thường</a>
+</div>
+
+@if (Model.Tab == "offline")
+{
+    <div class="list-toolbar">
+        <div class="toolbar-spacer">Danh sách các trụ sạc đang ở trạng thái Offline, cần kiểm tra hoặc kích hoạt lại.</div>
+        <div class="toolbar-actions">
+            <button type="button" class="btn btn-outline" data-export-csv="offlineTable" data-export-name="tru-offline">
+                @await Html.PartialAsync("_Icon", "download") Xuất CSV
+            </button>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <div class="table-scroll">
+            <table class="data-table" id="offlineTable">
+                <thead>
+                    <tr>
+                        <th>Mã trụ</th><th>Tên trụ</th><th>Trạm</th><th>Số cổng</th>
+                        <th class="wrap">Lý do / Thời điểm báo cáo</th><th class="no-export">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.OfflineChargers.Any())
+                    {
+                        <tr class="empty-row"><td colspan="6">Hiện không có trụ sạc nào Offline.</td></tr>
+                    }
+                    @foreach (var o in Model.OfflineChargers)
+                    {
+                        <tr>
+                            <td><strong>@o.Code</strong></td>
+                            <td>@o.Name</td>
+                            <td>@o.StationName</td>
+                            <td>@o.ConnectorCount</td>
+                            <td class="wrap">
+                                @o.Reason
+                                @if (o.SinceReportedFault.HasValue)
+                                {
+                                    <div class="form-hint">Từ: @o.SinceReportedFault.Value.ToString("dd/MM/yyyy HH:mm")</div>
+                                }
+                            </td>
+                            <td class="no-export">
+                                <form asp-controller="Operations" asp-action="ReactivateCharger" method="post" data-confirm="Kích hoạt lại trụ @o.Code?">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@o.Id" />
+                                    <input type="hidden" name="tab" value="offline" />
+                                    <button type="submit" class="btn btn-primary-sm btn-sm">@await Html.PartialAsync("_Icon", "power") Kích hoạt lại</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else if (Model.Tab == "abnormal")
+{
+    <div class="list-toolbar">
+        <div class="toolbar-spacer">Các đơn hàng có dấu hiệu bất thường cần vận hành viên đối soát và xử lý.</div>
+        <div class="toolbar-actions">
+            <button type="button" class="btn btn-outline" data-export-csv="abnormalTable" data-export-name="don-hang-bat-thuong">
+                @await Html.PartialAsync("_Icon", "download") Xuất CSV
+            </button>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <div class="table-scroll">
+            <table class="data-table" id="abnormalTable">
+                <thead>
+                    <tr>
+                        <th>Mã ghi nhận</th><th>Loại đơn</th><th>Mã đơn gốc</th><th>Khách hàng</th>
+                        <th>Số tiền</th><th>Loại bất thường</th><th>Trạng thái</th><th>Ngày phát hiện</th><th class="no-export">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.AbnormalOrders.Any())
+                    {
+                        <tr class="empty-row"><td colspan="9">Không có đơn hàng bất thường nào.</td></tr>
+                    }
+                    @foreach (var a in Model.AbnormalOrders)
+                    {
+                        <tr>
+                            <td><strong>@a.Code</strong></td>
+                            <td>@(a.OrderType == SourceOrderType.Charging ? "Đơn sạc" : "Nạp tiền")</td>
+                            <td>@a.OrderCode</td>
+                            <td>@a.CustomerName <span style="color:var(--text-muted)">(@a.CustomerCode)</span></td>
+                            <td>@ChauThanhEV.Services.MockDataService.FormatCurrency(a.Amount)</td>
+                            <td>@AbnormalTypeLabel(a.Type)</td>
+                            <td>
+                                @if (a.Status == AbnormalOrderStatus.Pending)
+                                {
+                                    <span class="pill pill-orange">Chờ xử lý</span>
+                                }
+                                else
+                                {
+                                    <span class="pill pill-green">Đã xử lý</span>
+                                }
+                            </td>
+                            <td>@a.DetectedAt.ToString("dd/MM HH:mm")</td>
+                            <td class="no-export">
+                                @if (a.Status == AbnormalOrderStatus.Pending)
+                                {
+                                    <div class="cell-actions">
+                                        <button type="button" class="btn btn-outline btn-sm" data-open-modal="modal-resolve-@a.Id">Xử lý</button>
+                                        <button type="button" class="btn btn-outline btn-sm" data-open-modal="modal-adjust-@a.Id">Điều chỉnh</button>
+                                        <button type="button" class="btn btn-outline btn-sm" data-open-modal="modal-refund-@a.Id">Hoàn tiền</button>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn btn-ghost btn-sm" data-open-modal="modal-note-@a.Id">@await Html.PartialAsync("_Icon", "eye")</button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @foreach (var a in Model.AbnormalOrders)
+    {
+        if (a.Status == AbnormalOrderStatus.Pending)
+        {
+            <div class="modal-overlay" id="modal-resolve-@a.Id">
+                <div class="modal-box">
+                    <div class="modal-header"><h3>Xử lý đơn @a.Code</h3><button type="button" class="modal-close" data-close-modal>&times;</button></div>
+                    <form asp-controller="Operations" asp-action="ResolveAbnormal" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@a.Id" />
+                        <input type="hidden" name="tab" value="abnormal" />
+                        <div class="modal-body">
+                            <p class="form-hint" style="margin-bottom:10px;">@a.Note</p>
+                            <div class="form-field">
+                                <label>Ghi chú xử lý</label>
+                                <textarea name="resolutionNote" placeholder="Mô tả cách xử lý..."></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline" data-close-modal>Hủy</button>
+                            <button type="submit" class="btn btn-primary-sm">Xác nhận đã xử lý</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="modal-overlay" id="modal-adjust-@a.Id">
+                <div class="modal-box">
+                    <div class="modal-header"><h3>Điều chỉnh số tiền — @a.Code</h3><button type="button" class="modal-close" data-close-modal>&times;</button></div>
+                    <form asp-controller="Operations" asp-action="AdjustAmount" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@a.Id" />
+                        <input type="hidden" name="tab" value="abnormal" />
+                        <div class="modal-body">
+                            <p class="form-hint" style="margin-bottom:10px;">Số tiền hiện tại: <strong>@ChauThanhEV.Services.MockDataService.FormatCurrency(a.Amount)</strong></p>
+                            <div class="form-field">
+                                <label>Số tiền mới (đ)</label>
+                                <input type="number" name="newAmount" value="@((long)a.Amount)" min="0" step="1000" required />
+                            </div>
+                            <div class="form-field" style="margin-top:10px;">
+                                <label>Ghi chú</label>
+                                <textarea name="note" placeholder="Lý do điều chỉnh..."></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline" data-close-modal>Hủy</button>
+                            <button type="submit" class="btn btn-primary-sm">Xác nhận điều chỉnh</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="modal-overlay" id="modal-refund-@a.Id">
+                <div class="modal-box">
+                    <div class="modal-header"><h3>Hoàn tiền — @a.Code</h3><button type="button" class="modal-close" data-close-modal>&times;</button></div>
+                    <form asp-controller="Operations" asp-action="Refund" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@a.Id" />
+                        <input type="hidden" name="tab" value="abnormal" />
+                        <div class="modal-body">
+                            <div class="form-field">
+                                <label>Số tiền hoàn vào ví khách hàng (đ)</label>
+                                <input type="number" name="refundAmount" value="@((long)a.Amount)" min="0" step="1000" required />
+                            </div>
+                            <div class="form-field" style="margin-top:10px;">
+                                <label>Ghi chú</label>
+                                <textarea name="note" placeholder="Lý do hoàn tiền..."></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline" data-close-modal>Hủy</button>
+                            <button type="submit" class="btn btn-primary-sm">Xác nhận hoàn tiền</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="modal-overlay" id="modal-note-@a.Id">
+                <div class="modal-box">
+                    <div class="modal-header"><h3>Đơn @a.Code — đã xử lý</h3><button type="button" class="modal-close" data-close-modal>&times;</button></div>
+                    <div class="modal-body">
+                        <div class="detail-grid">
+                            <div class="detail-item full"><label>Mô tả bất thường</label><p>@a.Note</p></div>
+                            <div class="detail-item full"><label>Ghi chú xử lý</label><p>@a.ResolutionNote</p></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline" data-close-modal>Đóng</button>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+}
+else
+{
+    <div class="list-toolbar">
+        <div class="toolbar-spacer">Toàn bộ lịch sử lỗi được ghi nhận trên các trụ / cổng sạc.</div>
+        <div class="toolbar-actions">
+            <button type="button" class="btn btn-outline" data-export-csv="faultTable" data-export-name="lich-su-loi">
+                @await Html.PartialAsync("_Icon", "download") Xuất CSV
+            </button>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <div class="table-scroll">
+            <table class="data-table" id="faultTable">
+                <thead>
+                    <tr>
+                        <th>Mã lỗi</th><th>Trụ</th><th>Cổng</th><th class="wrap">Mô tả</th>
+                        <th>Mức độ</th><th>Trạng thái</th><th>Báo cáo lúc</th><th>Xử lý lúc</th><th class="no-export">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Faults.Any())
+                    {
+                        <tr class="empty-row"><td colspan="9">Chưa có lỗi nào được ghi nhận.</td></tr>
+                    }
+                    @foreach (var f in Model.Faults)
+                    {
+                        <tr>
+                            <td><strong>@f.Code</strong></td>
+                            <td>@f.ChargerCode</td>
+                            <td>@(f.ConnectorCode ?? "-")</td>
+                            <td class="wrap">@f.Description</td>
+                            <td><span class="pill @SeverityClass(f.Severity)">@SeverityLabel(f.Severity)</span></td>
+                            <td>
+                                @if (f.Status == FaultStatus.Resolved)
+                                {
+                                    <span class="pill pill-green">Đã xử lý</span>
+                                }
+                                else if (f.Status == FaultStatus.Processing)
+                                {
+                                    <span class="pill pill-orange">Đang xử lý</span>
+                                }
+                                else
+                                {
+                                    <span class="pill pill-red">Mới</span>
+                                }
+                            </td>
+                            <td>@f.ReportedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>@(f.ResolvedAt.HasValue ? f.ResolvedAt.Value.ToString("dd/MM/yyyy HH:mm") : "-")</td>
+                            <td class="no-export">
+                                @if (f.Status != FaultStatus.Resolved)
+                                {
+                                    <button type="button" class="btn btn-primary-sm btn-sm" data-open-modal="modal-fault-@f.Id">Xử lý</button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @foreach (var f in Model.Faults.Where(x => x.Status != FaultStatus.Resolved))
+    {
+        <div class="modal-overlay" id="modal-fault-@f.Id">
+            <div class="modal-box">
+                <div class="modal-header"><h3>Xử lý lỗi @f.Code</h3><button type="button" class="modal-close" data-close-modal>&times;</button></div>
+                <form asp-controller="Operations" asp-action="ResolveFault" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@f.Id" />
+                    <input type="hidden" name="tab" value="faults" />
+                    <div class="modal-body">
+                        <p class="form-hint" style="margin-bottom:10px;">@f.Description</p>
+                        <div class="form-field">
+                            <label>Ghi chú xử lý</label>
+                            <textarea name="note" placeholder="Mô tả cách khắc phục..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline" data-close-modal>Hủy</button>
+                        <button type="submit" class="btn btn-primary-sm">Xác nhận đã xử lý</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    }
+}

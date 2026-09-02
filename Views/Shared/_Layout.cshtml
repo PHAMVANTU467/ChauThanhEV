@@ -1,0 +1,130 @@
+@using System.Security.Claims
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    var displayName = User.Identity?.Name ?? "admin";
+    var displayRole = User.FindFirst(ClaimTypes.Role)?.Value ?? "Quản trị viên";
+    string NavClass(string controllerName) => currentController.Equals(controllerName, StringComparison.OrdinalIgnoreCase) ? "nav-item active" : "nav-item";
+    bool IsGroupActive(params string[] controllers) => controllers.Any(controller => currentController.Equals(controller, StringComparison.OrdinalIgnoreCase));
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - CHÂU THÀNH EV</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" fill="#2563eb"/>
+                </svg>
+                <span>CHÂU THÀNH <b>EV</b></span>
+            </div>
+
+            <nav class="sidebar-nav" aria-label="Điều hướng chính">
+                <a class="@NavClass("Home")" href="@Url.Action("Index", "Home")"><span class="nav-icon">⌂</span><span class="nav-label">Trang chủ</span></a>
+
+                <div class="nav-group @(IsGroupActive("Stations", "Chargers", "UnregisteredChargers", "Reservations") ? "expanded" : "")">
+                    <button class="nav-parent" type="button" aria-expanded="@(IsGroupActive("Stations", "Chargers", "UnregisteredChargers", "Reservations") ? "true" : "false")"><span class="nav-icon">⚡</span><span class="nav-label">Quản lý trạm sạc</span><span class="nav-chevron">⌄</span></button>
+                    <div class="nav-submenu">
+                        <a class="@NavClass("Stations")" href="@Url.Action("Index", "Stations")">Quản lý trạm</a>
+                        <a class="@NavClass("Chargers")" href="@Url.Action("Index", "Chargers")">Quản lý trụ sạc</a>
+                        <a class="@NavClass("UnregisteredChargers")" href="@Url.Action("Index", "UnregisteredChargers")">Trụ sạc chưa đăng ký</a>
+                        <a class="@NavClass("Reservations")" href="@Url.Action("Index", "Reservations")">Quản lý đặt trước</a>
+                    </div>
+                </div>
+
+                <div class="nav-group @(IsGroupActive("Orders", "TopUpOrders", "Invoices") ? "expanded" : "")">
+                    <button class="nav-parent" type="button" aria-expanded="@(IsGroupActive("Orders", "TopUpOrders", "Invoices") ? "true" : "false")"><span class="nav-icon">▤</span><span class="nav-label">Quản lý đơn hàng</span><span class="nav-chevron">⌄</span></button>
+                    <div class="nav-submenu">
+                        <a class="@NavClass("Orders")" href="@Url.Action("Index", "Orders")">Đơn sạc</a>
+                        <a class="@NavClass("TopUpOrders")" href="@Url.Action("Index", "TopUpOrders")">Đơn nạp tiền</a>
+                        <a class="@NavClass("Invoices")" href="@Url.Action("Index", "Invoices")">Thông tin hóa đơn</a>
+                    </div>
+                </div>
+
+                <div class="nav-group @(IsGroupActive("FinancialManagement", "InternalTransactions", "TopUpPackages") ? "expanded" : "")">
+                    <button class="nav-parent" type="button" aria-expanded="@(IsGroupActive("FinancialManagement", "InternalTransactions", "TopUpPackages") ? "true" : "false")"><span class="nav-icon">◫</span><span class="nav-label">Quản lý tài khoản</span><span class="nav-chevron">⌄</span></button>
+                    <div class="nav-submenu">
+                        <a class="@NavClass("FinancialManagement")" href="@Url.Action("Index", "FinancialManagement")">Quản lý tài chính</a>
+                        <a class="@NavClass("InternalTransactions")" href="@Url.Action("Index", "InternalTransactions")">Lịch sử giao dịch nội bộ</a>
+                        <a class="@NavClass("TopUpPackages")" href="@Url.Action("Index", "TopUpPackages")">Gói nạp tiền</a>
+                    </div>
+                </div>
+
+                <a class="@NavClass("Customers")" href="@Url.Action("Index", "Customers")"><span class="nav-icon">◎</span><span class="nav-label">Quản lý người dùng</span></a>
+                <a class="@NavClass("RfidCards")" href="@Url.Action("Index", "RfidCards")"><span class="nav-icon">▣</span><span class="nav-label">Quản lý thẻ</span></a>
+
+                <div class="nav-group @(IsGroupActive("Operations") ? "expanded" : "")">
+                    <button class="nav-parent" type="button" aria-expanded="@(IsGroupActive("Operations") ? "true" : "false")"><span class="nav-icon">⚙</span><span class="nav-label">Vận hành &amp; Bảo trì</span><span class="nav-chevron">⌄</span></button>
+                    <div class="nav-submenu">
+                        <a class="@NavClass("Operations")" href="@Url.Action("Index", "Operations")">Lịch sử lỗi</a>
+                        <a class="@NavClass("Operations")" href="@Url.Action("Index", "Operations", new { tab = "offline" })">Quản lý trụ sạc Offline</a>
+                        <a class="@NavClass("Operations")" href="@Url.Action("Index", "Operations", new { tab = "abnormal" })">Quản lý đơn hàng bất thường</a>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <div class="main-col">
+            <header class="topbar">
+                <button class="icon-btn menu-toggle" type="button" aria-label="Thu gọn menu">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                </button>
+                <h1 class="page-title">@ViewData["Title"]</h1>
+
+                <div class="topbar-right">
+                    <button class="icon-btn bell-btn" type="button" aria-label="Thông báo">
+                        <svg viewBox="0 0 24 24" fill="none"><path d="M6 10a6 6 0 1 1 12 0c0 4 1.5 5.5 1.5 5.5H4.5S6 14 6 10Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M10 19a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                        <span class="badge">3</span>
+                    </button>
+
+                    <form asp-controller="Account" asp-action="Logout" method="post" class="user-menu-form">
+                        @Html.AntiForgeryToken()
+                        <div class="user-menu">
+                            <span class="avatar">AD</span>
+                            <span class="user-info">
+                                <strong>@displayName</strong>
+                                <small>@displayRole</small>
+                            </span>
+                            <button type="submit" class="icon-btn logout-btn" title="Đăng xuất" aria-label="Đăng xuất">
+                                <svg viewBox="0 0 24 24" fill="none"><path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 8l4 4-4 4M19 12H9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </header>
+
+            <main class="page-content">
+                @RenderBody()
+            </main>
+
+            <footer class="app-footer">
+                &copy; 2026 <strong>CHÂU THÀNH EV</strong> &nbsp;|&nbsp; Phiên bản 1.0.0
+            </footer>
+        </div>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    @if (TempData["ToastMessage"] != null)
+    {
+        <script>
+            window.__pendingToast = {
+                message: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["ToastMessage"]?.ToString())),
+                type: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["ToastType"]?.ToString() ?? "success"))
+            };
+        </script>
+    }
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

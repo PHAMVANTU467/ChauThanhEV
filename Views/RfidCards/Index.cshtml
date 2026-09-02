@@ -1,0 +1,127 @@
+@model RfidCardListViewModel
+@{
+    ViewData["Title"] = "Card Management";
+    var routeValues = new Dictionary<string, string>();
+    if (!string.IsNullOrWhiteSpace(Model.Keyword)) routeValues["keyword"] = Model.Keyword;
+    if (!string.IsNullOrWhiteSpace(Model.StatusFilter)) routeValues["status"] = Model.StatusFilter;
+}
+
+<div class="list-toolbar">
+    <form method="get" class="search-box">
+        @await Html.PartialAsync("_Icon", "search")
+        <input type="text" name="keyword" value="@Model.Keyword" placeholder="Tìm theo mã thẻ, người dùng..." />
+    </form>
+
+    <form method="get" class="filter-select-form">
+        @if (!string.IsNullOrWhiteSpace(Model.Keyword))
+        {
+            <input type="hidden" name="keyword" value="@Model.Keyword" />
+        }
+        <select name="status" class="filter-select" onchange="this.form.submit()">
+            <option value="all" selected="@(string.IsNullOrEmpty(Model.StatusFilter) || Model.StatusFilter == "all")">Tất cả trạng thái</option>
+            <option value="Active" selected="@(Model.StatusFilter == "Active")">Active</option>
+            <option value="Inactive" selected="@(Model.StatusFilter == "Inactive")">Inactive</option>
+        </select>
+    </form>
+
+    <div class="toolbar-actions">
+        <button type="button" class="btn btn-primary-sm" data-open-modal="modal-create-card">
+            @await Html.PartialAsync("_Icon", "plus") Add RFID
+        </button>
+    </div>
+</div>
+
+<div class="table-card">
+    <div class="table-scroll">
+        <table class="data-table" id="cardTable">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Card ID</th>
+                    <th>User</th>
+                    <th>Status</th>
+                    <th>Created Date</th>
+                    <th>Expiry Date</th>
+                    <th class="no-export">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Result.Items.Any())
+                {
+                    <tr class="empty-row"><td colspan="7">Không có thẻ RFID nào.</td></tr>
+                }
+                @for (int i = 0; i < Model.Result.Items.Count; i++)
+                {
+                    var card = Model.Result.Items[i];
+                    <tr>
+                        <td>@((Model.Result.Page - 1) * Model.Result.PageSize + i + 1)</td>
+                        <td><strong>@card.CardId</strong></td>
+                        <td>@card.UserName</td>
+                        <td><span class="pill @(card.Status == CardStatus.Active ? "pill-green" : "pill-gray")">@(card.Status == CardStatus.Active ? "Active" : "Inactive")</span></td>
+                        <td>@card.CreatedDate.ToString("dd/MM/yyyy")</td>
+                        <td>@card.ExpiryDate.ToString("dd/MM/yyyy")</td>
+                        <td class="no-export">
+                            <div class="cell-actions">
+                                <form asp-action="ToggleStatus" asp-controller="RfidCards" method="post" data-confirm="Cập nhật trạng thái thẻ @card.CardId?">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@card.Id" />
+                                    <button type="submit" class="btn btn-ghost btn-sm" title="Lock / Unlock">@await Html.PartialAsync("_Icon", "power")</button>
+                                </form>
+                                <form asp-action="Delete" asp-controller="RfidCards" method="post" data-confirm="Xóa thẻ @card.CardId?">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@card.Id" />
+                                    <button type="submit" class="btn btn-ghost btn-sm" title="Xóa">@await Html.PartialAsync("_Icon", "trash")</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @await Html.PartialAsync("_Pager", new PagerViewModel
+    {
+        Page = Model.Result.Page,
+        TotalPages = Model.Result.TotalPages,
+        TotalItems = Model.Result.TotalItems,
+        PageSize = Model.Result.PageSize,
+        Controller = "RfidCards",
+        Action = "Index",
+        RouteValues = routeValues
+    })
+</div>
+
+<div class="modal-overlay" id="modal-create-card">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>Thêm RFID mới</h3>
+            <button type="button" class="modal-close" data-close-modal>&times;</button>
+        </div>
+        <form asp-controller="RfidCards" asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-field"><label>Card ID</label><input type="text" name="CardId" required /></div>
+                    <div class="form-field">
+                        <label>User</label>
+                        <select name="UserId">
+                            @foreach (var u in Model.Customers)
+                            {
+                                <option value="@u.Id">@u.FullName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-field full">
+                        <label>Expiry Date</label>
+                        <input type="date" name="ExpiryDate" value="@DateTime.Now.AddMonths(6).ToString("yyyy-MM-dd")" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" data-close-modal>Cancel</button>
+                <button type="submit" class="btn btn-primary-sm">Save</button>
+            </div>
+        </form>
+    </div>
+</div>

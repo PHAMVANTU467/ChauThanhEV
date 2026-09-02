@@ -1,0 +1,48 @@
+@model PagerViewModel
+@{
+    int windowSize = 2;
+    int start = Math.Max(1, Model.Page - windowSize);
+    int end = Math.Min(Model.TotalPages, Model.Page + windowSize);
+
+    Dictionary<string, string> RouteFor(int p)
+    {
+        var dict = new Dictionary<string, string>(Model.RouteValues) { ["page"] = p.ToString() };
+        return dict;
+    }
+}
+<div class="pagination">
+    <span class="pagination-info">
+        Tổng <strong>@Model.TotalItems</strong> bản ghi — Trang @Model.Page / @Model.TotalPages
+    </span>
+    <div class="pagination-links">
+        @if (Model.Page <= 1)
+        {
+            <span class="disabled">&laquo;</span>
+        }
+        else
+        {
+            <a asp-controller="@Model.Controller" asp-action="@Model.Action" asp-all-route-data="RouteFor(Model.Page - 1)">&laquo;</a>
+        }
+
+        @for (int p = start; p <= end; p++)
+        {
+            if (p == Model.Page)
+            {
+                <span class="active">@p</span>
+            }
+            else
+            {
+                <a asp-controller="@Model.Controller" asp-action="@Model.Action" asp-all-route-data="RouteFor(p)">@p</a>
+            }
+        }
+
+        @if (Model.Page >= Model.TotalPages)
+        {
+            <span class="disabled">&raquo;</span>
+        }
+        else
+        {
+            <a asp-controller="@Model.Controller" asp-action="@Model.Action" asp-all-route-data="RouteFor(Model.Page + 1)">&raquo;</a>
+        }
+    </div>
+</div>
