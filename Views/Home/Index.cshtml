@@ -1,9 +1,41 @@
 @model DashboardViewModel
 @{
-    ViewData["Title"] = "Trang chủ";
+    ViewData["Title"] = "Trung tâm điều hành - Dashboard";
 }
 
-<h2 class="section-title">Trạng thái trụ sạc xe điện</h2>
+<!-- Dashboard Real-time Overview Banner -->
+<div class="dashboard-hero-banner">
+    <div class="hero-text">
+        <div class="hero-pill">
+            <span class="pulse-dot"></span> GIÁM SÁT HỆ THỐNG TRỰC TIẾP
+        </div>
+        <h2>Tổng quan Vận hành Mạng lưới Trạm sạc Châu Thành EV</h2>
+        <p>Hệ thống tự động đồng bộ trạng thái trạm sạc, công suất tải lưới và giao dịch tức thời theo chuẩn OCPP.</p>
+    </div>
+    <div class="hero-stats-strip">
+        <div class="hero-stat-item">
+            <span class="hero-stat-label">Trạm hoạt động</span>
+            <span class="hero-stat-val">@Model.TotalStations <small>/ 5</small></span>
+        </div>
+        <div class="hero-stat-item">
+            <span class="hero-stat-label">Công suất tải tức thời</span>
+            <span class="hero-stat-val text-cyan">@Model.ActivePowerKw.ToString("N1") <small>kW</small></span>
+        </div>
+        <div class="hero-stat-item">
+            <span class="hero-stat-label">Hiệu suất sử dụng cổng</span>
+            <span class="hero-stat-val text-green">@Model.UtilizationRate.ToString("N1")%</span>
+        </div>
+    </div>
+</div>
+
+<!-- 1. Trạng thái Trụ & Cổng Sạc -->
+<div class="section-header-row">
+    <div>
+        <h2 class="section-title">Trạng thái hạ tầng trạm &amp; cổng sạc</h2>
+        <p class="section-subtitle">Dữ liệu thời gian thực từ các trạm cao tốc Châu Thành 1, Châu Thành 2 và đối tác</p>
+    </div>
+</div>
+
 <div class="stat-grid">
     @foreach (var stat in Model.StationStats)
     {
@@ -20,19 +52,28 @@
     }
 </div>
 
-<h2 class="section-title">Tổng quan hôm nay</h2>
+<!-- 2. Tổng quan Tài chính & Vận hành Hôm nay -->
+<div class="section-header-row">
+    <div>
+        <h2 class="section-title">Tổng quan vận hành hôm nay</h2>
+        <p class="section-subtitle">Chỉ số giao dịch, sản lượng điện tiêu thụ và người dùng trong ngày</p>
+    </div>
+</div>
+
 <div class="overview-grid">
     <div class="gmv-card">
         <div class="gmv-head">
             <span class="stat-icon bg-blue">@await Html.PartialAsync("_Icon", "wallet2")</span>
-            <div>
+            <div class="gmv-info">
                 <p class="stat-title">Tổng giá trị giao dịch (GMV)</p>
                 <p class="gmv-value">@Model.TodayGmvValue</p>
             </div>
             <div class="gmv-compare">
                 <span>So với hôm qua</span>
                 <p>@Model.TodayGmvCompare</p>
-                <span class="change @(Model.TodayGmvChange >= 0 ? "positive" : "negative")">@(Model.TodayGmvChange >= 0 ? "▲" : "▼") @Math.Abs(Model.TodayGmvChange).ToString("0.00", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))%</span>
+                <span class="change-pill @(Model.TodayGmvChange >= 0 ? "positive" : "negative")">
+                    @(Model.TodayGmvChange >= 0 ? "▲ +" : "▼ ")@Math.Abs(Model.TodayGmvChange).ToString("0.00", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))%
+                </span>
             </div>
         </div>
     </div>
@@ -49,26 +90,37 @@
                 <div class="mini-compare">
                     <span>So với hôm qua</span>
                     <p>@card.CompareLabel</p>
-                    <span class="change @(card.IsPositive ? "positive" : "negative")">@(card.IsPositive ? "▲" : "▼") @Math.Abs(card.ChangePercent).ToString("0.00", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))%</span>
+                    <span class="change-pill @(card.IsPositive ? "positive" : "negative")">
+                        @(card.IsPositive ? "▲ +" : "▼ ")@Math.Abs(card.ChangePercent).ToString("0.00", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))%
+                    </span>
                 </div>
             </div>
         }
     </div>
 </div>
 
-<h2 class="section-title">Tổng quan tháng này</h2>
+<!-- 3. Tổng quan Tháng này -->
+<div class="section-header-row">
+    <div>
+        <h2 class="section-title">Tổng quan tháng này</h2>
+        <p class="section-subtitle">Tăng trưởng doanh thu và năng lượng tiêu thụ tích lũy trong tháng</p>
+    </div>
+</div>
+
 <div class="overview-grid">
-    <div class="gmv-card">
+    <div class="gmv-card gmv-month-card">
         <div class="gmv-head">
-            <span class="stat-icon bg-blue">@await Html.PartialAsync("_Icon", "wallet2")</span>
-            <div>
-                <p class="stat-title">Tổng giá trị giao dịch (GMV)</p>
+            <span class="stat-icon bg-green">@await Html.PartialAsync("_Icon", "wallet2")</span>
+            <div class="gmv-info">
+                <p class="stat-title">Tổng giá trị giao dịch tháng (GMV)</p>
                 <p class="gmv-value">@Model.MonthGmvValue</p>
             </div>
             <div class="gmv-compare">
                 <span>So với tháng trước</span>
                 <p>@Model.MonthGmvCompare</p>
-                <span class="change @(Model.MonthGmvChange >= 0 ? "positive" : "negative")">@(Model.MonthGmvChange >= 0 ? "▲" : "▼") @Math.Abs(Model.MonthGmvChange).ToString("0.00", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))%</span>
+                <span class="change-pill @(Model.MonthGmvChange >= 0 ? "positive" : "negative")">
+                    @(Model.MonthGmvChange >= 0 ? "▲ +" : "▼ ")@Math.Abs(Model.MonthGmvChange).ToString("0.00", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))%
+                </span>
             </div>
         </div>
     </div>
@@ -85,17 +137,30 @@
                 <div class="mini-compare">
                     <span>So với tháng trước</span>
                     <p>@card.CompareLabel</p>
-                    <span class="change @(card.IsPositive ? "positive" : "negative")">@(card.IsPositive ? "▲" : "▼") @Math.Abs(card.ChangePercent).ToString("0.00", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))%</span>
+                    <span class="change-pill @(card.IsPositive ? "positive" : "negative")">
+                        @(card.IsPositive ? "▲ +" : "▼ ")@Math.Abs(card.ChangePercent).ToString("0.00", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))%
+                    </span>
                 </div>
             </div>
         }
     </div>
 </div>
 
+<!-- 4. Khối Biểu đồ Thống kê Trực quan -->
+<div class="section-header-row">
+    <div>
+        <h2 class="section-title">Biểu đồ phân tích &amp; Thống kê</h2>
+        <p class="section-subtitle">Theo dõi xu hướng doanh thu, tình trạng cổng sạc và lưu lượng khách hàng</p>
+    </div>
+</div>
+
 <div class="bottom-grid three-col">
     <div class="chart-card span-2">
         <div class="chart-card-head">
-            <h3><span class="stat-icon bg-blue small">@await Html.PartialAsync("_Icon", "wallet2")</span> Doanh thu</h3>
+            <div>
+                <h3><span class="stat-icon bg-blue small">@await Html.PartialAsync("_Icon", "wallet2")</span> Xu hướng Doanh thu (Triệu VNĐ)</h3>
+                <span class="chart-sub">Biểu đồ biểu diễn dòng tiền từ các đơn sạc hoàn tất</span>
+            </div>
             <div class="range-tabs" data-target="revenue">
                 <button type="button" class="active" data-range="today">Hôm nay</button>
                 <button type="button" data-range="7d">7 ngày qua</button>
@@ -107,13 +172,16 @@
 
     <div class="chart-card">
         <div class="chart-card-head">
-            <h3><span class="stat-icon bg-purple small">@await Html.PartialAsync("_Icon", "bolt")</span> Trạng thái cổng sạc</h3>
+            <div>
+                <h3><span class="stat-icon bg-purple small">@await Html.PartialAsync("_Icon", "bolt")</span> Phân bổ cổng sạc</h3>
+                <span class="chart-sub">Tổng: <strong>@Model.TotalConnectors cổng sạc</strong></span>
+            </div>
         </div>
         <div class="chart-canvas-wrap chart-canvas-wrap-sm"><canvas id="connectorDoughnut"></canvas></div>
         <ul class="legend-list">
-            <li><span class="dot bg-green"></span> Available: <strong>@Model.AvailableConnectors</strong></li>
-            <li><span class="dot bg-blue"></span> Charging: <strong>@Model.ChargingConnectors</strong></li>
-            <li><span class="dot bg-red"></span> Fault: <strong>@Model.FaultConnectors</strong></li>
+            <li><span class="dot bg-green"></span> Sẵn sàng (Available): <strong>@Model.AvailableConnectors</strong></li>
+            <li><span class="dot bg-blue"></span> Đang sạc (Charging): <strong>@Model.ChargingConnectors</strong></li>
+            <li><span class="dot bg-red"></span> Lỗi / Bảo trì (Fault): <strong>@Model.FaultConnectors</strong></li>
         </ul>
     </div>
 </div>
@@ -121,7 +189,10 @@
 <div class="bottom-grid">
     <div class="chart-card">
         <div class="chart-card-head">
-            <h3><span class="stat-icon bg-purple small">@await Html.PartialAsync("_Icon", "users")</span> Người dùng hoạt động</h3>
+            <div>
+                <h3><span class="stat-icon bg-purple small">@await Html.PartialAsync("_Icon", "users")</span> Người dùng hoạt động</h3>
+                <span class="chart-sub">Số lượng khách hàng sạc xe hoặc giao dịch</span>
+            </div>
             <div class="range-tabs" data-target="users">
                 <button type="button" class="active" data-range="today">Hôm nay</button>
                 <button type="button" data-range="7d">7 ngày qua</button>
@@ -129,6 +200,62 @@
             </div>
         </div>
         <div class="chart-canvas-wrap"><canvas id="activeUserChart"></canvas></div>
+    </div>
+
+    <!-- Live Sessions Table Component -->
+    <div class="chart-card">
+        <div class="chart-card-head">
+            <div>
+                <h3><span class="stat-icon bg-green small">⚡</span> Phiên sạc gần đây</h3>
+                <span class="chart-sub">Giám sát các phiên sạc mới nhất trên hệ thống</span>
+            </div>
+            <a href="@Url.Action("Index", "Orders")" class="btn-ghost btn-sm">Xem tất cả đơn →</a>
+        </div>
+        <div class="table-scroll" style="max-height: 260px;">
+            <table class="data-table dashboard-mini-table">
+                <thead>
+                    <tr>
+                        <th>Mã đơn</th>
+                        <th>Khách hàng</th>
+                        <th>Điện năng</th>
+                        <th>Số tiền</th>
+                        <th>Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.RecentSessions != null && Model.RecentSessions.Any())
+                    {
+                        @foreach (var session in Model.RecentSessions)
+                        {
+                            <tr>
+                                <td><strong>@session.Code</strong></td>
+                                <td>@session.CustomerName</td>
+                                <td><span class="text-cyan font-bold">@session.EnergyKwh.ToString("N1") kWh</span></td>
+                                <td>@session.FormattedAmount</td>
+                                <td>
+                                    @if (session.Status == ChargingOrderStatus.Charging)
+                                    {
+                                        <span class="pill pill-blue"><span class="pulse-dot-sm"></span> Đang sạc</span>
+                                    }
+                                    else if (session.Status == ChargingOrderStatus.Completed)
+                                    {
+                                        <span class="pill pill-green">Hoàn tất</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="pill pill-orange">Chờ thanh toán</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr class="empty-row"><td colspan="5">Chưa có phiên sạc nào gần đây.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 

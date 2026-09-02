@@ -478,8 +478,33 @@ namespace ChauThanhEV.Services
             decimal chargingPct = totalConnectors == 0 ? 0 : Math.Round(charging * 100m / totalConnectors, 2);
             decimal faultPct = totalConnectors == 0 ? 0 : Math.Round(fault * 100m / totalConnectors, 2);
 
+            double activePower = Chargers
+                .Where(c => c.Status == ChargerStatus.Online && c.Connectors.Any(cn => cn.Status == ConnectorStatus.Charging))
+                .Sum(c => c.PowerKw * 0.75);
+
+            var recentSessions = ChargingOrders
+                .OrderByDescending(o => o.StartTime)
+                .Take(6)
+                .Select(o => new DashboardRecentSession
+                {
+                    Code = o.Code,
+                    CustomerName = Customers.FirstOrDefault(c => c.Id == o.CustomerId)?.FullName ?? "Khách vãng lai",
+                    StationName = Stations.FirstOrDefault(s => s.Id == o.StationId)?.Name ?? "Trạm Châu Thành",
+                    EnergyKwh = o.EnergyKwh,
+                    FormattedAmount = FormatCurrency(o.Amount),
+                    Status = o.Status,
+                    StartTime = o.StartTime
+                })
+                .ToList();
+
             var model = new DashboardViewModel
             {
+                TotalStations = Stations.Count(s => s.Active),
+                TotalChargers = totalChargers,
+                TotalConnectors = totalConnectors,
+                UtilizationRate = totalConnectors > 0 ? Math.Round(charging * 100.0 / totalConnectors, 1) : 0,
+                ActivePowerKw = Math.Round(activePower, 1),
+                RecentSessions = recentSessions,
                 AvailableConnectors = available,
                 ChargingConnectors = charging,
                 FaultConnectors = fault,

@@ -25,6 +25,12 @@
     </form>
 
     <div class="toolbar-actions">
+        <button type="button" class="btn btn-outline" data-export-csv="cardTable" data-export-name="danh-sach-the-rfid">
+            @await Html.PartialAsync("_Icon", "download") Xuất CSV
+        </button>
+        <button type="button" class="btn btn-outline" data-export-excel="cardTable" data-export-name="danh-sach-the-rfid">
+            @await Html.PartialAsync("_Icon", "download") Xuất Excel
+        </button>
         <button type="button" class="btn btn-primary-sm" data-open-modal="modal-create-card">
             @await Html.PartialAsync("_Icon", "plus") Add RFID
         </button>

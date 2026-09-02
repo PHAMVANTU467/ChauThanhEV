@@ -11,41 +11,78 @@
     <title>Đăng nhập - CHÂU THÀNH EV</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body class="login-body">
     <div class="login-shell">
+        <!-- Visual section: Hero Charging Station Image (Phóng to tối đa, nổi bật) -->
         <section class="login-visual">
+            <div class="login-visual-ambient"></div>
+
             <div class="login-brand">
                 <div class="brand-logo-circle">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" fill="#ffffff"/>
                     </svg>
                 </div>
-                <span>CHÂU THÀNH <b>EV</b></span>
+                <div class="login-brand-text">
+                    <span>CHÂU THÀNH <b>EV</b></span>
+                    <small>Hệ thống Quản lý &amp; Vận hành Trạm Sạc Xe Điện Cao Tốc</small>
+                </div>
             </div>
 
             <div class="login-illustration">
-                <img src="~/images/ev_charging_stations.png" alt="Trạm sạc xe điện Châu Thành EV" class="charging-stations-img" />
+                <div class="hero-image-wrapper">
+                    <img src="~/images/ev_charging_stations.png" alt="Hệ thống trạm sạc xe điện Châu Thành EV" class="charging-stations-img" />
+                    
+                    <!-- Floating Tech Specs Badges -->
+                    <div class="floating-badge badge-top-right">
+                        <span class="badge-icon">⚡</span>
+                        <div>
+                            <strong>160kW – 240kW</strong>
+                            <small>DC Fast Charging</small>
+                        </div>
+                    </div>
+
+                    <div class="floating-badge badge-bottom-left">
+                        <span class="badge-icon pulse-icon">🟢</span>
+                        <div>
+                            <strong>OCPP 1.6 / 2.0.1</strong>
+                            <small>Giám sát Real-time 24/7</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="login-visual-footer">
+                <div class="feature-tag">
+                    <span class="dot bg-green"></span> Hạ tầng sạc nhanh tiêu chuẩn Quốc tế
+                </div>
+                <div class="feature-tag">
+                    <span class="dot bg-blue"></span> Quản lý doanh thu &amp; điều phối tải thông minh
+                </div>
             </div>
         </section>
 
+        <!-- Login form panel -->
         <section class="login-panel">
             <div class="login-card">
                 <div class="login-card-logo">
                     <div class="brand-logo-circle large">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" fill="#ffffff"/>
                         </svg>
                     </div>
                 </div>
                 <h1>Đăng nhập hệ thống</h1>
+                <p class="login-subtitle">Trung tâm điều hành và quản lý trạm sạc</p>
 
                 @if (!ViewData.ModelState.IsValid && ViewData.ModelState[string.Empty]?.Errors.Count > 0)
                 {
                     <div class="form-alert">
-                        @ViewData.ModelState[string.Empty]!.Errors[0].ErrorMessage
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                        <span>@ViewData.ModelState[string.Empty]!.Errors[0].ErrorMessage</span>
                     </div>
                 }
 
@@ -53,10 +90,10 @@
                     @Html.AntiForgeryToken()
 
                     <div class="field-group">
-                        <label asp-for="Username">Tài khoản</label>
+                        <label asp-for="Username">Tài khoản quản trị</label>
                         <div class="input-with-icon">
                             <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.4" fill="currentColor"/><path d="M5 19c1.3-4 4-6 7-6s5.7 2 7 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
-                            <input asp-for="Username" placeholder="Nhập tài khoản" autocomplete="username" autofocus />
+                            <input asp-for="Username" placeholder="Nhập tên đăng nhập" autocomplete="username" autofocus />
                         </div>
                         <span asp-validation-for="Username" class="field-error"></span>
                     </div>
@@ -76,17 +113,25 @@
                     <div class="field-row">
                         <label class="checkbox-label">
                             <input asp-for="RememberMe" type="checkbox" />
-                            <span>Ghi nhớ đăng nhập</span>
+                            <span>Ghi nhớ phiên đăng nhập</span>
                         </label>
                         <a href="#" class="forgot-link">Quên mật khẩu?</a>
                     </div>
 
                     <button type="submit" class="btn-primary btn-block">
                         <svg viewBox="0 0 24 24" fill="none"><path d="M10 17l5-5-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 12h11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M20 5v14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                        Đăng nhập
+                        <span>Đăng nhập hệ thống</span>
                     </button>
 
-                    <p class="demo-hint">Tài khoản demo: <strong>admin</strong> &nbsp;·&nbsp; Mật khẩu: <strong>admin123</strong></p>
+                    <div class="demo-box">
+                        <div class="demo-title">
+                            <span class="badge-demo">DEMO</span> Thông tin tài khoản thử nghiệm
+                        </div>
+                        <div class="demo-credentials">
+                            <span>Tài khoản: <strong>admin</strong></span>
+                            <span>Mật khẩu: <strong>admin123</strong></span>
+                        </div>
+                    </div>
                 </form>
             </div>
         </section>

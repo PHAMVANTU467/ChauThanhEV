@@ -56,5 +56,24 @@ namespace ChauThanhEV.Models
         public ChartSeriesData ActiveUsersToday { get; set; } = new();
         public ChartSeriesData ActiveUsers7Days { get; set; } = new();
         public ChartSeriesData ActiveUsers30Days { get; set; } = new();
+
+        // Chỉ số vận hành trực tiếp & phiên sạc gần nhất
+        public int TotalStations { get; set; }
+        public int TotalChargers { get; set; }
+        public int TotalConnectors { get; set; }
+        public double UtilizationRate { get; set; }
+        public double ActivePowerKw { get; set; }
+        public List<DashboardRecentSession> RecentSessions { get; set; } = new();
+    }
+
+    public class DashboardRecentSession
+    {
+        public string Code { get; set; } = "";
+        public string CustomerName { get; set; } = "";
+        public string StationName { get; set; } = "";
+        public double EnergyKwh { get; set; }
+        public string FormattedAmount { get; set; } = "";
+        public ChargingOrderStatus Status { get; set; }
+        public DateTime StartTime { get; set; }
     }
 }

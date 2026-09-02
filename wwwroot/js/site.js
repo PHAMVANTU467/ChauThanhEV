@@ -168,20 +168,24 @@ document.querySelectorAll('[data-export-excel]').forEach(function (btn) {
 // ===================================================================
 // Dashboard: biểu đồ Chart.js (doanh thu, người dùng hoạt động, doughnut cổng sạc)
 // ===================================================================
-(function () {
+// ===================================================================
+// Dashboard: biểu đồ Chart.js (doanh thu, người dùng hoạt động, doughnut cổng sạc)
+// ===================================================================
+function initDashboardCharts() {
     if (typeof Chart === 'undefined' || !window.__dashboardData) return;
 
     var data = window.__dashboardData;
     var blue = '#2563eb';
-    Chart.defaults.font.family = "'Inter', sans-serif";
-    Chart.defaults.color = '#667085';
+    var purple = '#7c3aed';
+    Chart.defaults.font.family = "'Inter', -apple-system, BlinkMacSystemFont, sans-serif";
+    Chart.defaults.color = '#64748b';
 
     var revenueChart, activeUserChart, doughnutChart;
 
-    function makeGradient(ctx, color, alphaTop) {
-        var g = ctx.createLinearGradient(0, 0, 0, 220);
-        g.addColorStop(0, color.replace('ALPHA', alphaTop));
-        g.addColorStop(1, color.replace('ALPHA', '0.02'));
+    function makeGradient(ctx, colorRgb, alphaTop, alphaBottom) {
+        var g = ctx.createLinearGradient(0, 0, 0, 240);
+        g.addColorStop(0, 'rgba(' + colorRgb + ',' + (alphaTop || 0.35) + ')');
+        g.addColorStop(1, 'rgba(' + colorRgb + ',' + (alphaBottom || 0.0) + ')');
         return g;
     }
 
@@ -189,38 +193,67 @@ document.querySelectorAll('[data-export-excel]').forEach(function (btn) {
         var el = document.getElementById('revenueChart');
         if (!el) return;
         var series = data.revenue[key];
+        if (!series) return;
         if (revenueChart) revenueChart.destroy();
         var ctx = el.getContext('2d');
         var isToday = key === 'today';
+
         revenueChart = new Chart(ctx, {
             type: isToday ? 'line' : 'bar',
             data: {
                 labels: series.labels,
                 datasets: [{
+                    label: 'Doanh thu (triệu VNĐ)',
                     data: series.values,
                     borderColor: blue,
-                    backgroundColor: isToday ? makeGradient(ctx, 'rgba(37,99,235,ALPHA)', 0.28) : blue,
+                    backgroundColor: isToday ? makeGradient(ctx, '37, 99, 235', 0.28, 0.01) : blue,
                     fill: isToday,
-                    tension: 0.4,
-                    pointRadius: 0,
-                    borderWidth: 2.2,
-                    borderRadius: isToday ? 0 : 5,
-                    maxBarThickness: 26
+                    tension: 0.38,
+                    pointRadius: isToday ? 3 : 0,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: blue,
+                    pointBorderWidth: 2,
+                    borderWidth: 2.4,
+                    borderRadius: isToday ? 0 : 6,
+                    maxBarThickness: 28
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: { duration: 600 },
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        intersect: false, mode: 'index',
-                        callbacks: { label: function (ctx2) { return ' Doanh thu: ' + ctx2.parsed.y.toFixed(1) + ' triệu đ'; } }
+                        intersect: false,
+                        mode: 'index',
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        padding: 10,
+                        titleFont: { size: 12, weight: 'bold' },
+                        bodyFont: { size: 12 },
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: function (ctx2) {
+                                return ' Doanh thu: ' + ctx2.parsed.y.toFixed(2) + ' triệu VNĐ';
+                            }
+                        }
                     }
                 },
                 scales: {
-                    x: { grid: { display: false }, border: { display: false } },
-                    y: { grid: { color: '#eef1f6' }, border: { display: false }, ticks: { callback: function (v) { return v + 'M'; } } }
+                    x: {
+                        grid: { display: false },
+                        border: { display: false },
+                        ticks: { font: { size: 11 } }
+                    },
+                    y: {
+                        grid: { color: '#f1f5f9' },
+                        border: { display: false },
+                        ticks: {
+                            font: { size: 11 },
+                            callback: function (v) { return v + 'M'; }
+                        }
+                    }
                 }
             }
         });
@@ -230,31 +263,60 @@ document.querySelectorAll('[data-export-excel]').forEach(function (btn) {
         var el = document.getElementById('activeUserChart');
         if (!el) return;
         var series = data.activeUsers[key];
+        if (!series) return;
         if (activeUserChart) activeUserChart.destroy();
-        activeUserChart = new Chart(el.getContext('2d'), {
+        var ctx = el.getContext('2d');
+
+        activeUserChart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: series.labels,
                 datasets: [{
+                    label: 'Người dùng hoạt động',
                     data: series.values,
-                    borderColor: '#7c3aed',
-                    backgroundColor: '#7c3aed',
-                    tension: 0.4,
+                    borderColor: purple,
+                    backgroundColor: makeGradient(ctx, '124, 58, 237', 0.25, 0.01),
+                    fill: true,
+                    tension: 0.38,
                     pointRadius: 3,
-                    pointBackgroundColor: '#7c3aed',
-                    borderWidth: 2.2
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: purple,
+                    pointBorderWidth: 2,
+                    borderWidth: 2.4
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: { duration: 600 },
                 plugins: {
                     legend: { display: false },
-                    tooltip: { callbacks: { label: function (ctx2) { return ' Người dùng: ' + ctx2.parsed.y; } } }
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        padding: 10,
+                        titleFont: { size: 12, weight: 'bold' },
+                        bodyFont: { size: 12 },
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: function (ctx2) { return ' Khách hàng: ' + ctx2.parsed.y; }
+                        }
+                    }
                 },
                 scales: {
-                    x: { grid: { display: false }, border: { display: false } },
-                    y: { grid: { color: '#eef1f6' }, border: { display: false }, ticks: { precision: 0 } }
+                    x: {
+                        grid: { display: false },
+                        border: { display: false },
+                        ticks: { font: { size: 11 } }
+                    },
+                    y: {
+                        grid: { color: '#f1f5f9' },
+                        border: { display: false },
+                        ticks: {
+                            precision: 0,
+                            font: { size: 11 }
+                        }
+                    }
                 }
             }
         });
@@ -263,28 +325,39 @@ document.querySelectorAll('[data-export-excel]').forEach(function (btn) {
     function renderDoughnut() {
         var el = document.getElementById('connectorDoughnut');
         if (!el || !data.doughnut) return;
+        if (doughnutChart) doughnutChart.destroy();
+
         doughnutChart = new Chart(el.getContext('2d'), {
             type: 'doughnut',
             data: {
                 labels: data.doughnut.labels,
                 datasets: [{
                     data: data.doughnut.values,
-                    backgroundColor: ['#16a34a', '#2563eb', '#e4463c'],
-                    borderWidth: 0
+                    backgroundColor: ['#16a34a', '#2563eb', '#ef4444'],
+                    hoverBackgroundColor: ['#15803d', '#1d4ed8', '#dc2626'],
+                    borderWidth: 3,
+                    borderColor: '#ffffff',
+                    hoverOffset: 4
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                cutout: '68%',
+                cutout: '72%',
+                animation: { animateRotate: true, animateScale: true, duration: 800 },
                 plugins: {
                     legend: { display: false },
                     tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        padding: 10,
+                        titleFont: { size: 12, weight: 'bold' },
+                        bodyFont: { size: 12 },
+                        cornerRadius: 8,
                         callbacks: {
                             label: function (ctx2) {
                                 var total = ctx2.dataset.data.reduce(function (a, b) { return a + b; }, 0);
-                                var pct = total ? (ctx2.parsed / total * 100).toFixed(2) : '0.00';
-                                return ' ' + ctx2.label + ': ' + ctx2.parsed + ' (' + pct + '%)';
+                                var pct = total ? (ctx2.parsed / total * 100).toFixed(1) : '0.0';
+                                return ' ' + ctx2.label + ': ' + ctx2.parsed + ' cổng (' + pct + '%)';
                             }
                         }
                     }
@@ -310,4 +383,10 @@ document.querySelectorAll('[data-export-excel]').forEach(function (btn) {
             });
         });
     });
-})();
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initDashboardCharts);
+} else {
+    initDashboardCharts();
+}

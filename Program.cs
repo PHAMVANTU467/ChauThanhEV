@@ -4,13 +4,10 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 var builder = WebApplication.CreateBuilder(args);
 
 // Tắt ReloadOnChange để tránh lỗi inotify file watcher trên môi trường Linux Container (Render)
-builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
+foreach (var source in builder.Configuration.Sources.OfType<Microsoft.Extensions.Configuration.FileConfigurationSource>())
 {
-    foreach (var source in config.Sources.OfType<Microsoft.Extensions.Configuration.FileConfigurationSource>())
-    {
-        source.ReloadOnChange = false;
-    }
-});
+    source.ReloadOnChange = false;
+}
 
 builder.Services.AddControllersWithViews();
 

@@ -40,6 +40,12 @@
         <input type="text" name="keyword" value="@Model.Keyword" placeholder="Tìm theo mã giao dịch / loại giao dịch..." />
     </form>
     <div class="toolbar-actions">
+        <button type="button" class="btn btn-outline" data-export-csv="financialTable" data-export-name="lich-su-giao-dich">
+            @await Html.PartialAsync("_Icon", "download") Xuất CSV
+        </button>
+        <button type="button" class="btn btn-outline" data-export-excel="financialTable" data-export-name="lich-su-giao-dich">
+            @await Html.PartialAsync("_Icon", "download") Xuất Excel
+        </button>
         <button type="button" class="btn btn-primary-sm" data-open-modal="modal-withdraw">
             @await Html.PartialAsync("_Icon", "refund") Rút tiền
         </button>
