@@ -1,5 +1,13 @@
 # CHÂU THÀNH EV – Hệ thống Admin quản lý trạm sạc (ASP.NET Core MVC, .NET 8)
 
+> 🌐 **TRẢI NGHIỆM WEBSITE TRỰC TUYẾN (LIVE DEMO):**
+> 
+> 👉 **Website URL:** [https://chauthanhev.onrender.com](https://chauthanhev.onrender.com)
+> 🔑 **Tài khoản demo:** `admin` &nbsp;|&nbsp; **Mật khẩu:** `admin123`
+> *(Trải nghiệm trực tiếp toàn bộ tính năng trên trình duyệt mà không cần tải hay cài đặt mã nguồn)*
+
+---
+
 Hệ thống quản trị trạm sạc xe điện đầy đủ 5 module, dùng chung MỘT nguồn dữ liệu
 mock (`Services/MockDataService.cs`) để đảm bảo số liệu giữa Dashboard và các trang
 quản lý luôn thống nhất:
