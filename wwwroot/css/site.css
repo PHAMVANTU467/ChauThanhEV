@@ -666,6 +666,162 @@ input { font-family: inherit; }
     margin: 0 0 26px;
 }
 
+.login-card form {
+    width: 100%;
+}
+
+.form-alert {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    margin-bottom: 20px;
+}
+.form-alert svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.field-group {
+    margin-bottom: 18px;
+    text-align: left;
+}
+.field-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 6px;
+}
+.input-with-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    overflow: hidden;
+}
+.input-with-icon:focus-within {
+    border-color: #2563eb;
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+.input-with-icon > svg {
+    position: absolute;
+    left: 14px;
+    width: 20px !important;
+    height: 20px !important;
+    max-width: 20px !important;
+    max-height: 20px !important;
+    color: #94a3b8;
+    pointer-events: none;
+    flex-shrink: 0;
+}
+.input-with-icon:focus-within > svg {
+    color: #2563eb;
+}
+.input-with-icon input {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 12px 14px 12px 44px;
+    font-size: 14px;
+    color: #0f172a;
+    font-family: inherit;
+}
+.toggle-password {
+    background: transparent;
+    border: none;
+    padding: 10px 14px;
+    cursor: pointer;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+}
+.toggle-password:hover {
+    color: #334155;
+}
+.toggle-password svg {
+    width: 20px !important;
+    height: 20px !important;
+    max-width: 20px !important;
+    max-height: 20px !important;
+}
+.field-error {
+    display: block;
+    font-size: 12px;
+    color: #dc2626;
+    margin-top: 4px;
+}
+.field-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+    font-size: 13px;
+}
+.checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: #475467;
+    font-weight: 500;
+}
+.checkbox-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #2563eb;
+    cursor: pointer;
+}
+.forgot-link {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+}
+.forgot-link:hover {
+    text-decoration: underline;
+}
+.btn-primary.btn-block {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    padding: 13px 20px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+    transition: all 0.2s ease;
+}
+.btn-primary.btn-block:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+    transform: translateY(-1px);
+}
+.btn-primary.btn-block svg {
+    width: 18px !important;
+    height: 18px !important;
+    max-width: 18px !important;
+    max-height: 18px !important;
+}
+
 .demo-box {
     margin-top: 22px;
     background: #f1f5f9;
