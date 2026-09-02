@@ -3,6 +3,15 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Tắt ReloadOnChange để tránh lỗi inotify file watcher trên môi trường Linux Container (Render)
+builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
+{
+    foreach (var source in config.Sources.OfType<Microsoft.Extensions.Configuration.FileConfigurationSource>())
+    {
+        source.ReloadOnChange = false;
+    }
+});
+
 builder.Services.AddControllersWithViews();
 
 // Nguồn dữ liệu mock DUY NHẤT dùng chung cho toàn bộ hệ thống (Dashboard + các trang quản lý).
