@@ -18,52 +18,27 @@
     <div class="login-shell">
         <section class="login-visual">
             <div class="login-brand">
-                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" fill="#ffffff"/>
-                </svg>
+                <div class="brand-logo-circle">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" fill="#ffffff"/>
+                    </svg>
+                </div>
                 <span>CHÂU THÀNH <b>EV</b></span>
             </div>
 
-            <div class="login-illustration" aria-hidden="true">
-                <svg viewBox="0 0 420 320" xmlns="http://www.w3.org/2000/svg">
-                    <ellipse cx="210" cy="295" rx="170" ry="16" fill="rgba(4,20,54,0.35)"/>
-
-                    <!-- Trụ sạc trái -->
-                    <rect x="40" y="120" width="70" height="150" rx="12" fill="#eef3fb"/>
-                    <rect x="52" y="140" width="46" height="46" rx="8" fill="#0f2a5c"/>
-                    <circle cx="75" cy="163" r="12" fill="#2563eb"/>
-                    <rect x="60" y="196" width="30" height="8" rx="4" fill="#c7d3e8"/>
-                    <rect x="60" y="210" width="30" height="8" rx="4" fill="#c7d3e8"/>
-                    <path d="M100 235c26 6 30 26 24 46" stroke="#0f2a5c" stroke-width="6" fill="none" stroke-linecap="round"/>
-
-                    <!-- Trụ sạc giữa (đôi cổng) -->
-                    <rect x="150" y="70" width="110" height="205" rx="16" fill="#0b1f45"/>
-                    <rect x="168" y="96" width="74" height="46" rx="10" fill="#12295c"/>
-                    <circle cx="205" cy="119" r="14" fill="#38bdf8"/>
-                    <rect x="172" y="150" width="66" height="10" rx="5" fill="#22345f"/>
-                    <rect x="172" y="168" width="40" height="8" rx="4" fill="#22345f"/>
-                    <path d="M168 200c-30 8-36 34-28 62" stroke="#0b1f45" stroke-width="7" fill="none" stroke-linecap="round"/>
-                    <path d="M242 200c30 8 36 34 28 62" stroke="#0b1f45" stroke-width="7" fill="none" stroke-linecap="round"/>
-                    <circle cx="205" cy="82" r="4" fill="#22c55e"/>
-
-                    <!-- Trụ sạc phải -->
-                    <rect x="300" y="140" width="66" height="130" rx="12" fill="#eef3fb"/>
-                    <rect x="311" y="158" width="44" height="40" rx="8" fill="#0f2a5c"/>
-                    <circle cx="333" cy="178" r="10" fill="#ef4444"/>
-                    <rect x="318" y="210" width="28" height="7" rx="3.5" fill="#c7d3e8"/>
-                    <path d="M300 222c-22 6-26 24-20 44" stroke="#0f2a5c" stroke-width="6" fill="none" stroke-linecap="round"/>
-                </svg>
+            <div class="login-illustration">
+                <img src="~/images/ev_charging_stations.jpg" alt="Trạm sạc xe điện Châu Thành EV" class="charging-stations-img" />
             </div>
-
-            <p class="login-tagline">Nền tảng quản lý trạm sạc xe điện thông minh</p>
         </section>
 
         <section class="login-panel">
             <div class="login-card">
                 <div class="login-card-logo">
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" fill="#2563eb"/>
-                    </svg>
+                    <div class="brand-logo-circle large">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" fill="#ffffff"/>
+                        </svg>
+                    </div>
                 </div>
                 <h1>Đăng nhập hệ thống</h1>
 
@@ -80,7 +55,7 @@
                     <div class="field-group">
                         <label asp-for="Username">Tài khoản</label>
                         <div class="input-with-icon">
-                            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.4" stroke="currentColor" stroke-width="1.7"/><path d="M5 19c1.3-4 4-6 7-6s5.7 2 7 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.4" fill="currentColor"/><path d="M5 19c1.3-4 4-6 7-6s5.7 2 7 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
                             <input asp-for="Username" placeholder="Nhập tài khoản" autocomplete="username" autofocus />
                         </div>
                         <span asp-validation-for="Username" class="field-error"></span>
@@ -92,7 +67,7 @@
                             <svg viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="10" rx="2.2" stroke="currentColor" stroke-width="1.7"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
                             <input asp-for="Password" type="password" placeholder="Nhập mật khẩu" autocomplete="current-password" />
                             <button type="button" class="toggle-password" aria-label="Hiện mật khẩu">
-                                <svg viewBox="0 0 24 24" fill="none"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.7"/></svg>
+                                <svg viewBox="0 0 24 24" fill="none"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.7"/></svg>
                             </button>
                         </div>
                         <span asp-validation-for="Password" class="field-error"></span>
@@ -107,7 +82,7 @@
                     </div>
 
                     <button type="submit" class="btn-primary btn-block">
-                        <svg viewBox="0 0 24 24" fill="none"><path d="M10 17l5-5-5-5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 12h11" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M20 5v14" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+                        <svg viewBox="0 0 24 24" fill="none"><path d="M10 17l5-5-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 12h11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M20 5v14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                         Đăng nhập
                     </button>
 
