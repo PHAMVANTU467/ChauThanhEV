@@ -17,7 +17,7 @@ namespace ChauThanhEV.Controllers
             Description = "Theo dõi các trụ sạc OCPP đang chờ gán vào trạm.",
             Columns = new[] { "Mã trụ", "Model", "Địa chỉ OCPP", "Lần kết nối cuối", "Trạng thái" },
             Statuses = new[] { "Chờ đăng ký", "Đang kết nối" },
-            Rows = _data.Stations.Where(station => !station.Active).Select((station, index) => $"CHUA-GAN-{index + 1:000}|DC Fast Charger {160 + index * 80} kW|{station.Code}.ocpp.chauthanhev.mock|{_data.Now.AddMinutes(-index * 11):dd/MM/yyyy HH:mm}|Chờ đăng ký").ToArray()
+            Rows = Enumerable.Range(1, 5).Select(i => $"CHUA-GAN-{i:000}|DC Fast Charger {120 + i * 30} kW|ocpp-gateway-0{i}.chauthanhev.mock|{_data.Now.AddMinutes(-i * 18):dd/MM/yyyy HH:mm}|Chờ đăng ký").ToArray()
         });
     }
 

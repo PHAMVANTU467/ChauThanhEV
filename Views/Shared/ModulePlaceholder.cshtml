@@ -39,6 +39,10 @@
                 <th class="no-export">Hành động</th>
             </tr></thead>
             <tbody>
+                @if (!Model.Rows.Any())
+                {
+                    <tr class="empty-row"><td colspan="@(Model.Columns.Length + 2)">Không có dữ liệu phù hợp.</td></tr>
+                }
                 @foreach (var row in Model.Rows)
                 {
                     var cells = row.Split('|');
