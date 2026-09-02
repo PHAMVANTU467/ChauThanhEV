@@ -1,6 +1,6 @@
 @model StationListViewModel
 @{
-    ViewData["Title"] = "Station Management";
+    ViewData["Title"] = "Quản lý trạm sạc";
     var routeValues = new Dictionary<string, string>();
     if (!string.IsNullOrWhiteSpace(Model.Keyword)) routeValues["keyword"] = Model.Keyword;
     if (!string.IsNullOrWhiteSpace(Model.StatusFilter)) routeValues["status"] = Model.StatusFilter;
@@ -9,7 +9,7 @@
 <div class="list-toolbar">
     <form method="get" class="search-box">
         @await Html.PartialAsync("_Icon", "search")
-        <input type="text" name="keyword" value="@Model.Keyword" placeholder="Tìm theo mã trạm, tên, địa chỉ..." />
+        <input type="text" name="keyword" value="@Model.Keyword" placeholder="Tìm theo mã trạm, tên trạm, địa chỉ..." />
     </form>
 
     <form method="get" class="filter-select-form">
@@ -19,8 +19,8 @@
         }
         <select name="status" class="filter-select" onchange="this.form.submit()">
             <option value="all" selected="@(string.IsNullOrEmpty(Model.StatusFilter) || Model.StatusFilter == "all")">Tất cả trạng thái</option>
-            <option value="Active" selected="@(Model.StatusFilter == "Active")">Active</option>
-            <option value="Inactive" selected="@(Model.StatusFilter == "Inactive")">Inactive</option>
+            <option value="Active" selected="@(Model.StatusFilter == "Active")">Đang hoạt động</option>
+            <option value="Inactive" selected="@(Model.StatusFilter == "Inactive")">Tạm dừng</option>
         </select>
     </form>
 
@@ -32,7 +32,7 @@
             @await Html.PartialAsync("_Icon", "download") Xuất Excel
         </button>
         <button type="button" class="btn btn-primary-sm" data-open-modal="modal-create-station">
-            @await Html.PartialAsync("_Icon", "plus") Add
+            @await Html.PartialAsync("_Icon", "plus") Thêm trạm
         </button>
     </div>
 </div>
@@ -43,10 +43,10 @@
             <thead>
                 <tr>
                     <th>STT</th>
-                    <th>Station ID</th>
+                    <th>Mã trạm</th>
                     <th>Tên trạm</th>
                     <th>Vị trí</th>
-                    <th>Time Zone</th>
+                    <th>Múi giờ</th>
                     <th>Số trụ sạc</th>
                     <th>Trạng thái</th>
                     <th class="no-export">Hành động</th>
@@ -69,7 +69,7 @@
                         <td>@station.TimeZone</td>
                         <td>@chargers</td>
                         <td>
-                            <span class="pill @(station.Active ? "pill-green" : "pill-gray")">@(station.Active ? "Active" : "Inactive")</span>
+                            <span class="pill @(station.Active ? "pill-green" : "pill-gray")">@(station.Active ? "Đang hoạt động" : "Tạm dừng")</span>
                         </td>
                         <td class="no-export">
                             <div class="cell-actions">
@@ -102,7 +102,7 @@
 <div class="modal-overlay" id="modal-create-station">
     <div class="modal-box">
         <div class="modal-header">
-            <h3>Thêm trạm mới</h3>
+            <h3>Thêm trạm sạc mới</h3>
             <button type="button" class="modal-close" data-close-modal>&times;</button>
         </div>
         <form asp-controller="Stations" asp-action="Create" method="post">
@@ -110,33 +110,33 @@
             <div class="modal-body">
                 <div class="form-grid">
                     <div class="form-field full">
-                        <label>Tên trạm</label>
-                        <input type="text" name="Name" required />
+                        <label>Tên trạm sạc</label>
+                        <input type="text" name="Name" required placeholder="Nhập tên trạm sạc" />
                     </div>
                     <div class="form-field full">
-                        <label>Vị trí</label>
-                        <input type="text" name="Address" required />
+                        <label>Vị trí / Địa chỉ</label>
+                        <input type="text" name="Address" required placeholder="Km..., cao tốc..." />
                     </div>
                     <div class="form-field">
-                        <label>Time Zone</label>
+                        <label>Múi giờ</label>
                         <input type="text" name="TimeZone" value="Asia/Ho_Chi_Minh" />
                     </div>
                     <div class="form-field">
-                        <label>Giá điện mặc định (đ/kWh)</label>
+                        <label>Giá điện mặc định (VNĐ/kWh)</label>
                         <input type="number" name="DefaultElectricityPrice" value="3800" min="0" step="100" />
                     </div>
                     <div class="form-field full">
                         <label>Trạng thái</label>
                         <select name="Active">
-                            <option value="true">Active</option>
-                            <option value="false">Inactive</option>
+                            <option value="true">Đang hoạt động</option>
+                            <option value="false">Tạm dừng</option>
                         </select>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline" data-close-modal>Cancel</button>
-                <button type="submit" class="btn btn-primary-sm">Save</button>
+                <button type="button" class="btn btn-outline" data-close-modal>Hủy</button>
+                <button type="submit" class="btn btn-primary-sm">Lưu trạm</button>
             </div>
         </form>
     </div>
@@ -156,33 +156,33 @@
                 <div class="modal-body">
                     <div class="form-grid">
                         <div class="form-field full">
-                            <label>Tên trạm</label>
+                            <label>Tên trạm sạc</label>
                             <input type="text" name="Name" value="@station.Name" required />
                         </div>
                         <div class="form-field full">
-                            <label>Vị trí</label>
+                            <label>Vị trí / Địa chỉ</label>
                             <input type="text" name="Address" value="@station.Address" required />
                         </div>
                         <div class="form-field">
-                            <label>Time Zone</label>
+                            <label>Múi giờ</label>
                             <input type="text" name="TimeZone" value="@station.TimeZone" />
                         </div>
                         <div class="form-field">
-                            <label>Giá điện mặc định (đ/kWh)</label>
+                            <label>Giá điện mặc định (VNĐ/kWh)</label>
                             <input type="number" name="DefaultElectricityPrice" value="@station.DefaultElectricityPrice" min="0" step="100" />
                         </div>
                         <div class="form-field full">
                             <label>Trạng thái</label>
                             <select name="Active">
-                                <option value="true" selected="@(station.Active)">Active</option>
-                                <option value="false" selected="@(!station.Active)">Inactive</option>
+                                <option value="true" selected="@(station.Active)">Đang hoạt động</option>
+                                <option value="false" selected="@(!station.Active)">Tạm dừng</option>
                             </select>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline" data-close-modal>Cancel</button>
-                    <button type="submit" class="btn btn-primary-sm">Save</button>
+                    <button type="button" class="btn btn-outline" data-close-modal>Hủy</button>
+                    <button type="submit" class="btn btn-primary-sm">Lưu thay đổi</button>
                 </div>
             </form>
         </div>

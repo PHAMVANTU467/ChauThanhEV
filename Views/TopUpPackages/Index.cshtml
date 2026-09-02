@@ -1,6 +1,6 @@
 @model TopUpPackageListViewModel
 @{
-    ViewData["Title"] = "TOP UP Packages";
+    ViewData["Title"] = "Gói nạp tiền";
     var routeValues = new Dictionary<string, string>();
     if (!string.IsNullOrWhiteSpace(Model.Keyword)) routeValues["keyword"] = Model.Keyword;
     if (!string.IsNullOrWhiteSpace(Model.StatusFilter)) routeValues["status"] = Model.StatusFilter;
@@ -9,7 +9,7 @@
 <div class="list-toolbar">
     <form method="get" class="search-box">
         @await Html.PartialAsync("_Icon", "search")
-        <input type="text" name="keyword" value="@Model.Keyword" placeholder="Tìm theo tên gói..." />
+        <input type="text" name="keyword" value="@Model.Keyword" placeholder="Tìm theo tên gói nạp..." />
     </form>
 
     <form method="get" class="filter-select-form">
@@ -19,14 +19,20 @@
         }
         <select name="status" class="filter-select" onchange="this.form.submit()">
             <option value="all" selected="@(string.IsNullOrEmpty(Model.StatusFilter) || Model.StatusFilter == "all")">Tất cả trạng thái</option>
-            <option value="Active" selected="@(Model.StatusFilter == "Active")">Active</option>
-            <option value="Inactive" selected="@(Model.StatusFilter == "Inactive")">Inactive</option>
+            <option value="Active" selected="@(Model.StatusFilter == "Active")">Đang hoạt động</option>
+            <option value="Inactive" selected="@(Model.StatusFilter == "Inactive")">Tạm dừng</option>
         </select>
     </form>
 
     <div class="toolbar-actions">
+        <button type="button" class="btn btn-outline" data-export-csv="packageTable" data-export-name="danh-sach-goi-nap">
+            @await Html.PartialAsync("_Icon", "download") Xuất CSV
+        </button>
+        <button type="button" class="btn btn-outline" data-export-excel="packageTable" data-export-name="danh-sach-goi-nap">
+            @await Html.PartialAsync("_Icon", "download") Xuất Excel
+        </button>
         <button type="button" class="btn btn-primary-sm" data-open-modal="modal-create-package">
-            @await Html.PartialAsync("_Icon", "plus") Add
+            @await Html.PartialAsync("_Icon", "plus") Thêm gói nạp
         </button>
     </div>
 </div>
@@ -37,11 +43,11 @@
             <thead>
                 <tr>
                     <th>STT</th>
-                    <th>Package Name</th>
-                    <th>Amount</th>
-                    <th>Bonus / Discount</th>
-                    <th>Status</th>
-                    <th class="no-export">Actions</th>
+                    <th>Tên gói</th>
+                    <th>Mệnh giá nạp</th>
+                    <th>Thưởng / Ưu đãi</th>
+                    <th>Trạng thái</th>
+                    <th class="no-export">Hành động</th>
                 </tr>
             </thead>
             <tbody>
@@ -58,7 +64,7 @@
                         <td>@ChauThanhEV.Services.MockDataService.FormatCurrency(pkg.Amount)</td>
                         <td>@ChauThanhEV.Services.MockDataService.FormatCurrency(pkg.Bonus)</td>
                         <td>
-                            <span class="pill @(pkg.Active ? "pill-green" : "pill-gray")">@(pkg.Active ? "Active" : "Inactive")</span>
+                            <span class="pill @(pkg.Active ? "pill-green" : "pill-gray")">@(pkg.Active ? "Đang hoạt động" : "Tạm dừng")</span>
                         </td>
                         <td class="no-export">
                             <div class="cell-actions">
@@ -91,28 +97,37 @@
 <div class="modal-overlay" id="modal-create-package">
     <div class="modal-box">
         <div class="modal-header">
-            <h3>Thêm gói nạp tiền</h3>
+            <h3>Thêm gói nạp tiền mới</h3>
             <button type="button" class="modal-close" data-close-modal>&times;</button>
         </div>
         <form asp-controller="TopUpPackages" asp-action="Create" method="post">
             @Html.AntiForgeryToken()
             <div class="modal-body">
                 <div class="form-grid">
-                    <div class="form-field full"><label>Name</label><input type="text" name="Name" required /></div>
-                    <div class="form-field"><label>Amount</label><input type="number" name="Amount" value="0" min="0" step="1000" required /></div>
-                    <div class="form-field"><label>Bonus</label><input type="number" name="Bonus" value="0" min="0" step="1000" /></div>
                     <div class="form-field full">
-                        <label>Status</label>
+                        <label>Tên gói nạp</label>
+                        <input type="text" name="Name" required placeholder="Vd: Gói nạp xe dịch vụ 500k" />
+                    </div>
+                    <div class="form-field">
+                        <label>Mệnh giá (VNĐ)</label>
+                        <input type="number" name="Amount" value="100000" min="10000" step="10000" required />
+                    </div>
+                    <div class="form-field">
+                        <label>Tiền thưởng khuyến mãi (VNĐ)</label>
+                        <input type="number" name="Bonus" value="0" min="0" step="5000" />
+                    </div>
+                    <div class="form-field full">
+                        <label>Trạng thái</label>
                         <select name="Active">
-                            <option value="true">Active</option>
-                            <option value="false">Inactive</option>
+                            <option value="true">Đang hoạt động</option>
+                            <option value="false">Tạm dừng</option>
                         </select>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline" data-close-modal>Cancel</button>
-                <button type="submit" class="btn btn-primary-sm">Save</button>
+                <button type="button" class="btn btn-outline" data-close-modal>Hủy</button>
+                <button type="submit" class="btn btn-primary-sm">Lưu gói</button>
             </div>
         </form>
     </div>
@@ -122,27 +137,39 @@
 {
     <div class="modal-overlay" id="modal-edit-package-@pkg.Id">
         <div class="modal-box">
-            <div class="modal-header"><h3>Sửa gói @pkg.Name</h3><button type="button" class="modal-close" data-close-modal>&times;</button></div>
+            <div class="modal-header">
+                <h3>Sửa gói @pkg.Name</h3>
+                <button type="button" class="modal-close" data-close-modal>&times;</button>
+            </div>
             <form asp-controller="TopUpPackages" asp-action="Edit" method="post">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="Id" value="@pkg.Id" />
                 <div class="modal-body">
                     <div class="form-grid">
-                        <div class="form-field full"><label>Name</label><input type="text" name="Name" value="@pkg.Name" required /></div>
-                        <div class="form-field"><label>Amount</label><input type="number" name="Amount" value="@((long)pkg.Amount)" min="0" step="1000" required /></div>
-                        <div class="form-field"><label>Bonus</label><input type="number" name="Bonus" value="@((long)pkg.Bonus)" min="0" step="1000" /></div>
                         <div class="form-field full">
-                            <label>Status</label>
+                            <label>Tên gói nạp</label>
+                            <input type="text" name="Name" value="@pkg.Name" required />
+                        </div>
+                        <div class="form-field">
+                            <label>Mệnh giá (VNĐ)</label>
+                            <input type="number" name="Amount" value="@((long)pkg.Amount)" min="10000" step="10000" required />
+                        </div>
+                        <div class="form-field">
+                            <label>Tiền thưởng khuyến mãi (VNĐ)</label>
+                            <input type="number" name="Bonus" value="@((long)pkg.Bonus)" min="0" step="5000" />
+                        </div>
+                        <div class="form-field full">
+                            <label>Trạng thái</label>
                             <select name="Active">
-                                <option value="true" selected="@(pkg.Active)">Active</option>
-                                <option value="false" selected="@(!pkg.Active)">Inactive</option>
+                                <option value="true" selected="@(pkg.Active)">Đang hoạt động</option>
+                                <option value="false" selected="@(!pkg.Active)">Tạm dừng</option>
                             </select>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline" data-close-modal>Cancel</button>
-                    <button type="submit" class="btn btn-primary-sm">Save</button>
+                    <button type="button" class="btn btn-outline" data-close-modal>Hủy</button>
+                    <button type="submit" class="btn btn-primary-sm">Lưu thay đổi</button>
                 </div>
             </form>
         </div>

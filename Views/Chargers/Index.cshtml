@@ -142,8 +142,8 @@
                     <div class="form-field">
                         <label>Trạng thái</label>
                         <select name="Status">
-                            <option value="Online">Online</option>
-                            <option value="Offline">Offline</option>
+                            <option value="Online">Đang hoạt động (Online)</option>
+                            <option value="Offline">Ngoại tuyến (Offline)</option>
                         </select>
                     </div>
                     <div class="form-field">
@@ -153,7 +153,7 @@
                     <div class="form-field">
                         <label>Số cổng sạc</label>
                         <input type="number" name="ConnectorCount" value="2" min="1" max="4" />
-                        <p class="form-hint">Các cổng mới tạo mặc định ở trạng thái Available.</p>
+                        <p class="form-hint">Các cổng mới tạo mặc định ở trạng thái Sẵn sàng (Available).</p>
                     </div>
                 </div>
             </div>
@@ -252,8 +252,8 @@
                         <div class="form-field">
                             <label>Trạng thái</label>
                             <select name="Status">
-                                <option value="Online" selected="@(row.Status == ChargerStatus.Online)">Đang online</option>
-                                <option value="Offline" selected="@(row.Status == ChargerStatus.Offline)">Offline</option>
+                                <option value="Online" selected="@(row.Status == ChargerStatus.Online)">Đang hoạt động (Online)</option>
+                                <option value="Offline" selected="@(row.Status == ChargerStatus.Offline)">Ngoại tuyến (Offline)</option>
                                 <option value="Maintenance" selected="@(row.Status == ChargerStatus.Maintenance)">Đang bảo trì</option>
                             </select>
                         </div>

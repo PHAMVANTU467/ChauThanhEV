@@ -1,6 +1,6 @@
 @model RfidCardListViewModel
 @{
-    ViewData["Title"] = "Card Management";
+    ViewData["Title"] = "Quản lý thẻ RFID";
     var routeValues = new Dictionary<string, string>();
     if (!string.IsNullOrWhiteSpace(Model.Keyword)) routeValues["keyword"] = Model.Keyword;
     if (!string.IsNullOrWhiteSpace(Model.StatusFilter)) routeValues["status"] = Model.StatusFilter;
@@ -19,8 +19,8 @@
         }
         <select name="status" class="filter-select" onchange="this.form.submit()">
             <option value="all" selected="@(string.IsNullOrEmpty(Model.StatusFilter) || Model.StatusFilter == "all")">Tất cả trạng thái</option>
-            <option value="Active" selected="@(Model.StatusFilter == "Active")">Active</option>
-            <option value="Inactive" selected="@(Model.StatusFilter == "Inactive")">Inactive</option>
+            <option value="Active" selected="@(Model.StatusFilter == "Active")">Đang hoạt động</option>
+            <option value="Inactive" selected="@(Model.StatusFilter == "Inactive")">Đã khóa</option>
         </select>
     </form>
 
@@ -32,7 +32,7 @@
             @await Html.PartialAsync("_Icon", "download") Xuất Excel
         </button>
         <button type="button" class="btn btn-primary-sm" data-open-modal="modal-create-card">
-            @await Html.PartialAsync("_Icon", "plus") Add RFID
+            @await Html.PartialAsync("_Icon", "plus") Thêm thẻ RFID
         </button>
     </div>
 </div>
@@ -43,12 +43,12 @@
             <thead>
                 <tr>
                     <th>STT</th>
-                    <th>Card ID</th>
-                    <th>User</th>
-                    <th>Status</th>
-                    <th>Created Date</th>
-                    <th>Expiry Date</th>
-                    <th class="no-export">Actions</th>
+                    <th>Mã thẻ RFID</th>
+                    <th>Chủ thẻ (Khách hàng)</th>
+                    <th>Trạng thái</th>
+                    <th>Ngày tạo</th>
+                    <th>Ngày hết hạn</th>
+                    <th class="no-export">Hành động</th>
                 </tr>
             </thead>
             <tbody>
@@ -63,7 +63,7 @@
                         <td>@((Model.Result.Page - 1) * Model.Result.PageSize + i + 1)</td>
                         <td><strong>@card.CardId</strong></td>
                         <td>@card.UserName</td>
-                        <td><span class="pill @(card.Status == CardStatus.Active ? "pill-green" : "pill-gray")">@(card.Status == CardStatus.Active ? "Active" : "Inactive")</span></td>
+                        <td><span class="pill @(card.Status == CardStatus.Active ? "pill-green" : "pill-gray")">@(card.Status == CardStatus.Active ? "Đang hoạt động" : "Đã khóa")</span></td>
                         <td>@card.CreatedDate.ToString("dd/MM/yyyy")</td>
                         <td>@card.ExpiryDate.ToString("dd/MM/yyyy")</td>
                         <td class="no-export">
@@ -71,7 +71,7 @@
                                 <form asp-action="ToggleStatus" asp-controller="RfidCards" method="post" data-confirm="Cập nhật trạng thái thẻ @card.CardId?">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="id" value="@card.Id" />
-                                    <button type="submit" class="btn btn-ghost btn-sm" title="Lock / Unlock">@await Html.PartialAsync("_Icon", "power")</button>
+                                    <button type="submit" class="btn btn-ghost btn-sm" title="Khóa / Mở khóa">@await Html.PartialAsync("_Icon", "power")</button>
                                 </form>
                                 <form asp-action="Delete" asp-controller="RfidCards" method="post" data-confirm="Xóa thẻ @card.CardId?">
                                     @Html.AntiForgeryToken()
@@ -101,16 +101,16 @@
 <div class="modal-overlay" id="modal-create-card">
     <div class="modal-box">
         <div class="modal-header">
-            <h3>Thêm RFID mới</h3>
+            <h3>Thêm thẻ RFID mới</h3>
             <button type="button" class="modal-close" data-close-modal>&times;</button>
         </div>
         <form asp-controller="RfidCards" asp-action="Create" method="post">
             @Html.AntiForgeryToken()
             <div class="modal-body">
                 <div class="form-grid">
-                    <div class="form-field"><label>Card ID</label><input type="text" name="CardId" required /></div>
+                    <div class="form-field"><label>Mã thẻ RFID</label><input type="text" name="CardId" placeholder="Vd: RFID-2026-..." required /></div>
                     <div class="form-field">
-                        <label>User</label>
+                        <label>Chủ thẻ (Khách hàng)</label>
                         <select name="UserId">
                             @foreach (var u in Model.Customers)
                             {
@@ -119,14 +119,14 @@
                         </select>
                     </div>
                     <div class="form-field full">
-                        <label>Expiry Date</label>
+                        <label>Ngày hết hạn</label>
                         <input type="date" name="ExpiryDate" value="@DateTime.Now.AddMonths(6).ToString("yyyy-MM-dd")" />
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline" data-close-modal>Cancel</button>
-                <button type="submit" class="btn btn-primary-sm">Save</button>
+                <button type="button" class="btn btn-outline" data-close-modal>Hủy</button>
+                <button type="submit" class="btn btn-primary-sm">Lưu thẻ RFID</button>
             </div>
         </form>
     </div>

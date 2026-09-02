@@ -1,6 +1,6 @@
 @model ReservationListViewModel
 @{
-    ViewData["Title"] = "Reservation";
+    ViewData["Title"] = "Quản lý đặt trước";
     var routeValues = new Dictionary<string, string>();
     if (!string.IsNullOrWhiteSpace(Model.Keyword)) routeValues["keyword"] = Model.Keyword;
     if (!string.IsNullOrWhiteSpace(Model.StatusFilter)) routeValues["status"] = Model.StatusFilter;
@@ -19,15 +19,21 @@
         }
         <select name="status" class="filter-select" onchange="this.form.submit()">
             <option value="all" selected="@(string.IsNullOrEmpty(Model.StatusFilter) || Model.StatusFilter == "all")">Tất cả trạng thái</option>
-            <option value="Active" selected="@(Model.StatusFilter == "Active")">Active</option>
-            <option value="Expired" selected="@(Model.StatusFilter == "Expired")">Expired</option>
-            <option value="Cancelled" selected="@(Model.StatusFilter == "Cancelled")">Cancelled</option>
+            <option value="Active" selected="@(Model.StatusFilter == "Active")">Đang hiệu lực</option>
+            <option value="Expired" selected="@(Model.StatusFilter == "Expired")">Hết hạn</option>
+            <option value="Cancelled" selected="@(Model.StatusFilter == "Cancelled")">Đã hủy</option>
         </select>
     </form>
 
     <div class="toolbar-actions">
+        <button type="button" class="btn btn-outline" data-export-csv="reservationTable" data-export-name="danh-sach-dat-truoc">
+            @await Html.PartialAsync("_Icon", "download") Xuất CSV
+        </button>
+        <button type="button" class="btn btn-outline" data-export-excel="reservationTable" data-export-name="danh-sach-dat-truoc">
+            @await Html.PartialAsync("_Icon", "download") Xuất Excel
+        </button>
         <button type="button" class="btn btn-primary-sm" data-open-modal="modal-create-reservation">
-            @await Html.PartialAsync("_Icon", "plus") Add Reservation
+            @await Html.PartialAsync("_Icon", "plus") Thêm đặt trước
         </button>
     </div>
 </div>
@@ -37,18 +43,18 @@
         <table class="data-table" id="reservationTable">
             <thead>
                 <tr>
-                    <th>Reservation ID</th>
-                    <th>User</th>
-                    <th>Charger</th>
-                    <th>Start Time</th>
-                    <th>End Time</th>
-                    <th>Status</th>
+                    <th>Mã đặt trước</th>
+                    <th>Khách hàng</th>
+                    <th>Trụ sạc</th>
+                    <th>Thời gian bắt đầu</th>
+                    <th>Thời gian kết thúc</th>
+                    <th>Trạng thái</th>
                 </tr>
             </thead>
             <tbody>
                 @if (!Model.Result.Items.Any())
                 {
-                    <tr class="empty-row"><td colspan="6">Không có đặt chỗ nào.</td></tr>
+                    <tr class="empty-row"><td colspan="6">Không có lượt đặt trước nào.</td></tr>
                 }
                 @foreach (var reservation in Model.Result.Items)
                 {
@@ -61,15 +67,15 @@
                         <td>
                             @if (reservation.Status == ReservationStatus.Active)
                             {
-                                <span class="pill pill-green">Active</span>
+                                <span class="pill pill-green">Đang hiệu lực</span>
                             }
                             else if (reservation.Status == ReservationStatus.Expired)
                             {
-                                <span class="pill pill-gray">Expired</span>
+                                <span class="pill pill-gray">Hết hạn</span>
                             }
                             else
                             {
-                                <span class="pill pill-red">Cancelled</span>
+                                <span class="pill pill-red">Đã hủy</span>
                             }
                         </td>
                     </tr>
@@ -93,7 +99,7 @@
 <div class="modal-overlay" id="modal-create-reservation">
     <div class="modal-box">
         <div class="modal-header">
-            <h3>Thêm Reservation</h3>
+            <h3>Thêm lượt đặt trước mới</h3>
             <button type="button" class="modal-close" data-close-modal>&times;</button>
         </div>
         <form asp-controller="Reservations" asp-action="Create" method="post">
@@ -101,7 +107,7 @@
             <div class="modal-body">
                 <div class="form-grid">
                     <div class="form-field">
-                        <label>User</label>
+                        <label>Khách hàng</label>
                         <select name="UserId">
                             @foreach (var u in Model.Customers)
                             {
@@ -110,21 +116,27 @@
                         </select>
                     </div>
                     <div class="form-field">
-                        <label>Charger</label>
-                        <select name="ChargerId">
+                        <label>Trụ sạc</label>
+                        <select name="ChargerCode">
                             @foreach (var c in Model.Chargers)
                             {
-                                <option value="@c.Id">@c.Code - @c.Name</option>
+                                <option value="@c.Code">@c.Code (@c.Name)</option>
                             }
                         </select>
                     </div>
-                    <div class="form-field"><label>Start Date/Time</label><input type="datetime-local" name="StartTime" value="@DateTime.Now.AddHours(2).ToString("yyyy-MM-ddTHH:mm")" /></div>
-                    <div class="form-field"><label>Duration (minutes)</label><input type="number" name="DurationMinutes" value="60" min="30" step="15" /></div>
+                    <div class="form-field">
+                        <label>Thời gian bắt đầu</label>
+                        <input type="datetime-local" name="StartTime" value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                    </div>
+                    <div class="form-field">
+                        <label>Thời lượng (phút)</label>
+                        <input type="number" name="DurationMinutes" value="30" min="15" step="15" />
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline" data-close-modal>Cancel</button>
-                <button type="submit" class="btn btn-primary-sm">Confirm</button>
+                <button type="button" class="btn btn-outline" data-close-modal>Hủy</button>
+                <button type="submit" class="btn btn-primary-sm">Tạo đặt trước</button>
             </div>
         </form>
     </div>
