@@ -625,28 +625,28 @@ namespace ChauThanhEV.Services
 
             model.TotalIncomeToday = new OverviewCard
             {
-                Title = "Total Income",
+                Title = "Doanh thu thực nhận",
                 Value = FormatCurrency(todayRevenue),
                 CompareLabel = FormatCurrency(ydRevenue),
                 ChangePercent = PercentChange(todayRevenue, ydRevenue)
             };
             model.TotalElectricityToday = new OverviewCard
             {
-                Title = "Total Electricity",
+                Title = "Tổng điện tiêu thụ",
                 Value = FormatEnergy(todayEnergy),
                 CompareLabel = FormatEnergy(ydEnergy),
                 ChangePercent = PercentChange((decimal)todayEnergy, (decimal)ydEnergy)
             };
             model.NumbersOfOrderToday = new OverviewCard
             {
-                Title = "Numbers of Order",
+                Title = "Số lượng đơn hàng",
                 Value = FormatNumber(todayOrders),
                 CompareLabel = FormatNumber(ydOrders),
                 ChangePercent = PercentChange(todayOrders, ydOrders)
             };
             model.ActiveUsersTodayCard = new OverviewCard
             {
-                Title = "Active Users",
+                Title = "Khách hàng hoạt động",
                 Value = FormatNumber(todayUsers),
                 CompareLabel = FormatNumber(ydUsers),
                 ChangePercent = PercentChange(todayUsers, ydUsers)
@@ -666,28 +666,28 @@ namespace ChauThanhEV.Services
 
             model.TotalIncomeMonth = new OverviewCard
             {
-                Title = "Total Income",
+                Title = "Doanh thu thực nhận",
                 Value = FormatCurrency(monthRevenue),
                 CompareLabel = FormatCurrency(pmRevenue),
                 ChangePercent = PercentChange(monthRevenue, pmRevenue)
             };
             model.TotalElectricityMonth = new OverviewCard
             {
-                Title = "Total Electricity",
+                Title = "Tổng điện tiêu thụ",
                 Value = FormatEnergy(monthEnergy),
                 CompareLabel = FormatEnergy(pmEnergy),
                 ChangePercent = PercentChange((decimal)monthEnergy, (decimal)pmEnergy)
             };
             model.NumbersOfOrderMonth = new OverviewCard
             {
-                Title = "Numbers of Order",
+                Title = "Số lượng đơn hàng",
                 Value = FormatNumber(monthOrders),
                 CompareLabel = FormatNumber(pmOrders),
                 ChangePercent = PercentChange(monthOrders, pmOrders)
             };
             model.ActiveUsersMonthCard = new OverviewCard
             {
-                Title = "Active Users",
+                Title = "Khách hàng hoạt động",
                 Value = FormatNumber(monthUsers),
                 CompareLabel = FormatNumber(pmUsers),
                 ChangePercent = PercentChange(monthUsers, pmUsers)

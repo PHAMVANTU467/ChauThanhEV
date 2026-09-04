@@ -1,108 +1,108 @@
 @model ChauThanhEV.Models.DashboardViewModel
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Trang chủ";
 }
 
 <div class="beny-dashboard-container">
 
     <!-- ================================================================
-         SECTION 1: STATUS OF EV CHARGER
+         PHÂN KHU 1: TRẠNG THÁI TRỤ SẠC & CỔNG SẠC
          ================================================================ -->
     <div class="beny-section-group">
-        <h2 class="beny-sec-title">Status of EV Charger</h2>
+        <h2 class="beny-sec-title">Trạng thái Trụ sạc &amp; Cổng sạc</h2>
         <div class="status-charger-strip">
             <div class="scs-col">
-                <div class="scs-label">Number of EV Chargers</div>
+                <div class="scs-label">Tổng số trụ sạc</div>
                 <div class="scs-value color-cyan"><a href="@Url.Action("Index", "Chargers")">@Model.TotalChargers</a></div>
             </div>
             <div class="scs-col">
-                <div class="scs-label">Number of Off-line EV Charger</div>
+                <div class="scs-label">Số trụ ngoại tuyến</div>
                 <div class="scs-value color-orange"><a href="@Url.Action("Index", "Operations", new { tab = "offline" })">@Model.OfflineChargers</a></div>
             </div>
             <div class="scs-col">
-                <div class="scs-label">Number of Available Connector</div>
+                <div class="scs-label">Số cổng sạc sẵn sàng</div>
                 <div class="scs-value color-teal"><a href="@Url.Action("Index", "Chargers")">@Model.AvailableConnectors</a></div>
             </div>
             <div class="scs-col">
-                <div class="scs-label">Number of Charging Connector</div>
+                <div class="scs-label">Số cổng sạc đang sạc</div>
                 <div class="scs-value color-green"><a href="@Url.Action("Index", "Orders")">@Model.ChargingConnectors</a></div>
             </div>
             <div class="scs-col">
-                <div class="scs-label">Number of Reservation Connector</div>
+                <div class="scs-label">Số cổng đặt trước</div>
                 <div class="scs-value color-blue"><a href="@Url.Action("Index", "Reservations")">@Model.ReservationConnectors</a></div>
             </div>
             <div class="scs-col">
-                <div class="scs-label">Number of Fault Connector</div>
+                <div class="scs-label">Số cổng lỗi / sự cố</div>
                 <div class="scs-value color-red"><a href="@Url.Action("Index", "Operations")">@Model.FaultConnectors</a></div>
             </div>
         </div>
     </div>
 
     <!-- ================================================================
-         SECTION 2: OVERVIEW TODAY
+         PHÂN KHU 2: TỔNG QUAN HÔM NAY
          ================================================================ -->
     <div class="beny-section-group">
-        <h2 class="beny-sec-title">Overview Today</h2>
+        <h2 class="beny-sec-title">Tổng quan hôm nay</h2>
         <div class="overview-tri-grid">
-            <!-- Left: GMV with mini sparkline chart -->
+            <!-- Cột trái: GMV kèm biểu đồ sparkline giờ -->
             <div class="beny-card gmv-spark-card">
                 <div class="bc-head-row">
-                    <span class="bc-title">GMV</span>
+                    <span class="bc-title">GMV (Tổng giá trị giao dịch)</span>
                 </div>
                 <div class="bc-big-val color-red">@Model.TodayGmvValue</div>
                 <div class="bc-subline">
-                    <span class="sub-compare">Yesterday: @Model.TodayGmvCompare.Replace("Hôm qua: ", "")</span>
-                    <span class="sub-ratio">Compared to Yesterday: <b class="@(Model.TodayGmvChange >= 0 ? "text-green" : "text-red")">@(Model.TodayGmvChange >= 0 ? "↑ +" : "↓ ")@(Model.TodayGmvChange.ToString("0.00"))%</b></span>
+                    <span class="sub-compare">Hôm qua: @Model.TodayGmvCompare.Replace("Hôm qua: ", "")</span>
+                    <span class="sub-ratio">So với hôm qua: <b class="@(Model.TodayGmvChange >= 0 ? "text-green" : "text-red")">@(Model.TodayGmvChange >= 0 ? "↑ +" : "↓ ")@(Model.TodayGmvChange.ToString("0.00"))%</b></span>
                 </div>
                 <div class="mini-sparkline-wrap">
                     <canvas id="todayGmvSparkline" height="95"></canvas>
                 </div>
             </div>
 
-            <!-- Middle: Stacked Total Income & Total Electricity -->
+            <!-- Cột giữa: Thẻ kép Doanh thu & Điện năng -->
             <div class="stacked-card-col">
                 <div class="beny-card stacked-item-card">
                     <div class="bc-head-row">
-                        <span class="bc-title">Total Income</span>
+                        <span class="bc-title">Doanh thu thực nhận</span>
                     </div>
                     <div class="bc-big-val color-teal">@Model.TotalIncomeToday.Value</div>
                     <div class="bc-subline">
-                        <span class="sub-compare">Yesterday: @Model.TotalIncomeToday.CompareLabel</span>
-                        <span class="sub-ratio">Compared to Yesterday: <b class="@(Model.TotalIncomeToday.IsPositive ? "text-green" : "text-red")">@(Model.TotalIncomeToday.IsPositive ? "↑ +" : "↓ ")@(Model.TotalIncomeToday.ChangePercent.ToString("0.00"))%</b></span>
+                        <span class="sub-compare">Hôm qua: @Model.TotalIncomeToday.CompareLabel</span>
+                        <span class="sub-ratio">So với hôm qua: <b class="@(Model.TotalIncomeToday.IsPositive ? "text-green" : "text-red")">@(Model.TotalIncomeToday.IsPositive ? "↑ +" : "↓ ")@(Model.TotalIncomeToday.ChangePercent.ToString("0.00"))%</b></span>
                     </div>
                 </div>
                 <div class="beny-card stacked-item-card">
                     <div class="bc-head-row">
-                        <span class="bc-title">Total Electricity</span>
+                        <span class="bc-title">Tổng điện tiêu thụ</span>
                     </div>
                     <div class="bc-big-val color-cyan">@Model.TotalElectricityToday.Value</div>
                     <div class="bc-subline">
-                        <span class="sub-compare">Yesterday: @Model.TotalElectricityToday.CompareLabel</span>
-                        <span class="sub-ratio">Compared to Yesterday: <b class="@(Model.TotalElectricityToday.IsPositive ? "text-green" : "text-red")">@(Model.TotalElectricityToday.IsPositive ? "↑ +" : "↓ ")@(Model.TotalElectricityToday.ChangePercent.ToString("0.00"))%</b></span>
+                        <span class="sub-compare">Hôm qua: @Model.TotalElectricityToday.CompareLabel</span>
+                        <span class="sub-ratio">So với hôm qua: <b class="@(Model.TotalElectricityToday.IsPositive ? "text-green" : "text-red")">@(Model.TotalElectricityToday.IsPositive ? "↑ +" : "↓ ")@(Model.TotalElectricityToday.ChangePercent.ToString("0.00"))%</b></span>
                     </div>
                 </div>
             </div>
 
-            <!-- Right: Stacked Numbers of Order & Active Users -->
+            <!-- Cột phải: Thẻ kép Đơn hàng & Khách hàng -->
             <div class="stacked-card-col">
                 <div class="beny-card stacked-item-card">
                     <div class="bc-head-row">
-                        <span class="bc-title">Numbers of Order</span>
+                        <span class="bc-title">Số lượng đơn hàng</span>
                     </div>
                     <div class="bc-big-val color-cyan">@Model.NumbersOfOrderToday.Value</div>
                     <div class="bc-subline">
-                        <span class="sub-compare">Yesterday: @Model.NumbersOfOrderToday.CompareLabel</span>
-                        <span class="sub-ratio">Compared to Yesterday: <b class="@(Model.NumbersOfOrderToday.IsPositive ? "text-green" : "text-red")">@(Model.NumbersOfOrderToday.IsPositive ? "↑ +" : "↓ ")@(Model.NumbersOfOrderToday.ChangePercent.ToString("0.00"))%</b></span>
+                        <span class="sub-compare">Hôm qua: @Model.NumbersOfOrderToday.CompareLabel</span>
+                        <span class="sub-ratio">So với hôm qua: <b class="@(Model.NumbersOfOrderToday.IsPositive ? "text-green" : "text-red")">@(Model.NumbersOfOrderToday.IsPositive ? "↑ +" : "↓ ")@(Model.NumbersOfOrderToday.ChangePercent.ToString("0.00"))%</b></span>
                     </div>
                 </div>
                 <div class="beny-card stacked-item-card">
                     <div class="bc-head-row">
-                        <span class="bc-title">Active Users</span>
+                        <span class="bc-title">Khách hàng hoạt động</span>
                     </div>
                     <div class="bc-big-val color-cyan">@Model.ActiveUsersTodayCard.Value</div>
                     <div class="bc-subline">
-                        <span class="sub-compare">Yesterday: @Model.ActiveUsersTodayCard.CompareLabel</span>
-                        <span class="sub-ratio">Compared to Yesterday: <b class="@(Model.ActiveUsersTodayCard.IsPositive ? "text-green" : "text-red")">@(Model.ActiveUsersTodayCard.IsPositive ? "↑ +" : "↓ ")@(Model.ActiveUsersTodayCard.ChangePercent.ToString("0.00"))%</b></span>
+                        <span class="sub-compare">Hôm qua: @Model.ActiveUsersTodayCard.CompareLabel</span>
+                        <span class="sub-ratio">So với hôm qua: <b class="@(Model.ActiveUsersTodayCard.IsPositive ? "text-green" : "text-red")">@(Model.ActiveUsersTodayCard.IsPositive ? "↑ +" : "↓ ")@(Model.ActiveUsersTodayCard.ChangePercent.ToString("0.00"))%</b></span>
                     </div>
                 </div>
             </div>
@@ -110,70 +110,70 @@
     </div>
 
     <!-- ================================================================
-         SECTION 3: OVERVIEW MONTHLY
+         PHÂN KHU 3: TỔNG QUAN THÁNG NÀY
          ================================================================ -->
     <div class="beny-section-group">
-        <h2 class="beny-sec-title">Overview Monthly</h2>
+        <h2 class="beny-sec-title">Tổng quan tháng này</h2>
         <div class="overview-tri-grid">
-            <!-- Left: GMV Monthly with mini sparkline chart -->
+            <!-- Cột trái: GMV tháng kèm biểu đồ sparkline ngày -->
             <div class="beny-card gmv-spark-card">
                 <div class="bc-head-row">
-                    <span class="bc-title">GMV</span>
+                    <span class="bc-title">GMV (Tổng giá trị giao dịch)</span>
                 </div>
                 <div class="bc-big-val color-red">@Model.MonthGmvValue</div>
                 <div class="bc-subline">
-                    <span class="sub-compare">Last Month: @Model.MonthGmvCompare.Replace("Tháng trước: ", "")</span>
-                    <span class="sub-ratio">Compared to Last Month: <b class="@(Model.MonthGmvChange >= 0 ? "text-green" : "text-red")">@(Model.MonthGmvChange >= 0 ? "↑ +" : "↓ ")@(Model.MonthGmvChange.ToString("0.00"))%</b></span>
+                    <span class="sub-compare">Tháng trước: @Model.MonthGmvCompare.Replace("Tháng trước: ", "")</span>
+                    <span class="sub-ratio">So với tháng trước: <b class="@(Model.MonthGmvChange >= 0 ? "text-green" : "text-red")">@(Model.MonthGmvChange >= 0 ? "↑ +" : "↓ ")@(Model.MonthGmvChange.ToString("0.00"))%</b></span>
                 </div>
                 <div class="mini-sparkline-wrap">
                     <canvas id="monthGmvSparkline" height="95"></canvas>
                 </div>
             </div>
 
-            <!-- Middle: Stacked Total Income & Total Electricity -->
+            <!-- Cột giữa: Thẻ kép Doanh thu & Điện năng tháng -->
             <div class="stacked-card-col">
                 <div class="beny-card stacked-item-card">
                     <div class="bc-head-row">
-                        <span class="bc-title">Total Income</span>
+                        <span class="bc-title">Doanh thu thực nhận</span>
                     </div>
                     <div class="bc-big-val color-teal">@Model.TotalIncomeMonth.Value</div>
                     <div class="bc-subline">
-                        <span class="sub-compare">Last Month: @Model.TotalIncomeMonth.CompareLabel</span>
-                        <span class="sub-ratio">Compared to Last Month: <b class="@(Model.TotalIncomeMonth.IsPositive ? "text-green" : "text-red")">@(Model.TotalIncomeMonth.IsPositive ? "↑ +" : "↓ ")@(Model.TotalIncomeMonth.ChangePercent.ToString("0.00"))%</b></span>
+                        <span class="sub-compare">Tháng trước: @Model.TotalIncomeMonth.CompareLabel</span>
+                        <span class="sub-ratio">So với tháng trước: <b class="@(Model.TotalIncomeMonth.IsPositive ? "text-green" : "text-red")">@(Model.TotalIncomeMonth.IsPositive ? "↑ +" : "↓ ")@(Model.TotalIncomeMonth.ChangePercent.ToString("0.00"))%</b></span>
                     </div>
                 </div>
                 <div class="beny-card stacked-item-card">
                     <div class="bc-head-row">
-                        <span class="bc-title">Total Electricity</span>
+                        <span class="bc-title">Tổng điện tiêu thụ</span>
                     </div>
                     <div class="bc-big-val color-cyan">@Model.TotalElectricityMonth.Value</div>
                     <div class="bc-subline">
-                        <span class="sub-compare">Last Month: @Model.TotalElectricityMonth.CompareLabel</span>
-                        <span class="sub-ratio">Compared to Last Month: <b class="@(Model.TotalElectricityMonth.IsPositive ? "text-green" : "text-red")">@(Model.TotalElectricityMonth.IsPositive ? "↑ +" : "↓ ")@(Model.TotalElectricityMonth.ChangePercent.ToString("0.00"))%</b></span>
+                        <span class="sub-compare">Tháng trước: @Model.TotalElectricityMonth.CompareLabel</span>
+                        <span class="sub-ratio">So với tháng trước: <b class="@(Model.TotalElectricityMonth.IsPositive ? "text-green" : "text-red")">@(Model.TotalElectricityMonth.IsPositive ? "↑ +" : "↓ ")@(Model.TotalElectricityMonth.ChangePercent.ToString("0.00"))%</b></span>
                     </div>
                 </div>
             </div>
 
-            <!-- Right: Stacked Numbers of Order & Active Users -->
+            <!-- Cột phải: Thẻ kép Đơn hàng & Khách hàng tháng -->
             <div class="stacked-card-col">
                 <div class="beny-card stacked-item-card">
                     <div class="bc-head-row">
-                        <span class="bc-title">Numbers of Order</span>
+                        <span class="bc-title">Số lượng đơn hàng</span>
                     </div>
                     <div class="bc-big-val color-cyan">@Model.NumbersOfOrderMonth.Value</div>
                     <div class="bc-subline">
-                        <span class="sub-compare">Last Month: @Model.NumbersOfOrderMonth.CompareLabel</span>
-                        <span class="sub-ratio">Compared to Last Month: <b class="@(Model.NumbersOfOrderMonth.IsPositive ? "text-green" : "text-red")">@(Model.NumbersOfOrderMonth.IsPositive ? "↑ +" : "↓ ")@(Model.NumbersOfOrderMonth.ChangePercent.ToString("0.00"))%</b></span>
+                        <span class="sub-compare">Tháng trước: @Model.NumbersOfOrderMonth.CompareLabel</span>
+                        <span class="sub-ratio">So với tháng trước: <b class="@(Model.NumbersOfOrderMonth.IsPositive ? "text-green" : "text-red")">@(Model.NumbersOfOrderMonth.IsPositive ? "↑ +" : "↓ ")@(Model.NumbersOfOrderMonth.ChangePercent.ToString("0.00"))%</b></span>
                     </div>
                 </div>
                 <div class="beny-card stacked-item-card">
                     <div class="bc-head-row">
-                        <span class="bc-title">Active Users</span>
+                        <span class="bc-title">Khách hàng hoạt động</span>
                     </div>
                     <div class="bc-big-val color-cyan">@Model.ActiveUsersMonthCard.Value</div>
                     <div class="bc-subline">
-                        <span class="sub-compare">Last Month: @Model.ActiveUsersMonthCard.CompareLabel</span>
-                        <span class="sub-ratio">Compared to Last Month: <b class="@(Model.ActiveUsersMonthCard.IsPositive ? "text-green" : "text-red")">@(Model.ActiveUsersMonthCard.IsPositive ? "↑ +" : "↓ ")@(Model.ActiveUsersMonthCard.ChangePercent.ToString("0.00"))%</b></span>
+                        <span class="sub-compare">Tháng trước: @Model.ActiveUsersMonthCard.CompareLabel</span>
+                        <span class="sub-ratio">So với tháng trước: <b class="@(Model.ActiveUsersMonthCard.IsPositive ? "text-green" : "text-red")">@(Model.ActiveUsersMonthCard.IsPositive ? "↑ +" : "↓ ")@(Model.ActiveUsersMonthCard.ChangePercent.ToString("0.00"))%</b></span>
                     </div>
                 </div>
             </div>
@@ -181,18 +181,18 @@
     </div>
 
     <!-- ================================================================
-         SECTION 4: INCOME & ACTIVE USERS CHARTS
+         PHÂN KHU 4: BIỂU ĐỒ DOANH THU & KHÁCH HÀNG HOẠT ĐỘNG
          ================================================================ -->
     <div class="beny-charts-grid">
-        <!-- Income Chart Card -->
+        <!-- Biểu đồ Doanh thu -->
         <div class="beny-card chart-large-card">
             <div class="clc-head">
-                <h3 class="clc-title">Income</h3>
+                <h3 class="clc-title">Doanh thu</h3>
                 <div class="beny-tab-group" data-chart="revenueChart">
-                    <button type="button" class="beny-tab-btn active" data-period="today">Today</button>
-                    <button type="button" class="beny-tab-btn" data-period="7d">Last 7 days</button>
-                    <button type="button" class="beny-tab-btn" data-period="30d">Last 30 days</button>
-                    <button type="button" class="beny-tab-btn" data-period="90d">Last 90 days</button>
+                    <button type="button" class="beny-tab-btn active" data-period="today">Hôm nay</button>
+                    <button type="button" class="beny-tab-btn" data-period="7d">7 ngày qua</button>
+                    <button type="button" class="beny-tab-btn" data-period="30d">30 ngày qua</button>
+                    <button type="button" class="beny-tab-btn" data-period="90d">3 tháng qua (Quý)</button>
                 </div>
             </div>
             <div class="clc-body">
@@ -200,15 +200,15 @@
             </div>
         </div>
 
-        <!-- Active Users Chart Card -->
+        <!-- Biểu đồ Khách hàng hoạt động -->
         <div class="beny-card chart-large-card">
             <div class="clc-head">
-                <h3 class="clc-title">Active Users</h3>
+                <h3 class="clc-title">Khách hàng hoạt động</h3>
                 <div class="beny-tab-group" data-chart="activeUsersChart">
-                    <button type="button" class="beny-tab-btn active" data-period="today">Today</button>
-                    <button type="button" class="beny-tab-btn" data-period="7d">Last 7 days</button>
-                    <button type="button" class="beny-tab-btn" data-period="30d">Last 30 days</button>
-                    <button type="button" class="beny-tab-btn" data-period="90d">Last 90 days</button>
+                    <button type="button" class="beny-tab-btn active" data-period="today">Hôm nay</button>
+                    <button type="button" class="beny-tab-btn" data-period="7d">7 ngày qua</button>
+                    <button type="button" class="beny-tab-btn" data-period="30d">30 ngày qua</button>
+                    <button type="button" class="beny-tab-btn" data-period="90d">3 tháng qua (Quý)</button>
                 </div>
             </div>
             <div class="clc-body">
@@ -218,12 +218,12 @@
     </div>
 
     <!-- ================================================================
-         SECTION 5: 5 STATIONS FLEET MONITORING (40 CHARGERS - 80 PORTS)
+         PHÂN KHU 5: GIÁM SÁT 5 TRẠM SẠC CAO TỐC (40 TRỤ DC - 80 CỔNG SẠC)
          ================================================================ -->
     <div class="beny-section-group" style="margin-top: 28px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-            <h2 class="beny-sec-title" style="margin-bottom: 0;">Station Fleet Overview (5 Stations • 40 Chargers • 80 Ports)</h2>
-            <a href="@Url.Action("Index", "Stations")" class="btn btn-sm btn-outline-light" style="color: #00d2ff; border-color: rgba(0,210,255,0.4); background: rgba(0,210,255,0.08); font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 6px; text-decoration: none;">View All Stations &rarr;</a>
+            <h2 class="beny-sec-title" style="margin-bottom: 0;">Giám sát 5 Trạm sạc cao tốc (5 Trạm • 40 Trụ DC • 80 Cổng sạc)</h2>
+            <a href="@Url.Action("Index", "Stations")" class="btn btn-sm btn-outline-light" style="color: #00d2ff; border-color: rgba(0,210,255,0.4); background: rgba(0,210,255,0.08); font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 6px; text-decoration: none;">Xem tất cả trạm &rarr;</a>
         </div>
         <div class="station-fleet-grid">
             @foreach (var station in Model.StationsList)
@@ -244,33 +244,33 @@
 
                     <div class="sfc-metrics">
                         <div class="sfc-col">
-                            <div class="lbl">Chargers</div>
+                            <div class="lbl">Trụ sạc</div>
                             <div class="val">@station.TotalChargers Trụ DC</div>
                         </div>
                         <div class="sfc-col">
-                            <div class="lbl">Connectors</div>
+                            <div class="lbl">Cổng sạc</div>
                             <div class="val">@station.TotalConnectors Súng CCS2</div>
                         </div>
                         <div class="sfc-col">
-                            <div class="lbl">Active Load</div>
+                            <div class="lbl">Công suất tải</div>
                             <div class="val text-cyan">@station.ActivePowerKw.ToString("N0") kW</div>
                         </div>
                     </div>
 
                     <div class="sfc-connector-box">
                         <div class="scb-header">
-                            <span class="scb-title">Ports Status</span>
-                            <span class="scb-count">@station.ChargingConnectors Charging / @station.TotalConnectors Total</span>
+                            <span class="scb-title">Tình trạng cổng</span>
+                            <span class="scb-count">@station.ChargingConnectors Đang sạc / @station.TotalConnectors Tổng</span>
                         </div>
                         <div class="connector-progress-bar">
-                            <div class="cpb-seg charging" style="width: @chgPct.ToString("0.0")%" title="Charging: @station.ChargingConnectors"></div>
-                            <div class="cpb-seg available" style="width: @avlPct.ToString("0.0")%" title="Available: @station.AvailableConnectors"></div>
-                            <div class="cpb-seg offline" style="width: @fltPct.ToString("0.0")%" title="Offline/Fault: @station.FaultConnectors"></div>
+                            <div class="cpb-seg charging" style="width: @chgPct.ToString("0.0")%" title="Đang sạc: @station.ChargingConnectors"></div>
+                            <div class="cpb-seg available" style="width: @avlPct.ToString("0.0")%" title="Sẵn sàng: @station.AvailableConnectors"></div>
+                            <div class="cpb-seg offline" style="width: @fltPct.ToString("0.0")%" title="Bảo trì/Sự cố: @station.FaultConnectors"></div>
                         </div>
                         <div class="sfc-legend">
-                            <span><i class="leg-dot charging"></i> Charging (@station.ChargingConnectors)</span>
-                            <span><i class="leg-dot available"></i> Available (@station.AvailableConnectors)</span>
-                            <span><i class="leg-dot offline"></i> Maintenance (@station.FaultConnectors)</span>
+                            <span><i class="leg-dot charging"></i> Đang sạc (@station.ChargingConnectors)</span>
+                            <span><i class="leg-dot available"></i> Sẵn sàng (@station.AvailableConnectors)</span>
+                            <span><i class="leg-dot offline"></i> Bảo trì/Sự cố (@station.FaultConnectors)</span>
                         </div>
                     </div>
                 </div>
