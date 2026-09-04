@@ -65,6 +65,14 @@ input { font-family: inherit; }
     letter-spacing: 0.2px;
 }
 .sidebar-brand b { color: var(--primary); }
+.sidebar-brand-logo {
+    width: 34px;
+    height: 38px;
+    object-fit: contain;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    flex-shrink: 0;
+}
 
 .sidebar-nav { display: flex; flex-direction: column; gap: 4px; }
 
@@ -99,6 +107,7 @@ input { font-family: inherit; }
 .nav-submenu .nav-item { padding: 9px 10px; font-size: 13.5px; border-radius: 8px; }
 .nav-submenu .nav-item::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: currentColor; opacity: .35; margin-right: 2px; }
 .sidebar.collapsed { width: 76px; }
+.sidebar.collapsed .sidebar-brand { justify-content: center; padding-left: 0; padding-right: 0; }
 .sidebar.collapsed .sidebar-brand span, .sidebar.collapsed .nav-label, .sidebar.collapsed .nav-chevron { display: none; }
 .sidebar.collapsed .nav-item, .sidebar.collapsed .nav-parent { justify-content: center; padding-left: 0; padding-right: 0; }
 .sidebar.collapsed .nav-submenu { display: none; }
@@ -557,6 +566,25 @@ input { font-family: inherit; }
     border-radius: 16px;
     margin: 0 auto;
     box-shadow: 0 8px 24px rgba(0, 102, 255, 0.35);
+}
+
+.login-brand-logo-img {
+    width: 44px;
+    height: 52px;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.28);
+    flex-shrink: 0;
+}
+
+.login-card-logo-img {
+    width: 58px;
+    height: 68px;
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 71, 186, 0.2);
+    display: block;
+    margin: 0 auto;
 }
 
 .login-illustration {
