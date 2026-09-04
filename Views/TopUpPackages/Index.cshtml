@@ -14,7 +14,7 @@
 <!-- KPI Metric Cards Strip -->
 <div class="subpage-kpi-grid">
     <div class="subpage-kpi-card">
-        <div class="subpage-kpi-icon bg-blue">🎁</div>
+        <div class="subpage-kpi-icon bg-blue">@await Html.PartialAsync("_Icon", "tag")</div>
         <div class="subpage-kpi-info">
             <div class="subpage-kpi-label">Tổng số gói nạp ưu đãi</div>
             <div class="subpage-kpi-val">@totalPkgs <span style="font-size:13px; font-weight:600; color:#64748b;">gói</span></div>
@@ -22,7 +22,7 @@
         </div>
     </div>
     <div class="subpage-kpi-card">
-        <div class="subpage-kpi-icon bg-green">🟢</div>
+        <div class="subpage-kpi-icon bg-green">@await Html.PartialAsync("_Icon", "check")</div>
         <div class="subpage-kpi-info">
             <div class="subpage-kpi-label">Gói đang áp dụng</div>
             <div class="subpage-kpi-val">@activePkgs <span style="font-size:13px; font-weight:600; color:#64748b;">gói</span></div>
@@ -30,7 +30,7 @@
         </div>
     </div>
     <div class="subpage-kpi-card">
-        <div class="subpage-kpi-icon bg-orange">⭐</div>
+        <div class="subpage-kpi-icon bg-orange">@await Html.PartialAsync("_Icon", "star")</div>
         <div class="subpage-kpi-info">
             <div class="subpage-kpi-label">Mức ưu đãi tối đa</div>
             <div class="subpage-kpi-val">+20% <span style="font-size:13px; font-weight:600; color:#64748b;">giá trị nạp</span></div>
@@ -38,7 +38,7 @@
         </div>
     </div>
     <div class="subpage-kpi-card">
-        <div class="subpage-kpi-icon bg-purple">⚡</div>
+        <div class="subpage-kpi-icon bg-purple">@await Html.PartialAsync("_Icon", "bolt")</div>
         <div class="subpage-kpi-info">
             <div class="subpage-kpi-label">Mệnh giá phổ biến</div>
             <div class="subpage-kpi-val" style="font-size: 16px;">1M – 5M VNĐ</div>

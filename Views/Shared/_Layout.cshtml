@@ -28,10 +28,10 @@
             </div>
 
             <nav class="sidebar-nav" aria-label="Điều hướng chính">
-                <a class="@NavClass("Home")" href="@Url.Action("Index", "Home")"><span class="nav-icon">⌂</span><span class="nav-label">Trang chủ</span></a>
+                <a class="@NavClass("Home")" href="@Url.Action("Index", "Home")"><span class="nav-icon">@await Html.PartialAsync("_Icon", "home")</span><span class="nav-label">Trang chủ</span></a>
 
                 <div class="nav-group @(IsGroupActive("Stations", "Chargers", "UnregisteredChargers", "Reservations") ? "expanded" : "")">
-                    <button class="nav-parent" type="button" aria-expanded="@(IsGroupActive("Stations", "Chargers", "UnregisteredChargers", "Reservations") ? "true" : "false")"><span class="nav-icon">⚡</span><span class="nav-label">Quản lý trạm sạc</span><span class="nav-chevron">⌄</span></button>
+                    <button class="nav-parent" type="button" aria-expanded="@(IsGroupActive("Stations", "Chargers", "UnregisteredChargers", "Reservations") ? "true" : "false")"><span class="nav-icon">@await Html.PartialAsync("_Icon", "station")</span><span class="nav-label">Quản lý trạm sạc</span><span class="nav-chevron">⌄</span></button>
                     <div class="nav-submenu">
                         <a class="@NavClass("Stations")" href="@Url.Action("Index", "Stations")">Quản lý trạm</a>
                         <a class="@NavClass("Chargers")" href="@Url.Action("Index", "Chargers")">Quản lý trụ sạc</a>
@@ -40,17 +40,16 @@
                     </div>
                 </div>
 
-                <div class="nav-group @(IsGroupActive("Orders", "TopUpOrders", "Invoices") ? "expanded" : "")">
-                    <button class="nav-parent" type="button" aria-expanded="@(IsGroupActive("Orders", "TopUpOrders", "Invoices") ? "true" : "false")"><span class="nav-icon">▤</span><span class="nav-label">Quản lý đơn hàng</span><span class="nav-chevron">⌄</span></button>
+                <div class="nav-group @(IsGroupActive("Orders", "Invoices") ? "expanded" : "")">
+                    <button class="nav-parent" type="button" aria-expanded="@(IsGroupActive("Orders", "Invoices") ? "true" : "false")"><span class="nav-icon">@await Html.PartialAsync("_Icon", "doc")</span><span class="nav-label">Quản lý đơn hàng</span><span class="nav-chevron">⌄</span></button>
                     <div class="nav-submenu">
-                        <a class="@NavClass("Orders")" href="@Url.Action("Index", "Orders")">Đơn sạc</a>
-                        <a class="@NavClass("TopUpOrders")" href="@Url.Action("Index", "TopUpOrders")">Đơn nạp tiền</a>
+                        <a class="@NavClass("Orders")" href="@Url.Action("Index", "Orders")">Danh sách đơn hàng</a>
                         <a class="@NavClass("Invoices")" href="@Url.Action("Index", "Invoices")">Thông tin hóa đơn</a>
                     </div>
                 </div>
 
                 <div class="nav-group @(IsGroupActive("FinancialManagement", "InternalTransactions", "TopUpPackages") ? "expanded" : "")">
-                    <button class="nav-parent" type="button" aria-expanded="@(IsGroupActive("FinancialManagement", "InternalTransactions", "TopUpPackages") ? "true" : "false")"><span class="nav-icon">◫</span><span class="nav-label">Quản lý tài khoản</span><span class="nav-chevron">⌄</span></button>
+                    <button class="nav-parent" type="button" aria-expanded="@(IsGroupActive("FinancialManagement", "InternalTransactions", "TopUpPackages") ? "true" : "false")"><span class="nav-icon">@await Html.PartialAsync("_Icon", "wallet")</span><span class="nav-label">Quản lý tài khoản</span><span class="nav-chevron">⌄</span></button>
                     <div class="nav-submenu">
                         <a class="@NavClass("FinancialManagement")" href="@Url.Action("Index", "FinancialManagement")">Quản lý tài chính</a>
                         <a class="@NavClass("InternalTransactions")" href="@Url.Action("Index", "InternalTransactions")">Lịch sử giao dịch nội bộ</a>
@@ -58,11 +57,11 @@
                     </div>
                 </div>
 
-                <a class="@NavClass("Customers")" href="@Url.Action("Index", "Customers")"><span class="nav-icon">◎</span><span class="nav-label">Quản lý người dùng</span></a>
-                <a class="@NavClass("RfidCards")" href="@Url.Action("Index", "RfidCards")"><span class="nav-icon">▣</span><span class="nav-label">Quản lý thẻ RFID</span></a>
+                <a class="@NavClass("Customers")" href="@Url.Action("Index", "Customers")"><span class="nav-icon">@await Html.PartialAsync("_Icon", "users")</span><span class="nav-label">Quản lý người dùng</span></a>
+                <a class="@NavClass("RfidCards")" href="@Url.Action("Index", "RfidCards")"><span class="nav-icon">@await Html.PartialAsync("_Icon", "card")</span><span class="nav-label">Quản lý thẻ RFID</span></a>
 
                 <div class="nav-group @(IsGroupActive("Operations") ? "expanded" : "")">
-                    <button class="nav-parent" type="button" aria-expanded="@(IsGroupActive("Operations") ? "true" : "false")"><span class="nav-icon">⚙</span><span class="nav-label">Vận hành &amp; Bảo trì</span><span class="nav-chevron">⌄</span></button>
+                    <button class="nav-parent" type="button" aria-expanded="@(IsGroupActive("Operations") ? "true" : "false")"><span class="nav-icon">@await Html.PartialAsync("_Icon", "gear")</span><span class="nav-label">Vận hành &amp; Bảo trì</span><span class="nav-chevron">⌄</span></button>
                     <div class="nav-submenu">
                         <a class="@NavClass("Operations")" href="@Url.Action("Index", "Operations")">Lịch sử sự cố</a>
                         <a class="@NavClass("Operations")" href="@Url.Action("Index", "Operations", new { tab = "offline" })">Quản lý trụ sạc ngoại tuyến</a>
@@ -89,7 +88,7 @@
                         @Html.AntiForgeryToken()
                         <div class="user-menu">
                             <span class="user-display-tag">Quản trị viên</span>
-                            <span class="avatar avatar-beny">🧑‍💼</span>
+                            <span class="avatar avatar-beny">@await Html.PartialAsync("_Icon", "user")</span>
                             <button type="submit" class="icon-btn logout-btn" title="Đăng xuất" aria-label="Đăng xuất">
                                 <svg viewBox="0 0 24 24" fill="none"><path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 8l4 4-4 4M19 12H9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             </button>
@@ -105,7 +104,7 @@
                         <div class="subpage-banner-left">
                             <nav class="subpage-breadcrumb" aria-label="Đường dẫn">
                                 <a href="@Url.Action("Index", "Home")" class="bc-home-link">
-                                    <span class="bc-icon">⌂</span> Trang chủ
+                                    <span class="bc-icon">@await Html.PartialAsync("_Icon", "home")</span> Trang chủ
                                 </a>
                                 <span class="bc-sep">/</span>
                                 <span class="bc-current">@ViewData["Title"]</span>

@@ -18,7 +18,7 @@
 <!-- KPI Metric Cards Strip -->
 <div class="subpage-kpi-grid">
     <div class="subpage-kpi-card">
-        <div class="subpage-kpi-icon bg-blue">⚡</div>
+        <div class="subpage-kpi-icon bg-blue">@await Html.PartialAsync("_Icon", "bolt")</div>
         <div class="subpage-kpi-info">
             <div class="subpage-kpi-label">Tổng số trụ sạc DC</div>
             <div class="subpage-kpi-val">@totalChargers <span style="font-size:13px; font-weight:600; color:#64748b;">trụ</span></div>
@@ -26,7 +26,7 @@
         </div>
     </div>
     <div class="subpage-kpi-card">
-        <div class="subpage-kpi-icon bg-green">🟢</div>
+        <div class="subpage-kpi-icon bg-green">@await Html.PartialAsync("_Icon", "check")</div>
         <div class="subpage-kpi-info">
             <div class="subpage-kpi-label">Trụ sạc Online</div>
             <div class="subpage-kpi-val">@onlineChargers <span style="font-size:13px; font-weight:600; color:#64748b;">trụ</span></div>
@@ -34,7 +34,7 @@
         </div>
     </div>
     <div class="subpage-kpi-card">
-        <div class="subpage-kpi-icon bg-orange">🔌</div>
+        <div class="subpage-kpi-icon bg-orange">@await Html.PartialAsync("_Icon", "plug")</div>
         <div class="subpage-kpi-info">
             <div class="subpage-kpi-label">Cổng sạc sẵn sàng</div>
             <div class="subpage-kpi-val">@availConnectors <span style="font-size:13px; font-weight:600; color:#64748b;">/ @allConnectors.Count cổng</span></div>
@@ -42,7 +42,7 @@
         </div>
     </div>
     <div class="subpage-kpi-card">
-        <div class="subpage-kpi-icon bg-purple">⚠️</div>
+        <div class="subpage-kpi-icon bg-purple">@await Html.PartialAsync("_Icon", "warning")</div>
         <div class="subpage-kpi-info">
             <div class="subpage-kpi-label">Sự cố / Bảo trì</div>
             <div class="subpage-kpi-val">@faultConnectors <span style="font-size:13px; font-weight:600; color:#64748b;">cổng</span></div>

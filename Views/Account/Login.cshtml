@@ -36,7 +36,7 @@
                     
                     <!-- Floating Tech Specs Badges -->
                     <div class="floating-badge badge-top-right">
-                        <span class="badge-icon">⚡</span>
+                        <span class="badge-icon">@await Html.PartialAsync("_Icon", "bolt")</span>
                         <div>
                             <strong>160kW – 240kW</strong>
                             <small>DC Fast Charging</small>
@@ -44,7 +44,7 @@
                     </div>
 
                     <div class="floating-badge badge-bottom-left">
-                        <span class="badge-icon pulse-icon">🟢</span>
+                        <span class="badge-icon pulse-icon">@await Html.PartialAsync("_Icon", "check")</span>
                         <div>
                             <strong>OCPP 1.6 / 2.0.1</strong>
                             <small>Giám sát Real-time 24/7</small>

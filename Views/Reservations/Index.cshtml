@@ -16,7 +16,7 @@
 <!-- KPI Metric Cards Strip -->
 <div class="subpage-kpi-grid">
     <div class="subpage-kpi-card">
-        <div class="subpage-kpi-icon bg-blue">📅</div>
+        <div class="subpage-kpi-icon bg-blue">@await Html.PartialAsync("_Icon", "calendar")</div>
         <div class="subpage-kpi-info">
             <div class="subpage-kpi-label">Tổng lượt đặt trước</div>
             <div class="subpage-kpi-val">@totalRes <span style="font-size:13px; font-weight:600; color:#64748b;">lượt</span></div>
@@ -24,7 +24,7 @@
         </div>
     </div>
     <div class="subpage-kpi-card">
-        <div class="subpage-kpi-icon bg-green">🟢</div>
+        <div class="subpage-kpi-icon bg-green">@await Html.PartialAsync("_Icon", "check")</div>
         <div class="subpage-kpi-info">
             <div class="subpage-kpi-label">Đang hiệu lực giữ chỗ</div>
             <div class="subpage-kpi-val">@activeRes <span style="font-size:13px; font-weight:600; color:#64748b;">lượt</span></div>
@@ -32,7 +32,7 @@
         </div>
     </div>
     <div class="subpage-kpi-card">
-        <div class="subpage-kpi-icon bg-orange">⏱️</div>
+        <div class="subpage-kpi-icon bg-orange">@await Html.PartialAsync("_Icon", "clock")</div>
         <div class="subpage-kpi-info">
             <div class="subpage-kpi-label">Đã hết hạn giữ chỗ</div>
             <div class="subpage-kpi-val">@expiredRes <span style="font-size:13px; font-weight:600; color:#64748b;">lượt</span></div>
@@ -40,7 +40,7 @@
         </div>
     </div>
     <div class="subpage-kpi-card">
-        <div class="subpage-kpi-icon bg-purple">❌</div>
+        <div class="subpage-kpi-icon bg-purple">@await Html.PartialAsync("_Icon", "cross")</div>
         <div class="subpage-kpi-info">
             <div class="subpage-kpi-label">Lượt hủy bởi khách</div>
             <div class="subpage-kpi-val">@cancelledRes <span style="font-size:13px; font-weight:600; color:#64748b;">lượt</span></div>

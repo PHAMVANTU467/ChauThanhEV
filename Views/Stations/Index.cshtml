@@ -16,7 +16,7 @@
 <!-- KPI Metric Cards Strip -->
 <div class="subpage-kpi-grid">
     <div class="subpage-kpi-card">
-        <div class="subpage-kpi-icon bg-blue">🏢</div>
+        <div class="subpage-kpi-icon bg-blue">@await Html.PartialAsync("_Icon", "station")</div>
         <div class="subpage-kpi-info">
             <div class="subpage-kpi-label">Tổng số trạm sạc</div>
             <div class="subpage-kpi-val">@totalStations <span style="font-size:13px; font-weight:600; color:#64748b;">trạm</span></div>
@@ -24,7 +24,7 @@
         </div>
     </div>
     <div class="subpage-kpi-card">
-        <div class="subpage-kpi-icon bg-green">⚡</div>
+        <div class="subpage-kpi-icon bg-green">@await Html.PartialAsync("_Icon", "bolt")</div>
         <div class="subpage-kpi-info">
             <div class="subpage-kpi-label">Quy mô trụ sạc DC</div>
             <div class="subpage-kpi-val">@totalChargers <span style="font-size:13px; font-weight:600; color:#64748b;">trụ</span></div>
@@ -32,7 +32,7 @@
         </div>
     </div>
     <div class="subpage-kpi-card">
-        <div class="subpage-kpi-icon bg-orange">🔌</div>
+        <div class="subpage-kpi-icon bg-orange">@await Html.PartialAsync("_Icon", "plug")</div>
         <div class="subpage-kpi-info">
             <div class="subpage-kpi-label">Tổng cổng sạc CCS2</div>
             <div class="subpage-kpi-val">@totalConnectors <span style="font-size:13px; font-weight:600; color:#64748b;">cổng</span></div>
@@ -40,7 +40,7 @@
         </div>
     </div>
     <div class="subpage-kpi-card">
-        <div class="subpage-kpi-icon bg-purple">💰</div>
+        <div class="subpage-kpi-icon bg-purple">@await Html.PartialAsync("_Icon", "wallet")</div>
         <div class="subpage-kpi-info">
             <div class="subpage-kpi-label">Giá điện niêm yết</div>
             <div class="subpage-kpi-val">3.800 <span style="font-size:13px; font-weight:600; color:#64748b;">đ/kWh</span></div>

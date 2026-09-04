@@ -7,7 +7,7 @@
 <!-- KPI Metric Cards Strip -->
 <div class="subpage-kpi-grid">
     <div class="subpage-kpi-card">
-        <div class="subpage-kpi-icon bg-green">💰</div>
+        <div class="subpage-kpi-icon bg-green">@await Html.PartialAsync("_Icon", "wallet")</div>
         <div class="subpage-kpi-info">
             <div class="subpage-kpi-label">Tổng thu nhập kỳ 90 ngày</div>
             <div class="subpage-kpi-val" style="font-size: 18px;">@ChauThanhEV.Services.MockDataService.FormatCurrency(Model.Overview.TotalIncome)</div>
@@ -15,7 +15,7 @@
         </div>
     </div>
     <div class="subpage-kpi-card">
-        <div class="subpage-kpi-icon bg-blue">📅</div>
+        <div class="subpage-kpi-icon bg-blue">@await Html.PartialAsync("_Icon", "calendar")</div>
         <div class="subpage-kpi-info">
             <div class="subpage-kpi-label">Thu nhập hôm nay</div>
             <div class="subpage-kpi-val" style="font-size: 18px;">@ChauThanhEV.Services.MockDataService.FormatCurrency(Model.Overview.TodayIncome)</div>
@@ -23,7 +23,7 @@
         </div>
     </div>
     <div class="subpage-kpi-card">
-        <div class="subpage-kpi-icon bg-orange">⚡</div>
+        <div class="subpage-kpi-icon bg-orange">@await Html.PartialAsync("_Icon", "bolt")</div>
         <div class="subpage-kpi-info">
             <div class="subpage-kpi-label">Thu nhập tháng này</div>
             <div class="subpage-kpi-val" style="font-size: 18px;">@ChauThanhEV.Services.MockDataService.FormatCurrency(Model.Overview.ThisMonthIncome)</div>
@@ -31,7 +31,7 @@
         </div>
     </div>
     <div class="subpage-kpi-card">
-        <div class="subpage-kpi-icon bg-purple">💳</div>
+        <div class="subpage-kpi-icon bg-purple">@await Html.PartialAsync("_Icon", "card")</div>
         <div class="subpage-kpi-info">
             <div class="subpage-kpi-label">Số dư khả dụng để rút</div>
             <div class="subpage-kpi-val" style="font-size: 18px;">@ChauThanhEV.Services.MockDataService.FormatCurrency(Model.Overview.AvailableBalance)</div>

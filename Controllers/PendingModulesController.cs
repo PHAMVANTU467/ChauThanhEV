@@ -24,17 +24,7 @@ namespace ChauThanhEV.Controllers
     [Authorize]
     public class TopUpOrdersController : Controller
     {
-        private readonly MockDataService _data;
-        public TopUpOrdersController(MockDataService data) => _data = data;
-
-        public IActionResult Index() => View("~/Views/Shared/ModulePlaceholder.cshtml", new ModulePlaceholderViewModel
-        {
-            Title = "Đơn nạp tiền",
-            Description = "Tra cứu các giao dịch nạp tiền vào tài khoản khách hàng.",
-            Columns = new[] { "Mã đơn", "Khách hàng", "Số tiền", "Phương thức", "Thời gian" },
-            Statuses = new[] { "Thành công", "Đang xử lý", "Thất bại" },
-            Rows = _data.TopUpOrders.OrderByDescending(order => order.CreatedAt).Take(8).Select(order => $"{order.Code}|{_data.Customers.FirstOrDefault(customer => customer.Id == order.CustomerId)?.FullName}|{MockDataService.FormatCurrency(order.Amount)}|{order.Method}|{order.CreatedAt:dd/MM/yyyy HH:mm}|{(order.Status == TopUpStatus.Success ? "Thành công" : order.Status == TopUpStatus.Processing ? "Đang xử lý" : "Thất bại")}").ToArray()
-        });
+        public IActionResult Index() => RedirectToAction("Index", "Orders", new { tab = "topup" });
     }
 
     [Authorize]

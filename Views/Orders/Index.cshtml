@@ -20,7 +20,7 @@
 {
     <div class="subpage-kpi-grid">
         <div class="subpage-kpi-card">
-            <div class="subpage-kpi-icon bg-blue">▤</div>
+            <div class="subpage-kpi-icon bg-blue">@await Html.PartialAsync("_Icon", "doc")</div>
             <div class="subpage-kpi-info">
                 <div class="subpage-kpi-label">Tổng số đơn sạc</div>
                 <div class="subpage-kpi-val">@totalCharging <span style="font-size:13px; font-weight:600; color:#64748b;">đơn</span></div>
@@ -28,7 +28,7 @@
             </div>
         </div>
         <div class="subpage-kpi-card">
-            <div class="subpage-kpi-icon bg-green">✓</div>
+            <div class="subpage-kpi-icon bg-green">@await Html.PartialAsync("_Icon", "check")</div>
             <div class="subpage-kpi-info">
                 <div class="subpage-kpi-label">Đơn sạc hoàn thành</div>
                 <div class="subpage-kpi-val">@completedCharging <span style="font-size:13px; font-weight:600; color:#64748b;">đơn</span></div>
@@ -36,7 +36,7 @@
             </div>
         </div>
         <div class="subpage-kpi-card">
-            <div class="subpage-kpi-icon bg-orange">⚡</div>
+            <div class="subpage-kpi-icon bg-orange">@await Html.PartialAsync("_Icon", "bolt")</div>
             <div class="subpage-kpi-info">
                 <div class="subpage-kpi-label">Tổng điện năng tiêu thụ</div>
                 <div class="subpage-kpi-val">@totalEnergy.ToString("N1") <span style="font-size:13px; font-weight:600; color:#64748b;">kWh</span></div>
@@ -44,7 +44,7 @@
             </div>
         </div>
         <div class="subpage-kpi-card">
-            <div class="subpage-kpi-icon bg-purple">💰</div>
+            <div class="subpage-kpi-icon bg-purple">@await Html.PartialAsync("_Icon", "wallet")</div>
             <div class="subpage-kpi-info">
                 <div class="subpage-kpi-label">Tổng doanh thu đơn sạc</div>
                 <div class="subpage-kpi-val" style="font-size: 17px;">@ChauThanhEV.Services.MockDataService.FormatCurrency(totalChargingAmount)</div>
@@ -57,7 +57,7 @@ else
 {
     <div class="subpage-kpi-grid">
         <div class="subpage-kpi-card">
-            <div class="subpage-kpi-icon bg-blue">💳</div>
+            <div class="subpage-kpi-icon bg-blue">@await Html.PartialAsync("_Icon", "card")</div>
             <div class="subpage-kpi-info">
                 <div class="subpage-kpi-label">Tổng lượt nạp tiền</div>
                 <div class="subpage-kpi-val">@totalTopUp <span style="font-size:13px; font-weight:600; color:#64748b;">giao dịch</span></div>
@@ -65,7 +65,7 @@ else
             </div>
         </div>
         <div class="subpage-kpi-card">
-            <div class="subpage-kpi-icon bg-green">✓</div>
+            <div class="subpage-kpi-icon bg-green">@await Html.PartialAsync("_Icon", "check")</div>
             <div class="subpage-kpi-info">
                 <div class="subpage-kpi-label">Nạp tiền thành công</div>
                 <div class="subpage-kpi-val">@successTopUp <span style="font-size:13px; font-weight:600; color:#64748b;">giao dịch</span></div>
@@ -73,7 +73,7 @@ else
             </div>
         </div>
         <div class="subpage-kpi-card">
-            <div class="subpage-kpi-icon bg-orange">💰</div>
+            <div class="subpage-kpi-icon bg-orange">@await Html.PartialAsync("_Icon", "wallet")</div>
             <div class="subpage-kpi-info">
                 <div class="subpage-kpi-label">Tổng số tiền nạp ví</div>
                 <div class="subpage-kpi-val" style="font-size: 17px;">@ChauThanhEV.Services.MockDataService.FormatCurrency(totalTopUpAmount)</div>
@@ -81,7 +81,7 @@ else
             </div>
         </div>
         <div class="subpage-kpi-card">
-            <div class="subpage-kpi-icon bg-purple">⭐</div>
+            <div class="subpage-kpi-icon bg-purple">@await Html.PartialAsync("_Icon", "star")</div>
             <div class="subpage-kpi-info">
                 <div class="subpage-kpi-label">Kênh thanh toán</div>
                 <div class="subpage-kpi-val" style="font-size: 15px;">VietQR / Napas</div>
@@ -92,8 +92,8 @@ else
 }
 
 <div class="page-tabs">
-    <a class="@(isCharging ? "active" : "")" asp-action="Index" asp-route-tab="charging">⚡ Đơn hàng sạc</a>
-    <a class="@(!isCharging ? "active" : "")" asp-action="Index" asp-route-tab="topup">💳 Đơn hàng nạp tiền</a>
+    <a class="@(isCharging ? "active" : "")" asp-action="Index" asp-route-tab="charging">Đơn hàng sạc</a>
+    <a class="@(!isCharging ? "active" : "")" asp-action="Index" asp-route-tab="topup">Đơn hàng nạp tiền</a>
 </div>
 
 <div class="list-toolbar">

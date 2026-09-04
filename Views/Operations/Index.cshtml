@@ -33,7 +33,7 @@
 <!-- KPI Metric Cards Strip -->
 <div class="subpage-kpi-grid">
     <div class="subpage-kpi-card">
-        <div class="subpage-kpi-icon bg-red">⚠️</div>
+        <div class="subpage-kpi-icon bg-red">@await Html.PartialAsync("_Icon", "warning")</div>
         <div class="subpage-kpi-info">
             <div class="subpage-kpi-label">Sự cố đang xử lý</div>
             <div class="subpage-kpi-val">@unresolvedFaults <span style="font-size:13px; font-weight:600; color:#64748b;">sự cố</span></div>
@@ -41,7 +41,7 @@
         </div>
     </div>
     <div class="subpage-kpi-card">
-        <div class="subpage-kpi-icon bg-orange">📡</div>
+        <div class="subpage-kpi-icon bg-orange">@await Html.PartialAsync("_Icon", "offline")</div>
         <div class="subpage-kpi-info">
             <div class="subpage-kpi-label">Trụ sạc ngoại tuyến</div>
             <div class="subpage-kpi-val">@offlineChargersCount <span style="font-size:13px; font-weight:600; color:#64748b;">trụ sạc</span></div>
@@ -49,7 +49,7 @@
         </div>
     </div>
     <div class="subpage-kpi-card">
-        <div class="subpage-kpi-icon bg-blue">🔍</div>
+        <div class="subpage-kpi-icon bg-blue">@await Html.PartialAsync("_Icon", "search")</div>
         <div class="subpage-kpi-info">
             <div class="subpage-kpi-label">Đơn hàng bất thường</div>
             <div class="subpage-kpi-val">@unresolvedAbnormal <span style="font-size:13px; font-weight:600; color:#64748b;">đơn</span></div>
@@ -57,7 +57,7 @@
         </div>
     </div>
     <div class="subpage-kpi-card">
-        <div class="subpage-kpi-icon bg-green">🛡️</div>
+        <div class="subpage-kpi-icon bg-green">@await Html.PartialAsync("_Icon", "shield")</div>
         <div class="subpage-kpi-info">
             <div class="subpage-kpi-label">Chuẩn giám sát & SLA</div>
             <div class="subpage-kpi-val" style="font-size: 16px;">OCPP 1.6J • 24/7</div>
@@ -67,9 +67,9 @@
 </div>
 
 <div class="page-tabs">
-    <a class="@(Model.Tab == "faults" ? "active" : "")" asp-action="Index" asp-route-tab="faults">⚠️ Lịch sử sự cố</a>
-    <a class="@(Model.Tab == "offline" ? "active" : "")" asp-action="Index" asp-route-tab="offline">📡 Trụ ngoại tuyến (Offline)</a>
-    <a class="@(Model.Tab == "abnormal" ? "active" : "")" asp-action="Index" asp-route-tab="abnormal">🔍 Đơn hàng bất thường</a>
+    <a class="@(Model.Tab == "faults" ? "active" : "")" asp-action="Index" asp-route-tab="faults">Lịch sử sự cố</a>
+    <a class="@(Model.Tab == "offline" ? "active" : "")" asp-action="Index" asp-route-tab="offline">Trụ ngoại tuyến (Offline)</a>
+    <a class="@(Model.Tab == "abnormal" ? "active" : "")" asp-action="Index" asp-route-tab="abnormal">Đơn hàng bất thường</a>
 </div>
 
 @if (Model.Tab == "offline")

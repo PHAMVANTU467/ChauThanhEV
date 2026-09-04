@@ -15,7 +15,7 @@
 <!-- KPI Metric Cards Strip -->
 <div class="subpage-kpi-grid">
     <div class="subpage-kpi-card">
-        <div class="subpage-kpi-icon bg-blue">💳</div>
+        <div class="subpage-kpi-icon bg-blue">@await Html.PartialAsync("_Icon", "card")</div>
         <div class="subpage-kpi-info">
             <div class="subpage-kpi-label">Tổng số thẻ RFID</div>
             <div class="subpage-kpi-val">@totalCards <span style="font-size:13px; font-weight:600; color:#64748b;">thẻ</span></div>
@@ -23,7 +23,7 @@
         </div>
     </div>
     <div class="subpage-kpi-card">
-        <div class="subpage-kpi-icon bg-green">🟢</div>
+        <div class="subpage-kpi-icon bg-green">@await Html.PartialAsync("_Icon", "check")</div>
         <div class="subpage-kpi-info">
             <div class="subpage-kpi-label">Thẻ đang hoạt động</div>
             <div class="subpage-kpi-val">@activeCards <span style="font-size:13px; font-weight:600; color:#64748b;">thẻ</span></div>
@@ -31,7 +31,7 @@
         </div>
     </div>
     <div class="subpage-kpi-card">
-        <div class="subpage-kpi-icon bg-orange">🔒</div>
+        <div class="subpage-kpi-icon bg-orange">@await Html.PartialAsync("_Icon", "lock")</div>
         <div class="subpage-kpi-info">
             <div class="subpage-kpi-label">Thẻ tạm khóa / Báo mất</div>
             <div class="subpage-kpi-val">@lockedCards <span style="font-size:13px; font-weight:600; color:#64748b;">thẻ</span></div>
@@ -39,7 +39,7 @@
         </div>
     </div>
     <div class="subpage-kpi-card">
-        <div class="subpage-kpi-icon bg-purple">📡</div>
+        <div class="subpage-kpi-icon bg-purple">@await Html.PartialAsync("_Icon", "power")</div>
         <div class="subpage-kpi-info">
             <div class="subpage-kpi-label">Chuẩn giao tiếp vô tuyến</div>
             <div class="subpage-kpi-val" style="font-size: 16px;">Mifare 13.56 MHz</div>

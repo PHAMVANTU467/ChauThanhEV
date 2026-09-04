@@ -1,11 +1,13 @@
-﻿@model ChauThanhEV.Models.ErrorViewModel
+@model ChauThanhEV.Models.ErrorViewModel
 @{
     ViewData["Title"] = "Lỗi hệ thống";
     Layout = "_Layout";
 }
 
 <div class="table-card" style="padding: 48px 32px; text-align: center; max-width: 680px; margin: 40px auto;">
-    <div style="font-size: 54px; margin-bottom: 16px;">⚠️</div>
+    <div style="color: #ef4444; width: 64px; height: 64px; margin: 0 auto 16px; display: inline-flex; align-items: center; justify-content: center;">
+        @await Html.PartialAsync("_Icon", "warning")
+    </div>
     <h2 class="section-title" style="font-size: 22px; margin-bottom: 10px;">Đã xảy ra lỗi trong quá trình xử lý</h2>
     <p class="page-description" style="margin-bottom: 24px;">Hệ thống đã ghi nhận thông tin sự cố. Vui lòng thử lại hoặc quay về trang chủ.</p>
 
@@ -18,7 +20,7 @@
 
     <div style="display: flex; gap: 12px; justify-content: center;">
         <a href="@Url.Action("Index", "Home")" class="btn btn-primary-sm">
-            @await Html.PartialAsync("_Icon", "bolt") Quay về Trang chủ
+            @await Html.PartialAsync("_Icon", "home") Quay về Trang chủ
         </a>
         <button type="button" class="btn btn-outline" onclick="window.history.back()">
             Quay lại trang trước
