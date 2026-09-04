@@ -40,10 +40,11 @@
                     </div>
                 </div>
 
-                <div class="nav-group @(IsGroupActive("Orders", "Invoices") ? "expanded" : "")">
-                    <button class="nav-parent" type="button" aria-expanded="@(IsGroupActive("Orders", "Invoices") ? "true" : "false")"><span class="nav-icon">@await Html.PartialAsync("_Icon", "doc")</span><span class="nav-label">Quản lý đơn hàng</span><span class="nav-chevron">⌄</span></button>
+                <div class="nav-group @(IsGroupActive("Orders", "TopUpOrders", "Invoices") ? "expanded" : "")">
+                    <button class="nav-parent" type="button" aria-expanded="@(IsGroupActive("Orders", "TopUpOrders", "Invoices") ? "true" : "false")"><span class="nav-icon">@await Html.PartialAsync("_Icon", "doc")</span><span class="nav-label">Quản lý đơn hàng</span><span class="nav-chevron">⌄</span></button>
                     <div class="nav-submenu">
-                        <a class="@NavClass("Orders")" href="@Url.Action("Index", "Orders")">Danh sách đơn hàng</a>
+                        <a class="@NavClass("Orders")" href="@Url.Action("Index", "Orders")">Đơn hàng sạc</a>
+                        <a class="@NavClass("TopUpOrders")" href="@Url.Action("Index", "TopUpOrders")">Đơn hàng nạp tiền</a>
                         <a class="@NavClass("Invoices")" href="@Url.Action("Index", "Invoices")">Thông tin hóa đơn</a>
                     </div>
                 </div>

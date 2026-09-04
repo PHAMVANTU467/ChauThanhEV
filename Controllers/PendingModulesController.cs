@@ -22,12 +22,6 @@ namespace ChauThanhEV.Controllers
     }
 
     [Authorize]
-    public class TopUpOrdersController : Controller
-    {
-        public IActionResult Index() => RedirectToAction("Index", "Orders", new { tab = "topup" });
-    }
-
-    [Authorize]
     public class InvoicesController : Controller
     {
         private readonly MockDataService _data;

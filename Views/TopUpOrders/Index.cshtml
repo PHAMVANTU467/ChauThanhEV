@@ -1,0 +1,164 @@
+@model TopUpOrderListViewModel
+@inject ChauThanhEV.Services.MockDataService DataService
+@{
+    ViewData["Title"] = "Quản lý đơn nạp tiền";
+    var routeValues = new Dictionary<string, string>();
+    if (!string.IsNullOrWhiteSpace(Model.Keyword)) routeValues["keyword"] = Model.Keyword;
+    if (!string.IsNullOrWhiteSpace(Model.StatusFilter)) routeValues["status"] = Model.StatusFilter;
+
+    var totalTopUp = DataService.TopUpOrders.Count;
+    var successTopUp = DataService.TopUpOrders.Count(o => o.Status == TopUpStatus.Success);
+    var totalTopUpAmount = DataService.TopUpOrders.Where(o => o.Status == TopUpStatus.Success).Sum(o => o.Amount);
+}
+
+<!-- KPI Metric Cards Strip -->
+<div class="subpage-kpi-grid">
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-blue">@await Html.PartialAsync("_Icon", "card")</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Tổng lượt nạp tiền</div>
+            <div class="subpage-kpi-val">@totalTopUp <span style="font-size:13px; font-weight:600; color:#64748b;">giao dịch</span></div>
+            <div class="subpage-kpi-sub">Nạp ví điện tử xe điện</div>
+        </div>
+    </div>
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-green">@await Html.PartialAsync("_Icon", "check")</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Nạp tiền thành công</div>
+            <div class="subpage-kpi-val">@successTopUp <span style="font-size:13px; font-weight:600; color:#64748b;">giao dịch</span></div>
+            <div class="subpage-kpi-sub">@((successTopUp * 100.0 / totalTopUp).ToString("0.0"))% xử lý tức thì</div>
+        </div>
+    </div>
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-orange">@await Html.PartialAsync("_Icon", "wallet")</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Tổng số tiền nạp ví</div>
+            <div class="subpage-kpi-val" style="font-size: 17px;">@ChauThanhEV.Services.MockDataService.FormatCurrency(totalTopUpAmount)</div>
+            <div class="subpage-kpi-sub">VietQR, Thẻ ATM & Ví điện tử</div>
+        </div>
+    </div>
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-purple">@await Html.PartialAsync("_Icon", "star")</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Kênh thanh toán</div>
+            <div class="subpage-kpi-val" style="font-size: 15px;">VietQR / Napas</div>
+            <div class="subpage-kpi-sub">Tự động cộng số dư 24/7</div>
+        </div>
+    </div>
+</div>
+
+<div class="list-toolbar">
+    <form method="get" class="search-box">
+        @await Html.PartialAsync("_Icon", "search")
+        <input type="text" name="keyword" value="@Model.Keyword" placeholder="Tìm theo mã đơn, tên khách hàng, mã KH..." />
+    </form>
+
+    <form method="get" class="filter-select-form">
+        @if (!string.IsNullOrWhiteSpace(Model.Keyword))
+        {
+            <input type="hidden" name="keyword" value="@Model.Keyword" />
+        }
+        <select name="status" class="filter-select" onchange="this.form.submit()">
+            <option value="all" selected="@(string.IsNullOrEmpty(Model.StatusFilter) || Model.StatusFilter == "all")">Tất cả trạng thái</option>
+            <option value="Success" selected="@(Model.StatusFilter == "Success")">Thành công</option>
+            <option value="Processing" selected="@(Model.StatusFilter == "Processing")">Đang xử lý</option>
+            <option value="Failed" selected="@(Model.StatusFilter == "Failed")">Thất bại</option>
+        </select>
+    </form>
+
+    <div class="toolbar-actions">
+        <button type="button" class="btn btn-outline" data-export-csv="topupTable" data-export-name="don-nap-tien-chauthanh-ev">
+            @await Html.PartialAsync("_Icon", "download") Xuất CSV
+        </button>
+        <button type="button" class="btn btn-outline" data-export-excel="topupTable" data-export-name="don-nap-tien-chauthanh-ev">
+            @await Html.PartialAsync("_Icon", "download") Xuất Excel
+        </button>
+    </div>
+</div>
+
+<div class="table-card">
+    <div class="table-scroll">
+        <table class="data-table" id="topupTable">
+            <thead>
+                <tr>
+                    <th>Mã đơn</th>
+                    <th>Khách hàng</th>
+                    <th>Số tiền</th>
+                    <th>Phương thức</th>
+                    <th>Thời gian</th>
+                    <th>Trạng thái</th>
+                    <th class="no-export">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Result.Items.Any())
+                {
+                    <tr class="empty-row"><td colspan="7">Không tìm thấy đơn nạp tiền phù hợp.</td></tr>
+                }
+                @foreach (var row in Model.Result.Items)
+                {
+                    <tr>
+                        <td><strong>@row.Code</strong></td>
+                        <td>@row.CustomerName <span style="color:var(--text-muted)">(@row.CustomerCode)</span></td>
+                        <td><strong>@ChauThanhEV.Services.MockDataService.FormatCurrency(row.Amount)</strong></td>
+                        <td>@row.Method</td>
+                        <td>@row.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>
+                            @if (row.Status == TopUpStatus.Success)
+                            {
+                                <span class="pill pill-green">Thành công</span>
+                            }
+                            else if (row.Status == TopUpStatus.Processing)
+                            {
+                                <span class="pill pill-blue">Đang xử lý</span>
+                            }
+                            else
+                            {
+                                <span class="pill pill-red">Thất bại</span>
+                            }
+                        </td>
+                        <td class="no-export">
+                            <button type="button" class="btn btn-ghost btn-sm" data-open-modal="modal-topup-@row.Id" title="Xem chi tiết">@await Html.PartialAsync("_Icon", "eye")</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @await Html.PartialAsync("_Pager", new PagerViewModel
+    {
+        Page = Model.Result.Page,
+        TotalPages = Model.Result.TotalPages,
+        TotalItems = Model.Result.TotalItems,
+        PageSize = Model.Result.PageSize,
+        Controller = "TopUpOrders",
+        Action = "Index",
+        RouteValues = routeValues
+    })
+</div>
+
+@foreach (var row in Model.Result.Items)
+{
+    <div class="modal-overlay" id="modal-topup-@row.Id">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Chi tiết đơn hàng nạp tiền @row.Code</h3>
+                <button type="button" class="modal-close" data-close-modal>&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-grid">
+                    <div class="detail-item"><label>Mã giao dịch</label><p>@row.Code</p></div>
+                    <div class="detail-item"><label>Khách hàng</label><p>@row.CustomerName (@row.CustomerCode)</p></div>
+                    <div class="detail-item"><label>Số tiền nạp</label><p style="color:#059669; font-weight:700;">+@ChauThanhEV.Services.MockDataService.FormatCurrency(row.Amount)</p></div>
+                    <div class="detail-item"><label>Phương thức thanh toán</label><p>@row.Method</p></div>
+                    <div class="detail-item"><label>Thời gian nạp tiền</label><p>@row.CreatedAt.ToString("dd/MM/yyyy HH:mm:ss")</p></div>
+                    <div class="detail-item full"><label>Trạng thái</label><p>@(row.Status == TopUpStatus.Success ? "Thành công (Đã cộng ví)" : row.Status == TopUpStatus.Processing ? "Đang xử lý" : "Thất bại")</p></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" data-close-modal>Đóng</button>
+            </div>
+        </div>
+    </div>
+}

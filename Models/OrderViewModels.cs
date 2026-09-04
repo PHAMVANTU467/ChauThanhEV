@@ -38,4 +38,11 @@ namespace ChauThanhEV.Models
         public PagedResult<ChargingOrderRow> ChargingResult { get; set; } = new();
         public PagedResult<TopUpOrderRow> TopUpResult { get; set; } = new();
     }
+
+    public class TopUpOrderListViewModel
+    {
+        public string? Keyword { get; set; }
+        public string? StatusFilter { get; set; }
+        public PagedResult<TopUpOrderRow> Result { get; set; } = new();
+    }
 }

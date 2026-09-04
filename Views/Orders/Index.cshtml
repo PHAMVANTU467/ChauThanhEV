@@ -1,344 +1,181 @@
 @model OrderListViewModel
 @inject ChauThanhEV.Services.MockDataService DataService
 @{
-    ViewData["Title"] = "Quản lý đơn hàng";
-    ViewData["HeaderTag"] = "Dữ liệu kinh doanh 90 ngày • Hơn 1.200 giao dịch";
-    bool isCharging = Model.Tab != "topup";
+    ViewData["Title"] = "Quản lý đơn hàng sạc";
+    var routeValues = new Dictionary<string, string>();
+    if (!string.IsNullOrWhiteSpace(Model.Keyword)) routeValues["keyword"] = Model.Keyword;
+    if (!string.IsNullOrWhiteSpace(Model.StatusFilter)) routeValues["status"] = Model.StatusFilter;
 
     var totalCharging = DataService.ChargingOrders.Count;
     var completedCharging = DataService.ChargingOrders.Count(o => o.Status == ChargingOrderStatus.Completed);
     var totalEnergy = DataService.ChargingOrders.Sum(o => o.EnergyKwh);
     var totalChargingAmount = DataService.ChargingOrders.Where(o => o.Status == ChargingOrderStatus.Completed).Sum(o => o.Amount);
-
-    var totalTopUp = DataService.TopUpOrders.Count;
-    var successTopUp = DataService.TopUpOrders.Count(o => o.Status == TopUpStatus.Success);
-    var totalTopUpAmount = DataService.TopUpOrders.Where(o => o.Status == TopUpStatus.Success).Sum(o => o.Amount);
 }
 
 <!-- KPI Metric Cards Strip -->
-@if (isCharging)
-{
-    <div class="subpage-kpi-grid">
-        <div class="subpage-kpi-card">
-            <div class="subpage-kpi-icon bg-blue">@await Html.PartialAsync("_Icon", "doc")</div>
-            <div class="subpage-kpi-info">
-                <div class="subpage-kpi-label">Tổng số đơn sạc</div>
-                <div class="subpage-kpi-val">@totalCharging <span style="font-size:13px; font-weight:600; color:#64748b;">đơn</span></div>
-                <div class="subpage-kpi-sub">Giao dịch trong kỳ 90 ngày</div>
-            </div>
-        </div>
-        <div class="subpage-kpi-card">
-            <div class="subpage-kpi-icon bg-green">@await Html.PartialAsync("_Icon", "check")</div>
-            <div class="subpage-kpi-info">
-                <div class="subpage-kpi-label">Đơn sạc hoàn thành</div>
-                <div class="subpage-kpi-val">@completedCharging <span style="font-size:13px; font-weight:600; color:#64748b;">đơn</span></div>
-                <div class="subpage-kpi-sub">@((completedCharging * 100.0 / totalCharging).ToString("0.0"))% tỷ lệ thành công</div>
-            </div>
-        </div>
-        <div class="subpage-kpi-card">
-            <div class="subpage-kpi-icon bg-orange">@await Html.PartialAsync("_Icon", "bolt")</div>
-            <div class="subpage-kpi-info">
-                <div class="subpage-kpi-label">Tổng điện năng tiêu thụ</div>
-                <div class="subpage-kpi-val">@totalEnergy.ToString("N1") <span style="font-size:13px; font-weight:600; color:#64748b;">kWh</span></div>
-                <div class="subpage-kpi-sub">Điện sạc nhanh DC cao tốc</div>
-            </div>
-        </div>
-        <div class="subpage-kpi-card">
-            <div class="subpage-kpi-icon bg-purple">@await Html.PartialAsync("_Icon", "wallet")</div>
-            <div class="subpage-kpi-info">
-                <div class="subpage-kpi-label">Tổng doanh thu đơn sạc</div>
-                <div class="subpage-kpi-val" style="font-size: 17px;">@ChauThanhEV.Services.MockDataService.FormatCurrency(totalChargingAmount)</div>
-                <div class="subpage-kpi-sub">Đã quyết toán thành công</div>
-            </div>
+<div class="subpage-kpi-grid">
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-blue">@await Html.PartialAsync("_Icon", "doc")</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Tổng số đơn sạc</div>
+            <div class="subpage-kpi-val">@totalCharging <span style="font-size:13px; font-weight:600; color:#64748b;">đơn</span></div>
+            <div class="subpage-kpi-sub">Giao dịch trong kỳ 90 ngày</div>
         </div>
     </div>
-}
-else
-{
-    <div class="subpage-kpi-grid">
-        <div class="subpage-kpi-card">
-            <div class="subpage-kpi-icon bg-blue">@await Html.PartialAsync("_Icon", "card")</div>
-            <div class="subpage-kpi-info">
-                <div class="subpage-kpi-label">Tổng lượt nạp tiền</div>
-                <div class="subpage-kpi-val">@totalTopUp <span style="font-size:13px; font-weight:600; color:#64748b;">giao dịch</span></div>
-                <div class="subpage-kpi-sub">Nạp ví điện tử xe điện</div>
-            </div>
-        </div>
-        <div class="subpage-kpi-card">
-            <div class="subpage-kpi-icon bg-green">@await Html.PartialAsync("_Icon", "check")</div>
-            <div class="subpage-kpi-info">
-                <div class="subpage-kpi-label">Nạp tiền thành công</div>
-                <div class="subpage-kpi-val">@successTopUp <span style="font-size:13px; font-weight:600; color:#64748b;">giao dịch</span></div>
-                <div class="subpage-kpi-sub">@((successTopUp * 100.0 / totalTopUp).ToString("0.0"))% xử lý tức thì</div>
-            </div>
-        </div>
-        <div class="subpage-kpi-card">
-            <div class="subpage-kpi-icon bg-orange">@await Html.PartialAsync("_Icon", "wallet")</div>
-            <div class="subpage-kpi-info">
-                <div class="subpage-kpi-label">Tổng số tiền nạp ví</div>
-                <div class="subpage-kpi-val" style="font-size: 17px;">@ChauThanhEV.Services.MockDataService.FormatCurrency(totalTopUpAmount)</div>
-                <div class="subpage-kpi-sub">VietQR, Thẻ ATM & Ví điện tử</div>
-            </div>
-        </div>
-        <div class="subpage-kpi-card">
-            <div class="subpage-kpi-icon bg-purple">@await Html.PartialAsync("_Icon", "star")</div>
-            <div class="subpage-kpi-info">
-                <div class="subpage-kpi-label">Kênh thanh toán</div>
-                <div class="subpage-kpi-val" style="font-size: 15px;">VietQR / Napas</div>
-                <div class="subpage-kpi-sub">Tự động cộng số dư 24/7</div>
-            </div>
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-green">@await Html.PartialAsync("_Icon", "check")</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Đơn sạc hoàn thành</div>
+            <div class="subpage-kpi-val">@completedCharging <span style="font-size:13px; font-weight:600; color:#64748b;">đơn</span></div>
+            <div class="subpage-kpi-sub">@((completedCharging * 100.0 / totalCharging).ToString("0.0"))% tỷ lệ thành công</div>
         </div>
     </div>
-}
-
-<div class="page-tabs">
-    <a class="@(isCharging ? "active" : "")" asp-action="Index" asp-route-tab="charging">Đơn hàng sạc</a>
-    <a class="@(!isCharging ? "active" : "")" asp-action="Index" asp-route-tab="topup">Đơn hàng nạp tiền</a>
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-orange">@await Html.PartialAsync("_Icon", "bolt")</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Tổng điện năng tiêu thụ</div>
+            <div class="subpage-kpi-val">@totalEnergy.ToString("N1") <span style="font-size:13px; font-weight:600; color:#64748b;">kWh</span></div>
+            <div class="subpage-kpi-sub">Điện sạc nhanh DC cao tốc</div>
+        </div>
+    </div>
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-purple">@await Html.PartialAsync("_Icon", "wallet")</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Tổng doanh thu đơn sạc</div>
+            <div class="subpage-kpi-val" style="font-size: 17px;">@ChauThanhEV.Services.MockDataService.FormatCurrency(totalChargingAmount)</div>
+            <div class="subpage-kpi-sub">Đã quyết toán thành công</div>
+        </div>
+    </div>
 </div>
 
 <div class="list-toolbar">
     <form method="get" class="search-box">
-        <input type="hidden" name="tab" value="@Model.Tab" />
         @await Html.PartialAsync("_Icon", "search")
         <input type="text" name="keyword" value="@Model.Keyword" placeholder="Tìm theo mã đơn, tên khách hàng, mã KH..." />
     </form>
 
     <form method="get" class="filter-select-form">
-        <input type="hidden" name="tab" value="@Model.Tab" />
         @if (!string.IsNullOrWhiteSpace(Model.Keyword))
         {
             <input type="hidden" name="keyword" value="@Model.Keyword" />
         }
-        @if (isCharging)
-        {
-            <select name="status" class="filter-select" onchange="this.form.submit()">
-                <option value="all" selected="@(string.IsNullOrEmpty(Model.StatusFilter) || Model.StatusFilter == "all")">Tất cả trạng thái</option>
-                <option value="Completed" selected="@(Model.StatusFilter == "Completed")">Hoàn thành</option>
-                <option value="Charging" selected="@(Model.StatusFilter == "Charging")">Đang sạc</option>
-                <option value="Cancelled" selected="@(Model.StatusFilter == "Cancelled")">Đã hủy</option>
-            </select>
-        }
-        else
-        {
-            <select name="status" class="filter-select" onchange="this.form.submit()">
-                <option value="all" selected="@(string.IsNullOrEmpty(Model.StatusFilter) || Model.StatusFilter == "all")">Tất cả trạng thái</option>
-                <option value="Success" selected="@(Model.StatusFilter == "Success")">Thành công</option>
-                <option value="Processing" selected="@(Model.StatusFilter == "Processing")">Đang xử lý</option>
-                <option value="Failed" selected="@(Model.StatusFilter == "Failed")">Thất bại</option>
-            </select>
-        }
+        <select name="status" class="filter-select" onchange="this.form.submit()">
+            <option value="all" selected="@(string.IsNullOrEmpty(Model.StatusFilter) || Model.StatusFilter == "all")">Tất cả trạng thái</option>
+            <option value="Completed" selected="@(Model.StatusFilter == "Completed")">Hoàn thành</option>
+            <option value="Charging" selected="@(Model.StatusFilter == "Charging")">Đang sạc</option>
+            <option value="Cancelled" selected="@(Model.StatusFilter == "Cancelled")">Đã hủy</option>
+        </select>
     </form>
 
     <div class="toolbar-actions">
-        <button type="button" class="btn btn-outline" data-export-csv="orderTable" data-export-name="don-hang-chauthanh-ev">
+        <button type="button" class="btn btn-outline" data-export-csv="orderTable" data-export-name="don-hang-sac-chauthanh-ev">
             @await Html.PartialAsync("_Icon", "download") Xuất CSV
         </button>
-        <button type="button" class="btn btn-outline" data-export-excel="orderTable" data-export-name="don-hang-chauthanh-ev">
+        <button type="button" class="btn btn-outline" data-export-excel="orderTable" data-export-name="don-hang-sac-chauthanh-ev">
             @await Html.PartialAsync("_Icon", "download") Xuất Excel
         </button>
     </div>
 </div>
 
-@if (isCharging)
-{
-    var routeValues = new Dictionary<string, string> { ["tab"] = "charging" };
-    if (!string.IsNullOrWhiteSpace(Model.Keyword)) routeValues["keyword"] = Model.Keyword;
-    if (!string.IsNullOrWhiteSpace(Model.StatusFilter)) routeValues["status"] = Model.StatusFilter;
-
-    <div class="table-card">
-        <div class="table-scroll">
-            <table class="data-table" id="orderTable">
-                <thead>
+<div class="table-card">
+    <div class="table-scroll">
+        <table class="data-table" id="orderTable">
+            <thead>
+                <tr>
+                    <th>Mã đơn</th>
+                    <th>Khách hàng</th>
+                    <th>Trụ / Cổng</th>
+                    <th>Trạm</th>
+                    <th>Bắt đầu</th>
+                    <th>Kết thúc</th>
+                    <th>Điện năng</th>
+                    <th>Số tiền</th>
+                    <th>Trạng thái</th>
+                    <th class="no-export">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.ChargingResult.Items.Any())
+                {
+                    <tr class="empty-row"><td colspan="10">Không tìm thấy đơn hàng sạc phù hợp.</td></tr>
+                }
+                @foreach (var row in Model.ChargingResult.Items)
+                {
                     <tr>
-                        <th>Mã đơn</th>
-                        <th>Khách hàng</th>
-                        <th>Trụ / Cổng</th>
-                        <th>Trạm</th>
-                        <th>Bắt đầu</th>
-                        <th>Kết thúc</th>
-                        <th>Điện năng</th>
-                        <th>Số tiền</th>
-                        <th>Thanh toán</th>
-                        <th>Trạng thái</th>
-                        <th class="no-export">Hành động</th>
+                        <td><strong>@row.Code</strong></td>
+                        <td>@row.CustomerName <span style="color:var(--text-muted)">(@row.CustomerCode)</span></td>
+                        <td><span class="cell-subtle">@row.ChargerCode</span> / @row.ConnectorCode</td>
+                        <td>@row.StationName</td>
+                        <td>@row.StartTime.ToString("dd/MM HH:mm")</td>
+                        <td>@(row.EndTime.HasValue ? row.EndTime.Value.ToString("dd/MM HH:mm") : "-")</td>
+                        <td>@row.EnergyKwh.ToString("0.0") kWh</td>
+                        <td><strong>@ChauThanhEV.Services.MockDataService.FormatCurrency(row.Amount)</strong></td>
+                        <td>
+                            @if (row.Status == ChargingOrderStatus.Completed)
+                            {
+                                <span class="pill pill-green">Hoàn thành</span>
+                            }
+                            else if (row.Status == ChargingOrderStatus.Charging)
+                            {
+                                <span class="pill pill-blue">Đang sạc</span>
+                            }
+                            else if (row.Status == ChargingOrderStatus.Abnormal)
+                            {
+                                <span class="pill pill-orange">Bất thường</span>
+                            }
+                            else if (row.Status == ChargingOrderStatus.Failed)
+                            {
+                                <span class="pill pill-red">Thất bại</span>
+                            }
+                            else
+                            {
+                                <span class="pill pill-gray">Đã hủy</span>
+                            }
+                        </td>
+                        <td class="no-export">
+                            <button type="button" class="btn btn-ghost btn-sm" data-open-modal="modal-charging-@row.Id" title="Xem chi tiết">@await Html.PartialAsync("_Icon", "eye")</button>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    @if (!Model.ChargingResult.Items.Any())
-                    {
-                        <tr class="empty-row"><td colspan="11">Không tìm thấy đơn hàng phù hợp.</td></tr>
-                    }
-                    @foreach (var row in Model.ChargingResult.Items)
-                    {
-                        <tr>
-                            <td><strong>@row.Code</strong></td>
-                            <td>@row.CustomerName <span style="color:var(--text-muted)">(@row.CustomerCode)</span></td>
-                            <td>@row.ChargerCode / @row.ConnectorCode</td>
-                            <td>@row.StationName</td>
-                            <td>@row.StartTime.ToString("dd/MM HH:mm")</td>
-                            <td>@(row.EndTime.HasValue ? row.EndTime.Value.ToString("dd/MM HH:mm") : "-")</td>
-                            <td>@row.EnergyKwh.ToString("0.0") kWh</td>
-                            <td>@ChauThanhEV.Services.MockDataService.FormatCurrency(row.Amount)</td>
-                            <td>@row.PaymentMethod</td>
-                            <td>
-                                @if (row.Status == ChargingOrderStatus.Completed)
-                                {
-                                    <span class="pill pill-green">Hoàn thành</span>
-                                }
-                                else if (row.Status == ChargingOrderStatus.Charging)
-                                {
-                                    <span class="pill pill-blue">Đang sạc</span>
-                                }
-                                else if (row.Status == ChargingOrderStatus.Failed)
-                                {
-                                    <span class="pill pill-red">Thất bại</span>
-                                }
-                                else if (row.Status == ChargingOrderStatus.Abnormal)
-                                {
-                                    <span class="pill pill-orange">Bất thường</span>
-                                }
-                                else
-                                {
-                                    <span class="pill pill-gray">Đã hủy</span>
-                                }
-                            </td>
-                            <td class="no-export">
-                                <button type="button" class="btn btn-ghost btn-sm" data-open-modal="modal-charging-@row.Id">@await Html.PartialAsync("_Icon", "eye")</button>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-
-        @await Html.PartialAsync("_Pager", new PagerViewModel
-        {
-            Page = Model.ChargingResult.Page,
-            TotalPages = Model.ChargingResult.TotalPages,
-            TotalItems = Model.ChargingResult.TotalItems,
-            PageSize = Model.ChargingResult.PageSize,
-            Controller = "Orders",
-            Action = "Index",
-            RouteValues = routeValues
-        })
+                }
+            </tbody>
+        </table>
     </div>
 
-    @foreach (var row in Model.ChargingResult.Items)
+    @await Html.PartialAsync("_Pager", new PagerViewModel
     {
-        <div class="modal-overlay" id="modal-charging-@row.Id">
-            <div class="modal-box">
-                <div class="modal-header">
-                    <h3>Chi tiết đơn hàng sạc @row.Code</h3>
-                    <button type="button" class="modal-close" data-close-modal>&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="detail-grid">
-                        <div class="detail-item"><label>Khách hàng</label><p>@row.CustomerName (@row.CustomerCode)</p></div>
-                        <div class="detail-item"><label>Trạm / Trụ / Cổng</label><p>@row.StationName — @row.ChargerCode / @row.ConnectorCode</p></div>
-                        <div class="detail-item"><label>Thời gian bắt đầu</label><p>@row.StartTime.ToString("dd/MM/yyyy HH:mm")</p></div>
-                        <div class="detail-item"><label>Thời gian kết thúc</label><p>@(row.EndTime.HasValue ? row.EndTime.Value.ToString("dd/MM/yyyy HH:mm") : "Đang diễn ra")</p></div>
-                        <div class="detail-item"><label>Điện năng tiêu thụ</label><p>@row.EnergyKwh.ToString("0.0") kWh</p></div>
-                        <div class="detail-item"><label>Số tiền</label><p>@ChauThanhEV.Services.MockDataService.FormatCurrency(row.Amount)</p></div>
-                        <div class="detail-item"><label>Phương thức thanh toán</label><p>@row.PaymentMethod</p></div>
-                        <div class="detail-item"><label>Trạng thái</label><p>@(row.Status == ChargingOrderStatus.Completed ? "Hoàn thành" : row.Status == ChargingOrderStatus.Charging ? "Đang sạc" : row.Status == ChargingOrderStatus.Failed ? "Thất bại" : row.Status == ChargingOrderStatus.Abnormal ? "Bất thường" : "Đã hủy")</p></div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline" data-close-modal>Đóng</button>
-                </div>
-            </div>
-        </div>
-    }
-}
-else
+        Page = Model.ChargingResult.Page,
+        TotalPages = Model.ChargingResult.TotalPages,
+        TotalItems = Model.ChargingResult.TotalItems,
+        PageSize = Model.ChargingResult.PageSize,
+        Controller = "Orders",
+        Action = "Index",
+        RouteValues = routeValues
+    })
+</div>
+
+@foreach (var row in Model.ChargingResult.Items)
 {
-    var routeValues = new Dictionary<string, string> { ["tab"] = "topup" };
-    if (!string.IsNullOrWhiteSpace(Model.Keyword)) routeValues["keyword"] = Model.Keyword;
-    if (!string.IsNullOrWhiteSpace(Model.StatusFilter)) routeValues["status"] = Model.StatusFilter;
-
-    <div class="table-card">
-        <div class="table-scroll">
-            <table class="data-table" id="orderTable">
-                <thead>
-                    <tr>
-                        <th>Mã đơn</th>
-                        <th>Khách hàng</th>
-                        <th>Số tiền</th>
-                        <th>Phương thức</th>
-                        <th>Thời gian</th>
-                        <th>Trạng thái</th>
-                        <th class="no-export">Hành động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (!Model.TopUpResult.Items.Any())
-                    {
-                        <tr class="empty-row"><td colspan="7">Không tìm thấy đơn hàng phù hợp.</td></tr>
-                    }
-                    @foreach (var row in Model.TopUpResult.Items)
-                    {
-                        <tr>
-                            <td><strong>@row.Code</strong></td>
-                            <td>@row.CustomerName <span style="color:var(--text-muted)">(@row.CustomerCode)</span></td>
-                            <td>@ChauThanhEV.Services.MockDataService.FormatCurrency(row.Amount)</td>
-                            <td>@row.Method</td>
-                            <td>@row.CreatedAt.ToString("dd/MM HH:mm")</td>
-                            <td>
-                                @if (row.Status == TopUpStatus.Success)
-                                {
-                                    <span class="pill pill-green">Thành công</span>
-                                }
-                                else if (row.Status == TopUpStatus.Processing)
-                                {
-                                    <span class="pill pill-blue">Đang xử lý</span>
-                                }
-                                else
-                                {
-                                    <span class="pill pill-red">Thất bại</span>
-                                }
-                            </td>
-                            <td class="no-export">
-                                <button type="button" class="btn btn-ghost btn-sm" data-open-modal="modal-topup-@row.Id">@await Html.PartialAsync("_Icon", "eye")</button>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-
-        @await Html.PartialAsync("_Pager", new PagerViewModel
-        {
-            Page = Model.TopUpResult.Page,
-            TotalPages = Model.TopUpResult.TotalPages,
-            TotalItems = Model.TopUpResult.TotalItems,
-            PageSize = Model.TopUpResult.PageSize,
-            Controller = "Orders",
-            Action = "Index",
-            RouteValues = routeValues
-        })
-    </div>
-
-    @foreach (var row in Model.TopUpResult.Items)
-    {
-        <div class="modal-overlay" id="modal-topup-@row.Id">
-            <div class="modal-box">
-                <div class="modal-header">
-                    <h3>Chi tiết đơn hàng nạp tiền @row.Code</h3>
-                    <button type="button" class="modal-close" data-close-modal>&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="detail-grid">
-                        <div class="detail-item"><label>Khách hàng</label><p>@row.CustomerName (@row.CustomerCode)</p></div>
-                        <div class="detail-item"><label>Số tiền</label><p>@ChauThanhEV.Services.MockDataService.FormatCurrency(row.Amount)</p></div>
-                        <div class="detail-item"><label>Phương thức</label><p>@row.Method</p></div>
-                        <div class="detail-item"><label>Thời gian</label><p>@row.CreatedAt.ToString("dd/MM/yyyy HH:mm")</p></div>
-                        <div class="detail-item full"><label>Trạng thái</label><p>@(row.Status == TopUpStatus.Success ? "Thành công" : row.Status == TopUpStatus.Processing ? "Đang xử lý" : "Thất bại")</p></div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline" data-close-modal>Đóng</button>
+    <div class="modal-overlay" id="modal-charging-@row.Id">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Chi tiết đơn hàng sạc @row.Code</h3>
+                <button type="button" class="modal-close" data-close-modal>&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-grid">
+                    <div class="detail-item"><label>Khách hàng</label><p>@row.CustomerName (@row.CustomerCode)</p></div>
+                    <div class="detail-item"><label>Trạm / Trụ / Cổng</label><p>@row.StationName — @row.ChargerCode / @row.ConnectorCode</p></div>
+                    <div class="detail-item"><label>Thời gian bắt đầu</label><p>@row.StartTime.ToString("dd/MM/yyyy HH:mm")</p></div>
+                    <div class="detail-item"><label>Thời gian kết thúc</label><p>@(row.EndTime.HasValue ? row.EndTime.Value.ToString("dd/MM/yyyy HH:mm") : "Đang diễn ra")</p></div>
+                    <div class="detail-item"><label>Điện năng tiêu thụ</label><p>@row.EnergyKwh.ToString("0.0") kWh</p></div>
+                    <div class="detail-item"><label>Số tiền</label><p>@ChauThanhEV.Services.MockDataService.FormatCurrency(row.Amount)</p></div>
+                    <div class="detail-item"><label>Phương thức thanh toán</label><p>@row.PaymentMethod</p></div>
+                    <div class="detail-item"><label>Trạng thái</label><p>@(row.Status == ChargingOrderStatus.Completed ? "Hoàn thành" : row.Status == ChargingOrderStatus.Charging ? "Đang sạc" : row.Status == ChargingOrderStatus.Failed ? "Thất bại" : row.Status == ChargingOrderStatus.Abnormal ? "Bất thường" : "Đã hủy")</p></div>
                 </div>
             </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" data-close-modal>Đóng</button>
+            </div>
         </div>
-    }
+    </div>
 }

@@ -1,4 +1,4 @@
-using ChauThanhEV.Models;
+﻿using ChauThanhEV.Models;
 using ChauThanhEV.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -6,23 +6,22 @@ using Microsoft.AspNetCore.Mvc;
 namespace ChauThanhEV.Controllers
 {
     [Authorize]
-    public class OrdersController : Controller
+    public class TopUpOrdersController : Controller
     {
         private readonly MockDataService _data;
 
-        public OrdersController(MockDataService data)
+        public TopUpOrdersController(MockDataService data)
         {
             _data = data;
         }
 
         public IActionResult Index(string? keyword = null, string? status = null, int page = 1)
         {
-            var vm = new OrderListViewModel
+            var vm = new TopUpOrderListViewModel
             {
-                Tab = "charging",
                 Keyword = keyword,
                 StatusFilter = status,
-                ChargingResult = _data.SearchChargingOrders(keyword, status, page)
+                Result = _data.SearchTopUpOrders(keyword, status, page)
             };
 
             return View(vm);
