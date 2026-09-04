@@ -2,8 +2,9 @@
 
 > 🌐 **TRẢI NGHIỆM WEBSITE TRỰC TUYẾN (LIVE DEMO):**
 > 
-> 👉 **Website URL:** [https://chauthanhev.onrender.com](https://chauthanhev.onrender.com)
-> 🔑 **Tài khoản demo:** `admin` &nbsp;|&nbsp; **Mật khẩu:** `admin123`
+> 🚀 **Railway URL (Khuyên dùng - Tốc độ cao):** [https://chauthanhev-production.up.railway.app](https://chauthanhev-production.up.railway.app)  
+> 🔗 **Render URL:** [https://chauthanhev.onrender.com](https://chauthanhev.onrender.com)  
+> 🔑 **Tài khoản demo:** `admin` &nbsp;|&nbsp; **Mật khẩu:** `admin123`  
 > *(Trải nghiệm trực tiếp toàn bộ tính năng trên trình duyệt mà không cần tải hay cài đặt mã nguồn)*
 
 ---
