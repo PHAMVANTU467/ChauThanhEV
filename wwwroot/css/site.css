@@ -57,21 +57,25 @@ input { font-family: inherit; }
 .sidebar-brand {
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 17px;
-    font-weight: 700;
+    gap: 12px;
+    font-size: 18px;
+    font-weight: 800;
     color: var(--text-dark);
-    padding: 6px 10px 26px;
+    padding: 8px 10px 24px;
     letter-spacing: 0.2px;
 }
 .sidebar-brand b { color: var(--primary); }
 .sidebar-brand-logo {
-    width: 34px;
-    height: 38px;
+    width: 48px;
+    height: 52px;
     object-fit: contain;
-    border-radius: 6px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    border-radius: 8px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
     flex-shrink: 0;
+    transition: transform 0.2s ease;
+}
+.sidebar-brand-logo:hover {
+    transform: scale(1.04);
 }
 
 .sidebar-nav { display: flex; flex-direction: column; gap: 4px; }
@@ -109,6 +113,7 @@ input { font-family: inherit; }
 .sidebar.collapsed { width: 76px; }
 .sidebar.collapsed .sidebar-brand { justify-content: center; padding-left: 0; padding-right: 0; }
 .sidebar.collapsed .sidebar-brand span, .sidebar.collapsed .nav-label, .sidebar.collapsed .nav-chevron { display: none; }
+.sidebar.collapsed .sidebar-brand-logo { width: 44px; height: 48px; }
 .sidebar.collapsed .nav-item, .sidebar.collapsed .nav-parent { justify-content: center; padding-left: 0; padding-right: 0; }
 .sidebar.collapsed .nav-submenu { display: none; }
 
@@ -1538,6 +1543,135 @@ input { font-family: inherit; }
 .table-scroll { overflow-x: auto; }
 .cell-actions { display: flex; gap: 6px; }
 .empty-row td { text-align: center; padding: 40px 16px; color: #94a3b8; font-size: 14px; }
+
+/* ================================================================
+   Thanh phân trang bảng dữ liệu chuyên nghiệp (Enterprise Pagination)
+================================================================ */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 13px 20px;
+    background: #ffffff;
+    border-top: 1px solid #edf2f7;
+    font-size: 13px;
+    color: #475569;
+}
+.pagination-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    color: #64748b;
+    font-size: 12.5px;
+}
+.pagination-info .pg-num {
+    font-weight: 700;
+    color: #0f172a;
+}
+.pagination-info .pg-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 9px;
+    border-radius: 6px;
+    background: #f1f5f9;
+    color: #334155;
+    font-size: 11.5px;
+    font-weight: 600;
+    margin-left: 4px;
+}
+
+.pagination-links {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.pg-btn,
+.pagination-links a,
+.pagination-links span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-width: 32px;
+    height: 32px;
+    padding: 0 9px;
+    border-radius: 7px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    color: #334155;
+    font-size: 12.5px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    cursor: pointer;
+    user-select: none;
+}
+
+.pg-btn svg {
+    flex-shrink: 0;
+}
+
+.pg-btn-text {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.pg-btn:hover:not(.pg-disabled):not(.pg-active),
+.pagination-links a:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #0284c7;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.pg-btn.pg-active,
+.pagination-links .active {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+    border-color: #0284c7 !important;
+    color: #ffffff !important;
+    font-weight: 700;
+    box-shadow: 0 2px 6px rgba(2, 132, 199, 0.35);
+    cursor: default;
+}
+
+.pg-btn.pg-disabled,
+.pagination-links .disabled {
+    background: #f8fafc !important;
+    border-color: #f1f5f9 !important;
+    color: #cbd5e1 !important;
+    cursor: not-allowed;
+    pointer-events: none;
+    box-shadow: none;
+}
+
+.pg-ellipsis {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 32px;
+    color: #94a3b8;
+    font-weight: 700;
+    font-size: 12px;
+    border: none !important;
+    background: transparent !important;
+}
+
+@media (max-width: 640px) {
+    .pagination {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .pagination-links {
+        width: 100%;
+        justify-content: center;
+    }
+}
 
 /* Pills trạng thái dùng chung cho mọi thực thể */
 .pill {

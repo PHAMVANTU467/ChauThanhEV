@@ -1,8 +1,14 @@
 @model PagerViewModel
 @{
+    int totalPages = Math.Max(1, Model.TotalPages);
+    int currentPage = Math.Max(1, Math.Min(Model.Page, totalPages));
+    int pageSize = Model.PageSize > 0 ? Model.PageSize : 10;
+    int fromItem = Model.TotalItems == 0 ? 0 : (currentPage - 1) * pageSize + 1;
+    int toItem = Math.Min(currentPage * pageSize, Model.TotalItems);
+
     int windowSize = 2;
-    int start = Math.Max(1, Model.Page - windowSize);
-    int end = Math.Min(Model.TotalPages, Model.Page + windowSize);
+    int start = Math.Max(1, currentPage - windowSize);
+    int end = Math.Min(totalPages, currentPage + windowSize);
 
     Dictionary<string, string> RouteFor(int p)
     {
@@ -11,38 +17,81 @@
     }
 }
 <div class="pagination">
-    <span class="pagination-info">
-        Tổng <strong>@Model.TotalItems</strong> bản ghi — Trang @Model.Page / @Model.TotalPages
-    </span>
+    <div class="pagination-info">
+        <span>Hiển thị <strong class="pg-num">@fromItem – @toItem</strong> / <strong class="pg-num">@Model.TotalItems</strong> bản ghi</span>
+        <span class="pg-badge">Trang @currentPage / @totalPages</span>
+    </div>
     <div class="pagination-links">
-        @if (Model.Page <= 1)
+        @if (currentPage <= 1)
         {
-            <span class="disabled">&laquo;</span>
+            <span class="pg-btn pg-disabled" title="Trang đầu">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="pg-btn pg-disabled" title="Trang trước">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span class="pg-btn-text">Trước</span>
+            </span>
         }
         else
         {
-            <a asp-controller="@Model.Controller" asp-action="@Model.Action" asp-all-route-data="RouteFor(Model.Page - 1)">&laquo;</a>
+            <a class="pg-btn" asp-controller="@Model.Controller" asp-action="@Model.Action" asp-all-route-data="RouteFor(1)" title="Trang đầu">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <a class="pg-btn" asp-controller="@Model.Controller" asp-action="@Model.Action" asp-all-route-data="RouteFor(currentPage - 1)" title="Trang trước">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span class="pg-btn-text">Trước</span>
+            </a>
+        }
+
+        @if (start > 1)
+        {
+            <a class="pg-btn" asp-controller="@Model.Controller" asp-action="@Model.Action" asp-all-route-data="RouteFor(1)">1</a>
+            @if (start > 2)
+            {
+                <span class="pg-ellipsis">&hellip;</span>
+            }
         }
 
         @for (int p = start; p <= end; p++)
         {
-            if (p == Model.Page)
+            if (p == currentPage)
             {
-                <span class="active">@p</span>
+                <span class="pg-btn pg-active">@p</span>
             }
             else
             {
-                <a asp-controller="@Model.Controller" asp-action="@Model.Action" asp-all-route-data="RouteFor(p)">@p</a>
+                <a class="pg-btn" asp-controller="@Model.Controller" asp-action="@Model.Action" asp-all-route-data="RouteFor(p)">@p</a>
             }
         }
 
-        @if (Model.Page >= Model.TotalPages)
+        @if (end < totalPages)
         {
-            <span class="disabled">&raquo;</span>
+            @if (end < totalPages - 1)
+            {
+                <span class="pg-ellipsis">&hellip;</span>
+            }
+            <a class="pg-btn" asp-controller="@Model.Controller" asp-action="@Model.Action" asp-all-route-data="RouteFor(totalPages)">@totalPages</a>
+        }
+
+        @if (currentPage >= totalPages)
+        {
+            <span class="pg-btn pg-disabled" title="Trang sau">
+                <span class="pg-btn-text">Sau</span>
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="pg-btn pg-disabled" title="Trang cuối">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none"><path d="M13 17l5-5-5-5M6 17l5-5-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
         }
         else
         {
-            <a asp-controller="@Model.Controller" asp-action="@Model.Action" asp-all-route-data="RouteFor(Model.Page + 1)">&raquo;</a>
+            <a class="pg-btn" asp-controller="@Model.Controller" asp-action="@Model.Action" asp-all-route-data="RouteFor(currentPage + 1)" title="Trang sau">
+                <span class="pg-btn-text">Sau</span>
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <a class="pg-btn" asp-controller="@Model.Controller" asp-action="@Model.Action" asp-all-route-data="RouteFor(totalPages)" title="Trang cuối">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none"><path d="M13 17l5-5-5-5M6 17l5-5-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
         }
     </div>
 </div>
