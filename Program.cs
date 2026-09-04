@@ -40,10 +40,21 @@ app.UseStaticFiles(new StaticFileOptions
 {
     OnPrepareResponse = ctx =>
     {
-        // Yêu cầu trình duyệt luôn kiểm tra phiên bản mới của file tĩnh (CSS/JS)
-        ctx.Context.Response.Headers.Append("Cache-Control", "no-cache, no-store, must-revalidate");
-        ctx.Context.Response.Headers.Append("Pragma", "no-cache");
-        ctx.Context.Response.Headers.Append("Expires", "0");
+        var fileName = ctx.File.Name.ToLowerInvariant();
+        if (fileName.EndsWith(".png") || fileName.EndsWith(".jpg") || fileName.EndsWith(".jpeg") ||
+            fileName.EndsWith(".svg") || fileName.EndsWith(".webp") || fileName.EndsWith(".ico") ||
+            fileName.EndsWith(".woff") || fileName.EndsWith(".woff2"))
+        {
+            // Cho phép browser và CDN cache tài nguyên ảnh, font (1 năm)
+            // Nhờ asp-append-version, khi file thay đổi query ?v=... sẽ tự động cập nhật ngay
+            ctx.Context.Response.Headers["Cache-Control"] = "public, max-age=31536000, immutable";
+        }
+        else
+        {
+            // Với CSS/JS, dùng no-cache để trình duyệt kiểm tra ETag 304 Not Modified thay vì tải lại toàn bộ
+            ctx.Context.Response.Headers["Cache-Control"] = "no-cache";
+            ctx.Context.Response.Headers["Pragma"] = "no-cache";
+        }
     }
 });
 
