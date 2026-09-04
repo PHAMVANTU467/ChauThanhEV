@@ -1,15 +1,57 @@
 @model RfidCardListViewModel
+@inject ChauThanhEV.Services.MockDataService DataService
 @{
     ViewData["Title"] = "Quản lý thẻ RFID";
+    ViewData["HeaderTag"] = "Thẻ RFID Mifare 13.56MHz đồng bộ trụ sạc DC";
     var routeValues = new Dictionary<string, string>();
     if (!string.IsNullOrWhiteSpace(Model.Keyword)) routeValues["keyword"] = Model.Keyword;
     if (!string.IsNullOrWhiteSpace(Model.StatusFilter)) routeValues["status"] = Model.StatusFilter;
+
+    var totalCards = DataService.Cards.Count;
+    var activeCards = DataService.Cards.Count(c => c.Status == CardStatus.Active);
+    var lockedCards = DataService.Cards.Count(c => c.Status == CardStatus.Inactive);
 }
+
+<!-- KPI Metric Cards Strip -->
+<div class="subpage-kpi-grid">
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-blue">💳</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Tổng số thẻ RFID</div>
+            <div class="subpage-kpi-val">@totalCards <span style="font-size:13px; font-weight:600; color:#64748b;">thẻ</span></div>
+            <div class="subpage-kpi-sub">Đã phát hành toàn mạng lưới</div>
+        </div>
+    </div>
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-green">🟢</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Thẻ đang hoạt động</div>
+            <div class="subpage-kpi-val">@activeCards <span style="font-size:13px; font-weight:600; color:#64748b;">thẻ</span></div>
+            <div class="subpage-kpi-sub">@((activeCards * 100.0 / totalCards).ToString("0.0"))% sẵn sàng quẹt sạc xe</div>
+        </div>
+    </div>
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-orange">🔒</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Thẻ tạm khóa / Báo mất</div>
+            <div class="subpage-kpi-val">@lockedCards <span style="font-size:13px; font-weight:600; color:#64748b;">thẻ</span></div>
+            <div class="subpage-kpi-sub">Ngăn ngừa quẹt sạc trái phép</div>
+        </div>
+    </div>
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-purple">📡</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Chuẩn giao tiếp vô tuyến</div>
+            <div class="subpage-kpi-val" style="font-size: 16px;">Mifare 13.56 MHz</div>
+            <div class="subpage-kpi-sub">Tương thích đầu đọc trụ DC</div>
+        </div>
+    </div>
+</div>
 
 <div class="list-toolbar">
     <form method="get" class="search-box">
         @await Html.PartialAsync("_Icon", "search")
-        <input type="text" name="keyword" value="@Model.Keyword" placeholder="Tìm theo mã thẻ, người dùng..." />
+        <input type="text" name="keyword" value="@Model.Keyword" placeholder="Tìm theo mã thẻ, người dùng, SĐT..." />
     </form>
 
     <form method="get" class="filter-select-form">
@@ -25,10 +67,10 @@
     </form>
 
     <div class="toolbar-actions">
-        <button type="button" class="btn btn-outline" data-export-csv="cardTable" data-export-name="danh-sach-the-rfid">
+        <button type="button" class="btn btn-outline" data-export-csv="cardTable" data-export-name="danh-sach-the-rfid-chauthanh-ev">
             @await Html.PartialAsync("_Icon", "download") Xuất CSV
         </button>
-        <button type="button" class="btn btn-outline" data-export-excel="cardTable" data-export-name="danh-sach-the-rfid">
+        <button type="button" class="btn btn-outline" data-export-excel="cardTable" data-export-name="danh-sach-the-rfid-chauthanh-ev">
             @await Html.PartialAsync("_Icon", "download") Xuất Excel
         </button>
         <button type="button" class="btn btn-primary-sm" data-open-modal="modal-create-card">

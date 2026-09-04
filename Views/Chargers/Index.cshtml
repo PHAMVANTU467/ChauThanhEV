@@ -1,10 +1,55 @@
 @model ChargerListViewModel
+@inject ChauThanhEV.Services.MockDataService DataService
 @{
     ViewData["Title"] = "Quản lý trụ sạc";
+    ViewData["HeaderTag"] = "40 trụ sạc DC 160kW - 240kW • 80 cổng CCS2";
     var routeValues = new Dictionary<string, string>();
     if (!string.IsNullOrWhiteSpace(Model.Keyword)) routeValues["keyword"] = Model.Keyword;
     if (!string.IsNullOrWhiteSpace(Model.StatusFilter)) routeValues["status"] = Model.StatusFilter;
+
+    var totalChargers = DataService.Chargers.Count;
+    var onlineChargers = DataService.Chargers.Count(c => c.Status == ChargerStatus.Online);
+    var allConnectors = DataService.Chargers.SelectMany(c => c.Connectors).ToList();
+    var availConnectors = allConnectors.Count(c => c.Status == ConnectorStatus.Available);
+    var chargingConnectors = allConnectors.Count(c => c.Status == ConnectorStatus.Charging);
+    var faultConnectors = allConnectors.Count(c => c.Status == ConnectorStatus.Fault || c.Status == ConnectorStatus.Maintenance);
 }
+
+<!-- KPI Metric Cards Strip -->
+<div class="subpage-kpi-grid">
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-blue">⚡</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Tổng số trụ sạc DC</div>
+            <div class="subpage-kpi-val">@totalChargers <span style="font-size:13px; font-weight:600; color:#64748b;">trụ</span></div>
+            <div class="subpage-kpi-sub">8 trụ / trạm trên 5 tuyến cao tốc</div>
+        </div>
+    </div>
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-green">🟢</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Trụ sạc Online</div>
+            <div class="subpage-kpi-val">@onlineChargers <span style="font-size:13px; font-weight:600; color:#64748b;">trụ</span></div>
+            <div class="subpage-kpi-sub">@((onlineChargers * 100.0 / totalChargers).ToString("0.0"))% sẵn sàng phục vụ</div>
+        </div>
+    </div>
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-orange">🔌</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Cổng sạc sẵn sàng</div>
+            <div class="subpage-kpi-val">@availConnectors <span style="font-size:13px; font-weight:600; color:#64748b;">/ @allConnectors.Count cổng</span></div>
+            <div class="subpage-kpi-sub">@chargingConnectors cổng đang sạc xe</div>
+        </div>
+    </div>
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-purple">⚠️</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Sự cố / Bảo trì</div>
+            <div class="subpage-kpi-val">@faultConnectors <span style="font-size:13px; font-weight:600; color:#64748b;">cổng</span></div>
+            <div class="subpage-kpi-sub">Đội kỹ thuật theo dõi 24/7</div>
+        </div>
+    </div>
+</div>
 
 <div class="list-toolbar">
     <form method="get" class="search-box">
@@ -27,10 +72,10 @@
     </form>
 
     <div class="toolbar-actions">
-        <button type="button" class="btn btn-outline" data-export-csv="chargerTable" data-export-name="danh-sach-tru-sac">
+        <button type="button" class="btn btn-outline" data-export-csv="chargerTable" data-export-name="danh-sach-tru-sac-chauthanh-ev">
             @await Html.PartialAsync("_Icon", "download") Xuất CSV
         </button>
-        <button type="button" class="btn btn-outline" data-export-excel="chargerTable" data-export-name="danh-sach-tru-sac">
+        <button type="button" class="btn btn-outline" data-export-excel="chargerTable" data-export-name="danh-sach-tru-sac-chauthanh-ev">
             @await Html.PartialAsync("_Icon", "download") Xuất Excel
         </button>
         <button type="button" class="btn btn-primary-sm" data-open-modal="modal-create-charger">
@@ -147,13 +192,18 @@
                         </select>
                     </div>
                     <div class="form-field">
-                        <label>Công suất (kW)</label>
-                        <input type="number" name="PowerKw" value="60" min="1" step="1" />
+                        <label>Công suất DC (kW)</label>
+                        <select name="PowerKw">
+                            <option value="160" selected>160 kW (DC Fast Charge)</option>
+                            <option value="240">240 kW (DC Ultra Fast Charge)</option>
+                            <option value="360">360 kW (DC Super Charge)</option>
+                            <option value="120">120 kW (DC Fast Charge)</option>
+                        </select>
                     </div>
                     <div class="form-field">
-                        <label>Số cổng sạc</label>
+                        <label>Số cổng sạc CCS2</label>
                         <input type="number" name="ConnectorCount" value="2" min="1" max="4" />
-                        <p class="form-hint">Các cổng mới tạo mặc định ở trạng thái Sẵn sàng (Available).</p>
+                        <p class="form-hint">Chuẩn kết nối CCS2 Châu Âu, mặc định trạng thái Sẵn sàng.</p>
                     </div>
                 </div>
             </div>

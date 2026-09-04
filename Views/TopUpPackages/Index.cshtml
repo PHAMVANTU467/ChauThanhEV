@@ -1,10 +1,51 @@
 @model TopUpPackageListViewModel
+@inject ChauThanhEV.Services.MockDataService DataService
 @{
     ViewData["Title"] = "Gói nạp tiền";
+    ViewData["HeaderTag"] = "Chính sách ưu đãi nạp tiền ví điện tử xe điện";
     var routeValues = new Dictionary<string, string>();
     if (!string.IsNullOrWhiteSpace(Model.Keyword)) routeValues["keyword"] = Model.Keyword;
     if (!string.IsNullOrWhiteSpace(Model.StatusFilter)) routeValues["status"] = Model.StatusFilter;
+
+    var totalPkgs = DataService.TopUpPackages.Count;
+    var activePkgs = DataService.TopUpPackages.Count(p => p.Active);
 }
+
+<!-- KPI Metric Cards Strip -->
+<div class="subpage-kpi-grid">
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-blue">🎁</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Tổng số gói nạp ưu đãi</div>
+            <div class="subpage-kpi-val">@totalPkgs <span style="font-size:13px; font-weight:600; color:#64748b;">gói</span></div>
+            <div class="subpage-kpi-sub">Cấu hình khuyến mãi nạp ví</div>
+        </div>
+    </div>
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-green">🟢</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Gói đang áp dụng</div>
+            <div class="subpage-kpi-val">@activePkgs <span style="font-size:13px; font-weight:600; color:#64748b;">gói</span></div>
+            <div class="subpage-kpi-sub">Hiển thị trên App khách hàng</div>
+        </div>
+    </div>
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-orange">⭐</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Mức ưu đãi tối đa</div>
+            <div class="subpage-kpi-val">+20% <span style="font-size:13px; font-weight:600; color:#64748b;">giá trị nạp</span></div>
+            <div class="subpage-kpi-sub">Gói Doanh Nghiệp / Taxi EV</div>
+        </div>
+    </div>
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-purple">⚡</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Mệnh giá phổ biến</div>
+            <div class="subpage-kpi-val" style="font-size: 16px;">1M – 5M VNĐ</div>
+            <div class="subpage-kpi-sub">Tích lũy điểm sạc cao tốc</div>
+        </div>
+    </div>
+</div>
 
 <div class="list-toolbar">
     <form method="get" class="search-box">
@@ -25,10 +66,10 @@
     </form>
 
     <div class="toolbar-actions">
-        <button type="button" class="btn btn-outline" data-export-csv="packageTable" data-export-name="danh-sach-goi-nap">
+        <button type="button" class="btn btn-outline" data-export-csv="packageTable" data-export-name="danh-sach-goi-nap-chauthanh-ev">
             @await Html.PartialAsync("_Icon", "download") Xuất CSV
         </button>
-        <button type="button" class="btn btn-outline" data-export-excel="packageTable" data-export-name="danh-sach-goi-nap">
+        <button type="button" class="btn btn-outline" data-export-excel="packageTable" data-export-name="danh-sach-goi-nap-chauthanh-ev">
             @await Html.PartialAsync("_Icon", "download") Xuất Excel
         </button>
         <button type="button" class="btn btn-primary-sm" data-open-modal="modal-create-package">
@@ -43,7 +84,7 @@
             <thead>
                 <tr>
                     <th>STT</th>
-                    <th>Tên gói</th>
+                    <th>Tên gói nạp</th>
                     <th>Mệnh giá nạp</th>
                     <th>Thưởng / Ưu đãi</th>
                     <th>Trạng thái</th>
@@ -62,13 +103,13 @@
                         <td>@((Model.Result.Page - 1) * Model.Result.PageSize + i + 1)</td>
                         <td><strong>@pkg.Name</strong></td>
                         <td>@ChauThanhEV.Services.MockDataService.FormatCurrency(pkg.Amount)</td>
-                        <td>@ChauThanhEV.Services.MockDataService.FormatCurrency(pkg.Bonus)</td>
+                        <td><span style="color:#059669; font-weight:700;">+@ChauThanhEV.Services.MockDataService.FormatCurrency(pkg.Bonus)</span></td>
                         <td>
                             <span class="pill @(pkg.Active ? "pill-green" : "pill-gray")">@(pkg.Active ? "Đang hoạt động" : "Tạm dừng")</span>
                         </td>
                         <td class="no-export">
                             <div class="cell-actions">
-                                <button type="button" class="btn btn-ghost btn-sm" data-open-modal="modal-edit-package-@pkg.Id" title="Sửa">@await Html.PartialAsync("_Icon", "edit")</button>
+                                <button type="button" class="btn btn-ghost btn-sm" data-open-modal="modal-edit-package-@pkg.Id" title="Sửa gói nạp">@await Html.PartialAsync("_Icon", "edit")</button>
                                 <form asp-action="Delete" asp-controller="TopUpPackages" method="post" data-confirm="Xóa gói @pkg.Name?">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="id" value="@pkg.Id" />

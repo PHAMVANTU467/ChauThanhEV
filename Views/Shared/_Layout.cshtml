@@ -98,7 +98,34 @@
                 </div>
             </header>
 
-            <main class="page-content">
+            @if (!currentController.Equals("Home", StringComparison.OrdinalIgnoreCase))
+            {
+                <div class="subpage-banner">
+                    <div class="subpage-banner-inner">
+                        <div class="subpage-banner-left">
+                            <nav class="subpage-breadcrumb" aria-label="Đường dẫn">
+                                <a href="@Url.Action("Index", "Home")" class="bc-home-link">
+                                    <span class="bc-icon">⌂</span> Trang chủ
+                                </a>
+                                <span class="bc-sep">/</span>
+                                <span class="bc-current">@ViewData["Title"]</span>
+                            </nav>
+                            <div class="subpage-title-row">
+                                <h1 class="subpage-banner-title">@ViewData["Title"]</h1>
+                                @if (ViewData["HeaderTag"] != null)
+                                {
+                                    <span class="subpage-banner-tag">
+                                        <span class="tag-dot"></span>
+                                        @ViewData["HeaderTag"]
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <main class="page-content @(currentController.Equals("Home", StringComparison.OrdinalIgnoreCase) ? "home-page-content" : "subpage-page-content")">
                 @RenderBody()
             </main>
 

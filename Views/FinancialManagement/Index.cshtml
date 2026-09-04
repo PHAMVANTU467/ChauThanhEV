@@ -1,49 +1,55 @@
 @model FinancialViewModel
 @{
     ViewData["Title"] = "Quản lý tài chính";
+    ViewData["HeaderTag"] = "Báo cáo doanh thu & Đối soát tài chính 90 ngày";
 }
 
-<div class="overview-grid">
-    <div class="mini-card">
-        <span class="stat-icon bg-green">@await Html.PartialAsync("_Icon", "wallet")</span>
-        <div class="mini-body">
-            <p class="stat-title">Tổng thu nhập</p>
-            <p class="mini-value">@ChauThanhEV.Services.MockDataService.FormatCurrency(Model.Overview.TotalIncome)</p>
+<!-- KPI Metric Cards Strip -->
+<div class="subpage-kpi-grid">
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-green">💰</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Tổng thu nhập kỳ 90 ngày</div>
+            <div class="subpage-kpi-val" style="font-size: 18px;">@ChauThanhEV.Services.MockDataService.FormatCurrency(Model.Overview.TotalIncome)</div>
+            <div class="subpage-kpi-sub">Doanh thu sạc xe & dịch vụ</div>
         </div>
     </div>
-    <div class="mini-card">
-        <span class="stat-icon bg-blue">@await Html.PartialAsync("_Icon", "doc")</span>
-        <div class="mini-body">
-            <p class="stat-title">Thu nhập hôm nay</p>
-            <p class="mini-value">@ChauThanhEV.Services.MockDataService.FormatCurrency(Model.Overview.TodayIncome)</p>
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-blue">📅</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Thu nhập hôm nay</div>
+            <div class="subpage-kpi-val" style="font-size: 18px;">@ChauThanhEV.Services.MockDataService.FormatCurrency(Model.Overview.TodayIncome)</div>
+            <div class="subpage-kpi-sub">Phát sinh trong ngày</div>
         </div>
     </div>
-    <div class="mini-card">
-        <span class="stat-icon bg-orange">@await Html.PartialAsync("_Icon", "bolt2")</span>
-        <div class="mini-body">
-            <p class="stat-title">Thu nhập tháng này</p>
-            <p class="mini-value">@ChauThanhEV.Services.MockDataService.FormatCurrency(Model.Overview.ThisMonthIncome)</p>
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-orange">⚡</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Thu nhập tháng này</div>
+            <div class="subpage-kpi-val" style="font-size: 18px;">@ChauThanhEV.Services.MockDataService.FormatCurrency(Model.Overview.ThisMonthIncome)</div>
+            <div class="subpage-kpi-sub">Tăng trưởng ổn định</div>
         </div>
     </div>
-    <div class="mini-card">
-        <span class="stat-icon bg-purple">@await Html.PartialAsync("_Icon", "wallet2")</span>
-        <div class="mini-body">
-            <p class="stat-title">Số dư khả dụng</p>
-            <p class="mini-value">@ChauThanhEV.Services.MockDataService.FormatCurrency(Model.Overview.AvailableBalance)</p>
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-purple">💳</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Số dư khả dụng để rút</div>
+            <div class="subpage-kpi-val" style="font-size: 18px;">@ChauThanhEV.Services.MockDataService.FormatCurrency(Model.Overview.AvailableBalance)</div>
+            <div class="subpage-kpi-sub">Sẵn sàng đối soát ngân hàng</div>
         </div>
     </div>
 </div>
 
-<div class="list-toolbar" style="margin-top: 24px;">
+<div class="list-toolbar">
     <form method="get" class="search-box">
         @await Html.PartialAsync("_Icon", "search")
         <input type="text" name="keyword" value="@Model.Keyword" placeholder="Tìm theo mã giao dịch / loại giao dịch..." />
     </form>
     <div class="toolbar-actions">
-        <button type="button" class="btn btn-outline" data-export-csv="financialTable" data-export-name="lich-su-giao-dich">
+        <button type="button" class="btn btn-outline" data-export-csv="financialTable" data-export-name="lich-su-giao-dich-chauthanh-ev">
             @await Html.PartialAsync("_Icon", "download") Xuất CSV
         </button>
-        <button type="button" class="btn btn-outline" data-export-excel="financialTable" data-export-name="lich-su-giao-dich">
+        <button type="button" class="btn btn-outline" data-export-excel="financialTable" data-export-name="lich-su-giao-dich-chauthanh-ev">
             @await Html.PartialAsync("_Icon", "download") Xuất Excel
         </button>
         <button type="button" class="btn btn-primary-sm" data-open-modal="modal-withdraw">

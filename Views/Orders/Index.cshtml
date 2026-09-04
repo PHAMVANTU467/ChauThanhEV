@@ -1,19 +1,106 @@
 @model OrderListViewModel
+@inject ChauThanhEV.Services.MockDataService DataService
 @{
     ViewData["Title"] = "Quản lý đơn hàng";
+    ViewData["HeaderTag"] = "Dữ liệu kinh doanh 90 ngày • Hơn 1.200 giao dịch";
     bool isCharging = Model.Tab != "topup";
+
+    var totalCharging = DataService.ChargingOrders.Count;
+    var completedCharging = DataService.ChargingOrders.Count(o => o.Status == ChargingOrderStatus.Completed);
+    var totalEnergy = DataService.ChargingOrders.Sum(o => o.EnergyKwh);
+    var totalChargingAmount = DataService.ChargingOrders.Where(o => o.Status == ChargingOrderStatus.Completed).Sum(o => o.Amount);
+
+    var totalTopUp = DataService.TopUpOrders.Count;
+    var successTopUp = DataService.TopUpOrders.Count(o => o.Status == TopUpStatus.Success);
+    var totalTopUpAmount = DataService.TopUpOrders.Where(o => o.Status == TopUpStatus.Success).Sum(o => o.Amount);
+}
+
+<!-- KPI Metric Cards Strip -->
+@if (isCharging)
+{
+    <div class="subpage-kpi-grid">
+        <div class="subpage-kpi-card">
+            <div class="subpage-kpi-icon bg-blue">▤</div>
+            <div class="subpage-kpi-info">
+                <div class="subpage-kpi-label">Tổng số đơn sạc</div>
+                <div class="subpage-kpi-val">@totalCharging <span style="font-size:13px; font-weight:600; color:#64748b;">đơn</span></div>
+                <div class="subpage-kpi-sub">Giao dịch trong kỳ 90 ngày</div>
+            </div>
+        </div>
+        <div class="subpage-kpi-card">
+            <div class="subpage-kpi-icon bg-green">✓</div>
+            <div class="subpage-kpi-info">
+                <div class="subpage-kpi-label">Đơn sạc hoàn thành</div>
+                <div class="subpage-kpi-val">@completedCharging <span style="font-size:13px; font-weight:600; color:#64748b;">đơn</span></div>
+                <div class="subpage-kpi-sub">@((completedCharging * 100.0 / totalCharging).ToString("0.0"))% tỷ lệ thành công</div>
+            </div>
+        </div>
+        <div class="subpage-kpi-card">
+            <div class="subpage-kpi-icon bg-orange">⚡</div>
+            <div class="subpage-kpi-info">
+                <div class="subpage-kpi-label">Tổng điện năng tiêu thụ</div>
+                <div class="subpage-kpi-val">@totalEnergy.ToString("N1") <span style="font-size:13px; font-weight:600; color:#64748b;">kWh</span></div>
+                <div class="subpage-kpi-sub">Điện sạc nhanh DC cao tốc</div>
+            </div>
+        </div>
+        <div class="subpage-kpi-card">
+            <div class="subpage-kpi-icon bg-purple">💰</div>
+            <div class="subpage-kpi-info">
+                <div class="subpage-kpi-label">Tổng doanh thu đơn sạc</div>
+                <div class="subpage-kpi-val" style="font-size: 17px;">@ChauThanhEV.Services.MockDataService.FormatCurrency(totalChargingAmount)</div>
+                <div class="subpage-kpi-sub">Đã quyết toán thành công</div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="subpage-kpi-grid">
+        <div class="subpage-kpi-card">
+            <div class="subpage-kpi-icon bg-blue">💳</div>
+            <div class="subpage-kpi-info">
+                <div class="subpage-kpi-label">Tổng lượt nạp tiền</div>
+                <div class="subpage-kpi-val">@totalTopUp <span style="font-size:13px; font-weight:600; color:#64748b;">giao dịch</span></div>
+                <div class="subpage-kpi-sub">Nạp ví điện tử xe điện</div>
+            </div>
+        </div>
+        <div class="subpage-kpi-card">
+            <div class="subpage-kpi-icon bg-green">✓</div>
+            <div class="subpage-kpi-info">
+                <div class="subpage-kpi-label">Nạp tiền thành công</div>
+                <div class="subpage-kpi-val">@successTopUp <span style="font-size:13px; font-weight:600; color:#64748b;">giao dịch</span></div>
+                <div class="subpage-kpi-sub">@((successTopUp * 100.0 / totalTopUp).ToString("0.0"))% xử lý tức thì</div>
+            </div>
+        </div>
+        <div class="subpage-kpi-card">
+            <div class="subpage-kpi-icon bg-orange">💰</div>
+            <div class="subpage-kpi-info">
+                <div class="subpage-kpi-label">Tổng số tiền nạp ví</div>
+                <div class="subpage-kpi-val" style="font-size: 17px;">@ChauThanhEV.Services.MockDataService.FormatCurrency(totalTopUpAmount)</div>
+                <div class="subpage-kpi-sub">VietQR, Thẻ ATM & Ví điện tử</div>
+            </div>
+        </div>
+        <div class="subpage-kpi-card">
+            <div class="subpage-kpi-icon bg-purple">⭐</div>
+            <div class="subpage-kpi-info">
+                <div class="subpage-kpi-label">Kênh thanh toán</div>
+                <div class="subpage-kpi-val" style="font-size: 15px;">VietQR / Napas</div>
+                <div class="subpage-kpi-sub">Tự động cộng số dư 24/7</div>
+            </div>
+        </div>
+    </div>
 }
 
 <div class="page-tabs">
-    <a class="@(isCharging ? "active" : "")" asp-action="Index" asp-route-tab="charging">Đơn hàng sạc</a>
-    <a class="@(!isCharging ? "active" : "")" asp-action="Index" asp-route-tab="topup">Đơn hàng nạp tiền</a>
+    <a class="@(isCharging ? "active" : "")" asp-action="Index" asp-route-tab="charging">⚡ Đơn hàng sạc</a>
+    <a class="@(!isCharging ? "active" : "")" asp-action="Index" asp-route-tab="topup">💳 Đơn hàng nạp tiền</a>
 </div>
 
 <div class="list-toolbar">
     <form method="get" class="search-box">
         <input type="hidden" name="tab" value="@Model.Tab" />
         @await Html.PartialAsync("_Icon", "search")
-        <input type="text" name="keyword" value="@Model.Keyword" placeholder="Tìm theo mã đơn, tên khách hàng..." />
+        <input type="text" name="keyword" value="@Model.Keyword" placeholder="Tìm theo mã đơn, tên khách hàng, mã KH..." />
     </form>
 
     <form method="get" class="filter-select-form">
@@ -43,10 +130,10 @@
     </form>
 
     <div class="toolbar-actions">
-        <button type="button" class="btn btn-outline" data-export-csv="orderTable" data-export-name="don-hang">
+        <button type="button" class="btn btn-outline" data-export-csv="orderTable" data-export-name="don-hang-chauthanh-ev">
             @await Html.PartialAsync("_Icon", "download") Xuất CSV
         </button>
-        <button type="button" class="btn btn-outline" data-export-excel="orderTable" data-export-name="don-hang">
+        <button type="button" class="btn btn-outline" data-export-excel="orderTable" data-export-name="don-hang-chauthanh-ev">
             @await Html.PartialAsync("_Icon", "download") Xuất Excel
         </button>
     </div>

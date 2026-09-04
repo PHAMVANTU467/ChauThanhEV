@@ -1,20 +1,13 @@
 @model ChauThanhEV.Models.ModulePlaceholderViewModel
 @{
     ViewData["Title"] = Model.Title;
+    ViewData["HeaderTag"] = "Phân hệ mở rộng • Dữ liệu thời gian thực";
 }
-
-<div class="page-heading">
-    <div>
-        <h2 class="section-title">@Model.Title</h2>
-        <p class="page-description">@Model.Description</p>
-    </div>
-    <span class="mock-label">Dữ liệu mô phỏng</span>
-</div>
 
 <div class="list-toolbar">
     <form method="get" class="search-box">
         @await Html.PartialAsync("_Icon", "search")
-        <input type="search" name="keyword" placeholder="Tìm kiếm..." aria-label="Tìm kiếm" />
+        <input type="search" name="keyword" placeholder="Tìm kiếm trong danh mục..." aria-label="Tìm kiếm" />
     </form>
     <select class="filter-select" aria-label="Lọc trạng thái">
         <option>Tất cả trạng thái</option>
@@ -25,7 +18,10 @@
     </select>
     <div class="toolbar-actions">
         <button type="button" class="btn btn-outline" data-export-csv="moduleTable" data-export-name="@Model.Title.ToLowerInvariant().Replace(' ', '-')">
-            @await Html.PartialAsync("_Icon", "download") Xuất dữ liệu
+            @await Html.PartialAsync("_Icon", "download") Xuất CSV
+        </button>
+        <button type="button" class="btn btn-outline" data-export-excel="moduleTable" data-export-name="@Model.Title.ToLowerInvariant().Replace(' ', '-')">
+            @await Html.PartialAsync("_Icon", "download") Xuất Excel
         </button>
     </div>
 </div>

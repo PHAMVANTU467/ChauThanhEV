@@ -1,15 +1,58 @@
 @model StationListViewModel
+@inject ChauThanhEV.Services.MockDataService DataService
 @{
     ViewData["Title"] = "Quản lý trạm sạc";
+    ViewData["HeaderTag"] = "Hệ thống 5 trạm cao tốc • 40 trụ DC • 80 cổng CCS2";
     var routeValues = new Dictionary<string, string>();
     if (!string.IsNullOrWhiteSpace(Model.Keyword)) routeValues["keyword"] = Model.Keyword;
     if (!string.IsNullOrWhiteSpace(Model.StatusFilter)) routeValues["status"] = Model.StatusFilter;
+
+    var totalStations = DataService.Stations.Count;
+    var activeStations = DataService.Stations.Count(s => s.Active);
+    var totalChargers = DataService.Chargers.Count;
+    var totalConnectors = DataService.Chargers.SelectMany(c => c.Connectors).Count();
 }
+
+<!-- KPI Metric Cards Strip -->
+<div class="subpage-kpi-grid">
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-blue">🏢</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Tổng số trạm sạc</div>
+            <div class="subpage-kpi-val">@totalStations <span style="font-size:13px; font-weight:600; color:#64748b;">trạm</span></div>
+            <div class="subpage-kpi-sub">@activeStations trạm đang hoạt động (100%)</div>
+        </div>
+    </div>
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-green">⚡</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Quy mô trụ sạc DC</div>
+            <div class="subpage-kpi-val">@totalChargers <span style="font-size:13px; font-weight:600; color:#64748b;">trụ</span></div>
+            <div class="subpage-kpi-sub">8 trụ/trạm (4x160kW + 4x240kW)</div>
+        </div>
+    </div>
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-orange">🔌</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Tổng cổng sạc CCS2</div>
+            <div class="subpage-kpi-val">@totalConnectors <span style="font-size:13px; font-weight:600; color:#64748b;">cổng</span></div>
+            <div class="subpage-kpi-sub">2 cổng sạc nhanh / trụ</div>
+        </div>
+    </div>
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-purple">💰</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Giá điện niêm yết</div>
+            <div class="subpage-kpi-val">3.800 <span style="font-size:13px; font-weight:600; color:#64748b;">đ/kWh</span></div>
+            <div class="subpage-kpi-sub">Áp dụng đồng bộ toàn mạng lưới</div>
+        </div>
+    </div>
+</div>
 
 <div class="list-toolbar">
     <form method="get" class="search-box">
         @await Html.PartialAsync("_Icon", "search")
-        <input type="text" name="keyword" value="@Model.Keyword" placeholder="Tìm theo mã trạm, tên trạm, địa chỉ..." />
+        <input type="text" name="keyword" value="@Model.Keyword" placeholder="Tìm theo mã trạm, tên trạm, tuyến cao tốc..." />
     </form>
 
     <form method="get" class="filter-select-form">
@@ -25,10 +68,10 @@
     </form>
 
     <div class="toolbar-actions">
-        <button type="button" class="btn btn-outline" data-export-csv="stationTable" data-export-name="danh-sach-tram">
+        <button type="button" class="btn btn-outline" data-export-csv="stationTable" data-export-name="danh-sach-tram-chauthanh-ev">
             @await Html.PartialAsync("_Icon", "download") Xuất CSV
         </button>
-        <button type="button" class="btn btn-outline" data-export-excel="stationTable" data-export-name="danh-sach-tram">
+        <button type="button" class="btn btn-outline" data-export-excel="stationTable" data-export-name="danh-sach-tram-chauthanh-ev">
             @await Html.PartialAsync("_Icon", "download") Xuất Excel
         </button>
         <button type="button" class="btn btn-primary-sm" data-open-modal="modal-create-station">
@@ -44,10 +87,12 @@
                 <tr>
                     <th>STT</th>
                     <th>Mã trạm</th>
-                    <th>Tên trạm</th>
-                    <th>Vị trí</th>
+                    <th>Tên trạm sạc</th>
+                    <th>Vị trí tuyến cao tốc</th>
                     <th>Múi giờ</th>
-                    <th>Số trụ sạc</th>
+                    <th>Quy mô trụ DC</th>
+                    <th>Cổng CCS2</th>
+                    <th>Giá điện</th>
                     <th>Trạng thái</th>
                     <th class="no-export">Hành động</th>
                 </tr>
@@ -55,25 +100,36 @@
             <tbody>
                 @if (!Model.Result.Items.Any())
                 {
-                    <tr class="empty-row"><td colspan="8">Không tìm thấy trạm phù hợp.</td></tr>
+                    <tr class="empty-row"><td colspan="10">Không tìm thấy trạm phù hợp.</td></tr>
                 }
                 @for (int i = 0; i < Model.Result.Items.Count; i++)
                 {
                     var station = Model.Result.Items[i];
-                    var chargers = ViewContext.HttpContext.RequestServices.GetService<ChauThanhEV.Services.MockDataService>()?.Chargers.Where(c => c.StationId == station.Id).Count() ?? 0;
+                    var stChargers = DataService.Chargers.Where(c => c.StationId == station.Id).ToList();
+                    var chargerCount = stChargers.Count;
+                    var connectorCount = stChargers.Sum(c => c.Connectors.Count);
+                    var totalKw = stChargers.Sum(c => c.PowerKw);
                     <tr>
                         <td>@((Model.Result.Page - 1) * Model.Result.PageSize + i + 1)</td>
-                        <td><strong>@station.Code</strong></td>
-                        <td>@station.Name</td>
-                        <td>@station.Address</td>
+                        <td><strong class="color-blue">@station.Code</strong></td>
+                        <td><strong>@station.Name</strong></td>
+                        <td class="wrap">@station.Address</td>
                         <td>@station.TimeZone</td>
-                        <td>@chargers</td>
+                        <td>
+                            <strong>@chargerCount trụ DC</strong>
+                            <span style="font-size:11.5px; color:#64748b; display:block;">(@totalKw.ToString("N0") kW)</span>
+                        </td>
+                        <td>
+                            <strong>@connectorCount cổng</strong>
+                            <span style="font-size:11.5px; color:#0284c7; display:block;">CCS2 Fast</span>
+                        </td>
+                        <td>@ChauThanhEV.Services.MockDataService.FormatCurrency(station.DefaultElectricityPrice)/kWh</td>
                         <td>
                             <span class="pill @(station.Active ? "pill-green" : "pill-gray")">@(station.Active ? "Đang hoạt động" : "Tạm dừng")</span>
                         </td>
                         <td class="no-export">
                             <div class="cell-actions">
-                                <button type="button" class="btn btn-ghost btn-sm" data-open-modal="modal-edit-station-@station.Id" title="Sửa">@await Html.PartialAsync("_Icon", "edit")</button>
+                                <button type="button" class="btn btn-ghost btn-sm" data-open-modal="modal-edit-station-@station.Id" title="Sửa thông tin trạm">@await Html.PartialAsync("_Icon", "edit")</button>
                                 <form asp-action="Delete" asp-controller="Stations" method="post" data-confirm="Xóa trạm @station.Name khỏi hệ thống?">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="id" value="@station.Id" />

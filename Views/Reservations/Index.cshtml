@@ -1,10 +1,53 @@
 @model ReservationListViewModel
+@inject ChauThanhEV.Services.MockDataService DataService
 @{
     ViewData["Title"] = "Quản lý đặt trước";
+    ViewData["HeaderTag"] = "Đặt trước cổng sạc cao tốc Châu Thành EV • Giữ chỗ thông minh";
     var routeValues = new Dictionary<string, string>();
     if (!string.IsNullOrWhiteSpace(Model.Keyword)) routeValues["keyword"] = Model.Keyword;
     if (!string.IsNullOrWhiteSpace(Model.StatusFilter)) routeValues["status"] = Model.StatusFilter;
+
+    var totalRes = DataService.Reservations.Count;
+    var activeRes = DataService.Reservations.Count(r => r.Status == ReservationStatus.Active);
+    var expiredRes = DataService.Reservations.Count(r => r.Status == ReservationStatus.Expired);
+    var cancelledRes = DataService.Reservations.Count(r => r.Status == ReservationStatus.Cancelled);
 }
+
+<!-- KPI Metric Cards Strip -->
+<div class="subpage-kpi-grid">
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-blue">📅</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Tổng lượt đặt trước</div>
+            <div class="subpage-kpi-val">@totalRes <span style="font-size:13px; font-weight:600; color:#64748b;">lượt</span></div>
+            <div class="subpage-kpi-sub">Lịch hẹn sạc xe cao tốc</div>
+        </div>
+    </div>
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-green">🟢</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Đang hiệu lực giữ chỗ</div>
+            <div class="subpage-kpi-val">@activeRes <span style="font-size:13px; font-weight:600; color:#64748b;">lượt</span></div>
+            <div class="subpage-kpi-sub">Trụ đang khóa cổng chờ khách</div>
+        </div>
+    </div>
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-orange">⏱️</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Đã hết hạn giữ chỗ</div>
+            <div class="subpage-kpi-val">@expiredRes <span style="font-size:13px; font-weight:600; color:#64748b;">lượt</span></div>
+            <div class="subpage-kpi-sub">Quá 15 phút chưa cắm sạc</div>
+        </div>
+    </div>
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-purple">❌</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Lượt hủy bởi khách</div>
+            <div class="subpage-kpi-val">@cancelledRes <span style="font-size:13px; font-weight:600; color:#64748b;">lượt</span></div>
+            <div class="subpage-kpi-sub">Hủy chủ động trước giờ hẹn</div>
+        </div>
+    </div>
+</div>
 
 <div class="list-toolbar">
     <form method="get" class="search-box">
@@ -26,10 +69,10 @@
     </form>
 
     <div class="toolbar-actions">
-        <button type="button" class="btn btn-outline" data-export-csv="reservationTable" data-export-name="danh-sach-dat-truoc">
+        <button type="button" class="btn btn-outline" data-export-csv="reservationTable" data-export-name="danh-sach-dat-truoc-chauthanh-ev">
             @await Html.PartialAsync("_Icon", "download") Xuất CSV
         </button>
-        <button type="button" class="btn btn-outline" data-export-excel="reservationTable" data-export-name="danh-sach-dat-truoc">
+        <button type="button" class="btn btn-outline" data-export-excel="reservationTable" data-export-name="danh-sach-dat-truoc-chauthanh-ev">
             @await Html.PartialAsync("_Icon", "download") Xuất Excel
         </button>
         <button type="button" class="btn btn-primary-sm" data-open-modal="modal-create-reservation">

@@ -1,15 +1,58 @@
 @model CustomerListViewModel
+@inject ChauThanhEV.Services.MockDataService DataService
 @{
-    ViewData["Title"] = "Quản lý tài khoản";
+    ViewData["Title"] = "Quản lý người dùng";
+    ViewData["HeaderTag"] = "30 tài khoản khách hàng thành viên • Châu Thành EV";
     var routeValues = new Dictionary<string, string>();
     if (!string.IsNullOrWhiteSpace(Model.Keyword)) routeValues["keyword"] = Model.Keyword;
     if (!string.IsNullOrWhiteSpace(Model.StatusFilter)) routeValues["status"] = Model.StatusFilter;
+
+    var totalCust = DataService.Customers.Count;
+    var activeCust = DataService.Customers.Count(c => c.Status == CustomerStatus.Active);
+    var totalWallet = DataService.Customers.Sum(c => c.WalletBalance);
+    var totalRfid = DataService.Cards.Count;
 }
+
+<!-- KPI Metric Cards Strip -->
+<div class="subpage-kpi-grid">
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-blue">👤</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Tổng số khách hàng</div>
+            <div class="subpage-kpi-val">@totalCust <span style="font-size:13px; font-weight:600; color:#64748b;">thành viên</span></div>
+            <div class="subpage-kpi-sub">Đăng ký sử dụng dịch vụ</div>
+        </div>
+    </div>
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-green">🟢</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Tài khoản hoạt động</div>
+            <div class="subpage-kpi-val">@activeCust <span style="font-size:13px; font-weight:600; color:#64748b;">tài khoản</span></div>
+            <div class="subpage-kpi-sub">@((activeCust * 100.0 / totalCust).ToString("0.0"))% hoạt động bình thường</div>
+        </div>
+    </div>
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-orange">💰</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Tổng số dư ví khách hàng</div>
+            <div class="subpage-kpi-val" style="font-size: 17px;">@ChauThanhEV.Services.MockDataService.FormatCurrency(totalWallet)</div>
+            <div class="subpage-kpi-sub">Số dư khả dụng sạc xe</div>
+        </div>
+    </div>
+    <div class="subpage-kpi-card">
+        <div class="subpage-kpi-icon bg-purple">💳</div>
+        <div class="subpage-kpi-info">
+            <div class="subpage-kpi-label">Thẻ RFID đã liên kết</div>
+            <div class="subpage-kpi-val">@totalRfid <span style="font-size:13px; font-weight:600; color:#64748b;">thẻ</span></div>
+            <div class="subpage-kpi-sub">Quẹt thẻ tự động tại trụ sạc</div>
+        </div>
+    </div>
+</div>
 
 <div class="list-toolbar">
     <form method="get" class="search-box">
         @await Html.PartialAsync("_Icon", "search")
-        <input type="text" name="keyword" value="@Model.Keyword" placeholder="Tìm theo mã KH, tên, số điện thoại..." />
+        <input type="text" name="keyword" value="@Model.Keyword" placeholder="Tìm theo mã KH, họ tên, số điện thoại..." />
     </form>
 
     <form method="get" class="filter-select-form">
@@ -25,10 +68,10 @@
     </form>
 
     <div class="toolbar-actions">
-        <button type="button" class="btn btn-outline" data-export-csv="customerTable" data-export-name="danh-sach-khach-hang">
+        <button type="button" class="btn btn-outline" data-export-csv="customerTable" data-export-name="danh-sach-khach-hang-chauthanh-ev">
             @await Html.PartialAsync("_Icon", "download") Xuất CSV
         </button>
-        <button type="button" class="btn btn-outline" data-export-excel="customerTable" data-export-name="danh-sach-khach-hang">
+        <button type="button" class="btn btn-outline" data-export-excel="customerTable" data-export-name="danh-sach-khach-hang-chauthanh-ev">
             @await Html.PartialAsync("_Icon", "download") Xuất Excel
         </button>
         <button type="button" class="btn btn-primary-sm" data-open-modal="modal-create-customer">
