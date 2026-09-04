@@ -28,9 +28,11 @@ namespace ChauThanhEV.Controllers
             ViewBag.RevenueTodayJson = JsonSerializer.Serialize(model.RevenueToday, JsonOptions);
             ViewBag.Revenue7DaysJson = JsonSerializer.Serialize(model.Revenue7Days, JsonOptions);
             ViewBag.Revenue30DaysJson = JsonSerializer.Serialize(model.Revenue30Days, JsonOptions);
+            ViewBag.Revenue90DaysJson = JsonSerializer.Serialize(model.Revenue90Days, JsonOptions);
             ViewBag.ActiveUsersTodayJson = JsonSerializer.Serialize(model.ActiveUsersToday, JsonOptions);
             ViewBag.ActiveUsers7DaysJson = JsonSerializer.Serialize(model.ActiveUsers7Days, JsonOptions);
             ViewBag.ActiveUsers30DaysJson = JsonSerializer.Serialize(model.ActiveUsers30Days, JsonOptions);
+            ViewBag.ActiveUsers90DaysJson = JsonSerializer.Serialize(model.ActiveUsers90Days, JsonOptions);
             ViewBag.DoughnutJson = JsonSerializer.Serialize(new
             {
                 labels = new[] { "Available", "Charging", "Fault" },

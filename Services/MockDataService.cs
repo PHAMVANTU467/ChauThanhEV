@@ -47,13 +47,13 @@ namespace ChauThanhEV.Services
             var rnd = new Random(20260902);
 
             // ---- Stations ----
-            var stationInfos = new (string Code, string Name, string Address, bool Active)[]
+            var stationInfos = new (string Code, string Name, string Address, bool Active, string Prefix)[]
             {
-                ("TTC-CT-01", "TTC Châu Thành 1", "Km205+092, cao tốc Vĩnh Hảo – Phan Thiết, bên trái tuyến (mock)", true),
-                ("TTC-CT-02", "TTC Châu Thành 2", "Km205+092, cao tốc Vĩnh Hảo – Phan Thiết, bên phải tuyến (mock)", true),
-                ("REF-PD-KM47", "Trạm Km47+500", "Cao tốc Phan Thiết – Dầu Giây, trạm đối tác tham chiếu (mock)", true),
-                ("PROP-KM31-32", "Trạm Km31–32", "Cao tốc Phan Thiết – Dầu Giây, vị trí đề xuất (proposed)", false),
-                ("PROP-KM41-100", "Km41+100", "Cao tốc TP.HCM – Long Thành – Dầu Giây, mở rộng mạng lưới (proposed)", false),
+                ("TTC-CT-01", "TTC Châu Thành 1", "Km205+092, cao tốc Vĩnh Hảo – Phan Thiết, bên trái tuyến", true, "TTC1"),
+                ("TTC-CT-02", "TTC Châu Thành 2", "Km205+092, cao tốc Vĩnh Hảo – Phan Thiết, bên phải tuyến", true, "TTC2"),
+                ("TTC-PD-KM47", "Trạm Phan Thiết Km47+500", "Cao tốc Phan Thiết – Dầu Giây", true, "KM47"),
+                ("TTC-DG-KM31", "Trạm Dầu Giây Km31+500", "Cao tốc Phan Thiết – Dầu Giây", true, "KM31"),
+                ("TTC-LT-KM41", "Trạm Long Thành Km41+100", "Cao tốc TP.HCM – Long Thành – Dầu Giây", true, "KM41"),
             };
             for (int i = 0; i < stationInfos.Length; i++)
             {
@@ -69,42 +69,103 @@ namespace ChauThanhEV.Services
             }
 
             // ---- Chargers + Connectors ----
-            // Cấu hình mock theo phương án: mỗi trụ DC có đúng 2 cổng CCS2.
-            var chargerDefinitions = new (int StationId, string Code, string Name, double PowerKw, ChargerStatus Status, ConnectorStatus A, ConnectorStatus B)[]
+            // Mỗi địa điểm lắp đúng 8 trụ sạc, mỗi trụ có đúng 2 cổng CCS2 (A và B). Tổng 40 trụ, 80 cổng.
+            var chargerStatusMatrix = new (ChargerStatus Status, ConnectorStatus A, ConnectorStatus B)[][]
             {
-                (1, "TTC1-DC-160-01", "DC Fast Charger 160 kW - Trụ 01", 160, ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Charging),
-                (1, "TTC1-DC-240-01", "DC Fast Charger 240 kW - Trụ 02", 240, ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Available),
-                (1, "TTC1-DC-160-02", "DC Fast Charger 160 kW - Trụ 03", 160, ChargerStatus.Maintenance, ConnectorStatus.Maintenance, ConnectorStatus.Maintenance),
-                (2, "TTC2-DC-240-01", "DC Fast Charger 240 kW - Trụ 01", 240, ChargerStatus.Online, ConnectorStatus.Charging, ConnectorStatus.Available),
-                (2, "TTC2-DC-160-01", "DC Fast Charger 160 kW - Trụ 02", 160, ChargerStatus.Offline, ConnectorStatus.Fault, ConnectorStatus.Fault),
-                (2, "TTC2-DC-240-02", "DC Fast Charger 240 kW - Trụ 03", 240, ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Fault),
-                (3, "REF47-DC-160-01", "DC Fast Charger 160 kW - Trụ 01", 160, ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Available),
-                (3, "REF47-DC-240-01", "DC Fast Charger 240 kW - Trụ 02", 240, ChargerStatus.Online, ConnectorStatus.Charging, ConnectorStatus.Available),
+                // Trạm 1: TTC Châu Thành 1
+                new (ChargerStatus, ConnectorStatus, ConnectorStatus)[]
+                {
+                    (ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Charging),
+                    (ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Available),
+                    (ChargerStatus.Online, ConnectorStatus.Charging, ConnectorStatus.Available),
+                    (ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Available),
+                    (ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Charging),
+                    (ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Available),
+                    (ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Available),
+                    (ChargerStatus.Maintenance, ConnectorStatus.Maintenance, ConnectorStatus.Maintenance),
+                },
+                // Trạm 2: TTC Châu Thành 2
+                new (ChargerStatus, ConnectorStatus, ConnectorStatus)[]
+                {
+                    (ChargerStatus.Online, ConnectorStatus.Charging, ConnectorStatus.Available),
+                    (ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Available),
+                    (ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Charging),
+                    (ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Available),
+                    (ChargerStatus.Online, ConnectorStatus.Charging, ConnectorStatus.Charging),
+                    (ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Available),
+                    (ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Fault),
+                    (ChargerStatus.Offline, ConnectorStatus.Fault, ConnectorStatus.Fault),
+                },
+                // Trạm 3: Trạm Phan Thiết Km47+500
+                new (ChargerStatus, ConnectorStatus, ConnectorStatus)[]
+                {
+                    (ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Available),
+                    (ChargerStatus.Online, ConnectorStatus.Charging, ConnectorStatus.Available),
+                    (ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Available),
+                    (ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Charging),
+                    (ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Available),
+                    (ChargerStatus.Online, ConnectorStatus.Charging, ConnectorStatus.Available),
+                    (ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Available),
+                    (ChargerStatus.Offline, ConnectorStatus.Fault, ConnectorStatus.Fault),
+                },
+                // Trạm 4: Trạm Dầu Giây Km31+500
+                new (ChargerStatus, ConnectorStatus, ConnectorStatus)[]
+                {
+                    (ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Available),
+                    (ChargerStatus.Online, ConnectorStatus.Charging, ConnectorStatus.Available),
+                    (ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Available),
+                    (ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Available),
+                    (ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Charging),
+                    (ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Available),
+                    (ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Available),
+                    (ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Available),
+                },
+                // Trạm 5: Trạm Long Thành Km41+100
+                new (ChargerStatus, ConnectorStatus, ConnectorStatus)[]
+                {
+                    (ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Charging),
+                    (ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Available),
+                    (ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Available),
+                    (ChargerStatus.Online, ConnectorStatus.Charging, ConnectorStatus.Available),
+                    (ChargerStatus.Online, ConnectorStatus.Charging, ConnectorStatus.Charging),
+                    (ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Available),
+                    (ChargerStatus.Online, ConnectorStatus.Available, ConnectorStatus.Available),
+                    (ChargerStatus.Maintenance, ConnectorStatus.Maintenance, ConnectorStatus.Maintenance),
+                },
             };
-            foreach (var definition in chargerDefinitions)
+
+            for (int s = 0; s < stationInfos.Length; s++)
             {
-                var charger = new Charger
+                var sInfo = stationInfos[s];
+                var matrix = chargerStatusMatrix[s];
+                for (int c = 0; c < 8; c++)
                 {
-                    Id = _nextChargerId++,
-                    Code = definition.Code,
-                    Name = definition.Name,
-                    StationId = definition.StationId,
-                    PowerKw = definition.PowerKw,
-                    Status = definition.Status,
-                    InstallDate = Now.AddDays(-180 - _nextChargerId * 9)
-                };
-                foreach (var connector in new[] { ("A", definition.A), ("B", definition.B) })
-                {
-                    charger.Connectors.Add(new Connector
+                    double power = c < 4 ? 160 : 240;
+                    var st = matrix[c];
+                    var charger = new Charger
                     {
-                        Id = _nextConnectorId++,
-                        Code = $"{charger.Code}-{connector.Item1}",
-                        ChargerId = charger.Id,
-                        ConnectorType = "CCS2",
-                        Status = connector.Item2
-                    });
+                        Id = _nextChargerId++,
+                        Code = $"{sInfo.Prefix}-DC-{(int)power}-{c + 1:00}",
+                        Name = $"DC Fast Charger {(int)power} kW - Trụ {c + 1:00}",
+                        StationId = s + 1,
+                        PowerKw = power,
+                        Status = st.Status,
+                        InstallDate = Now.AddDays(-210 - _nextChargerId * 3)
+                    };
+
+                    foreach (var connector in new[] { ("A", st.A), ("B", st.B) })
+                    {
+                        charger.Connectors.Add(new Connector
+                        {
+                            Id = _nextConnectorId++,
+                            Code = $"{charger.Code}-{connector.Item1}",
+                            ChargerId = charger.Id,
+                            ConnectorType = "CCS2",
+                            Status = connector.Item2
+                        });
+                    }
+                    Chargers.Add(charger);
                 }
-                Chargers.Add(charger);
             }
 
             // ---- Faults: gắn với trụ offline + cổng lỗi hiện tại, cộng thêm lịch sử đã xử lý ----
@@ -159,18 +220,36 @@ namespace ChauThanhEV.Services
             // ---- Customer & other management ----
             var customerProfiles = new (string Name, string Phone, string Email, decimal Balance, CustomerStatus Status)[]
             {
-                ("Nguyễn Minh Anh", "0903120456", "minhanh.mock@chauthanhev.vn", 1250000m, CustomerStatus.Active),
+                ("Nguyễn Minh Anh", "0903120456", "minhanh.mock@chauthanhev.vn", 1850000m, CustomerStatus.Active),
                 ("Trần Gia Huy", "0918472301", "giahuy.mock@chauthanhev.vn", 680000m, CustomerStatus.Active),
-                ("Lê Hoàng Nam", "0985123789", "hoangnam.mock@chauthanhev.vn", 2150000m, CustomerStatus.Active),
+                ("Lê Hoàng Nam", "0985123789", "hoangnam.mock@chauthanhev.vn", 2450000m, CustomerStatus.Active),
                 ("Phạm Ngọc Mai", "0934781265", "ngocmai.mock@chauthanhev.vn", 420000m, CustomerStatus.Active),
-                ("Võ Thanh Tùng", "0976312048", "thanhtung.mock@chauthanhev.vn", 950000m, CustomerStatus.Active),
+                ("Võ Thanh Tùng", "0976312048", "thanhtung.mock@chauthanhev.vn", 1950000m, CustomerStatus.Active),
                 ("Đỗ Khánh Linh", "0908765123", "khanhlinh.mock@chauthanhev.vn", 300000m, CustomerStatus.Locked),
-                ("Bùi Quốc Việt", "0942018367", "quocviet.mock@chauthanhev.vn", 1780000m, CustomerStatus.Active),
+                ("Bùi Quốc Việt", "0942018367", "quocviet.mock@chauthanhev.vn", 2780000m, CustomerStatus.Active),
                 ("Ngô Thùy Dương", "0967452108", "thuyduong.mock@chauthanhev.vn", 560000m, CustomerStatus.Active),
-                ("Huỳnh Đức Long", "0912356780", "duclong.mock@chauthanhev.vn", 830000m, CustomerStatus.Active),
+                ("Huỳnh Đức Long", "0912356780", "duclong.mock@chauthanhev.vn", 1830000m, CustomerStatus.Active),
                 ("Lý Hải Yến", "0987345612", "haiyen.mock@chauthanhev.vn", 1120000m, CustomerStatus.Active),
-                ("Dương Nhật Quang", "0938120674", "nhatquang.mock@chauthanhev.vn", 250000m, CustomerStatus.Active),
-                ("Mai Thị Bích Ngọc", "0904567812", "bichngoc.mock@chauthanhev.vn", 1460000m, CustomerStatus.Active)
+                ("Dương Nhật Quang", "0938120674", "nhatquang.mock@chauthanhev.vn", 850000m, CustomerStatus.Active),
+                ("Mai Thị Bích Ngọc", "0904567812", "bichngoc.mock@chauthanhev.vn", 1460000m, CustomerStatus.Active),
+                ("Trịnh Văn Hùng", "0913245678", "vanhung.mock@chauthanhev.vn", 3200000m, CustomerStatus.Active),
+                ("Đặng Thu Thảo", "0978901234", "thuthao.mock@chauthanhev.vn", 750000m, CustomerStatus.Active),
+                ("Vũ Đình Khoa", "0945678901", "dinhkhoa.mock@chauthanhev.vn", 1600000m, CustomerStatus.Active),
+                ("Phan Thanh Hằng", "0932109876", "thanhhang.mock@chauthanhev.vn", 920000m, CustomerStatus.Active),
+                ("Lâm Chí Dũng", "0981234560", "chidung.mock@chauthanhev.vn", 2100000m, CustomerStatus.Active),
+                ("Hoàng Kim Oanh", "0909876543", "kimoanh.mock@chauthanhev.vn", 530000m, CustomerStatus.Active),
+                ("Đinh Quang Trọng", "0965432109", "quangtrong.mock@chauthanhev.vn", 1280000m, CustomerStatus.Active),
+                ("Cao Mỹ Duyên", "0919876543", "myduyen.mock@chauthanhev.vn", 670000m, CustomerStatus.Active),
+                ("Hà Tuấn Kiệt", "0943210987", "tuankiet.mock@chauthanhev.vn", 3500000m, CustomerStatus.Active),
+                ("Tạ Bích Phương", "0934567890", "bichphuong.mock@chauthanhev.vn", 410000m, CustomerStatus.Active),
+                ("Lương Gia Bảo", "0978123456", "giabao.mock@chauthanhev.vn", 1890000m, CustomerStatus.Active),
+                ("Chu Diệu Linh", "0901234567", "dieulinh.mock@chauthanhev.vn", 950000m, CustomerStatus.Active),
+                ("Đoàn Khắc Tiệp", "0967890123", "khactiep.mock@chauthanhev.vn", 2300000m, CustomerStatus.Active),
+                ("Trương Hoài An", "0914567890", "hoaian.mock@chauthanhev.vn", 1150000m, CustomerStatus.Active),
+                ("Tô Quốc Tuấn", "0989012345", "quoctuan.mock@chauthanhev.vn", 840000m, CustomerStatus.Active),
+                ("Lê Ngọc Bích", "0936789012", "ngocbich.mock@chauthanhev.vn", 1320000m, CustomerStatus.Active),
+                ("Nguyễn Hữu Đạt", "0972345678", "huudat.mock@chauthanhev.vn", 4700000m, CustomerStatus.Active),
+                ("Vương Diễm My", "0906789012", "diemmy.mock@chauthanhev.vn", 620000m, CustomerStatus.Active)
             };
             for (int i = 0; i < customerProfiles.Length; i++)
             {
@@ -184,20 +263,20 @@ namespace ChauThanhEV.Services
                     Email = profile.Email,
                     WalletBalance = profile.Balance,
                     Status = profile.Status,
-                    RegisteredAt = Now.AddDays(-45 - i * 17)
+                    RegisteredAt = Now.AddDays(-110 - i * 5)
                 });
             }
 
-            // ---- Charging orders & Top-up orders: sinh theo 40 ngày gần nhất ----
+            // ---- Charging orders & Top-up orders: sinh đầy đủ 90 ngày (3 tháng kinh doanh) ----
             string[] paymentMethods = { "Ví điện tử", "Thẻ ngân hàng", "Chuyển khoản" };
             string[] topupMethods = { "Chuyển khoản ngân hàng", "Ví Momo", "Thẻ tín dụng" };
 
-            for (int daysAgo = 39; daysAgo >= 0; daysAgo--)
+            for (int daysAgo = 89; daysAgo >= 0; daysAgo--)
             {
                 var day = Now.Date.AddDays(-daysAgo);
                 bool isToday = daysAgo == 0;
 
-                int chargingCount = Math.Max(6, (int)Math.Round(58 - daysAgo * 1.15 + rnd.Next(-4, 5)));
+                int chargingCount = Math.Max(12, (int)Math.Round(52 - daysAgo * 0.32 + rnd.Next(-5, 6)));
                 for (int j = 0; j < chargingCount; j++)
                 {
                     var customer = Customers[rnd.Next(Customers.Count)];
@@ -215,7 +294,7 @@ namespace ChauThanhEV.Services
                     ChargingOrderStatus status;
                     DateTime? end = start.AddMinutes(durationMin);
                     double roll = rnd.NextDouble();
-                    if (isToday && j < 3)
+                    if (isToday && j < 6)
                     {
                         status = ChargingOrderStatus.Charging;
                         end = null;
@@ -259,8 +338,8 @@ namespace ChauThanhEV.Services
                     });
                 }
 
-                int topupCount = Math.Max(2, (int)Math.Round(14 - daysAgo * 0.28 + rnd.Next(-2, 3)));
-                decimal[] topupAmounts = { 50000m, 100000m, 200000m, 300000m, 500000m, 1000000m };
+                int topupCount = Math.Max(4, (int)Math.Round(16 - daysAgo * 0.11 + rnd.Next(-3, 4)));
+                decimal[] topupAmounts = { 50000m, 100000m, 200000m, 300000m, 500000m, 1000000m, 2000000m };
                 for (int j = 0; j < topupCount; j++)
                 {
                     var customer = Customers[rnd.Next(Customers.Count)];
@@ -484,16 +563,23 @@ namespace ChauThanhEV.Services
 
             var recentSessions = ChargingOrders
                 .OrderByDescending(o => o.StartTime)
-                .Take(6)
-                .Select(o => new DashboardRecentSession
+                .Take(7)
+                .Select(o =>
                 {
-                    Code = o.Code,
-                    CustomerName = Customers.FirstOrDefault(c => c.Id == o.CustomerId)?.FullName ?? "Khách vãng lai",
-                    StationName = Stations.FirstOrDefault(s => s.Id == o.StationId)?.Name ?? "Trạm Châu Thành",
-                    EnergyKwh = o.EnergyKwh,
-                    FormattedAmount = FormatCurrency(o.Amount),
-                    Status = o.Status,
-                    StartTime = o.StartTime
+                    var ch = Chargers.FirstOrDefault(c => c.Id == o.ChargerId);
+                    var conn = ch?.Connectors.FirstOrDefault(cn => cn.Id == o.ConnectorId);
+                    return new DashboardRecentSession
+                    {
+                        Code = o.Code,
+                        CustomerName = Customers.FirstOrDefault(c => c.Id == o.CustomerId)?.FullName ?? "Khách vãng lai",
+                        StationName = Stations.FirstOrDefault(s => s.Id == o.StationId)?.Name ?? "Trạm Châu Thành",
+                        ChargerCode = ch?.Code ?? "DC-Charger",
+                        ConnectorLabel = conn?.Code.Split('-').Last() ?? "A",
+                        EnergyKwh = o.EnergyKwh,
+                        FormattedAmount = FormatCurrency(o.Amount),
+                        Status = o.Status,
+                        StartTime = o.StartTime
+                    };
                 })
                 .ToList();
 
@@ -502,6 +588,7 @@ namespace ChauThanhEV.Services
                 TotalStations = Stations.Count(s => s.Active),
                 TotalChargers = totalChargers,
                 TotalConnectors = totalConnectors,
+                OfflineChargers = offlineChargers,
                 UtilizationRate = totalConnectors > 0 ? Math.Round(charging * 100.0 / totalConnectors, 1) : 0,
                 ActivePowerKw = Math.Round(activePower, 1),
                 RecentSessions = recentSessions,
@@ -524,11 +611,13 @@ namespace ChauThanhEV.Services
             var monthStart = new DateTime(Now.Year, Now.Month, 1);
             var monthEnd = monthStart.AddMonths(1);
             var prevMonthStart = monthStart.AddMonths(-1);
+            var quarterStart = Now.Date.AddDays(-90);
 
             var (todayRevenue, todayGmv, todayEnergy, todayOrders, todayUsers) = Aggregate(todayStart, todayEnd);
             var (ydRevenue, ydGmv, ydEnergy, ydOrders, ydUsers) = Aggregate(yesterdayStart, todayStart);
             var (monthRevenue, monthGmv, monthEnergy, monthOrders, monthUsers) = Aggregate(monthStart, monthEnd);
             var (pmRevenue, pmGmv, pmEnergy, pmOrders, pmUsers) = Aggregate(prevMonthStart, monthStart);
+            var (quarterRevenue, quarterGmv, quarterEnergy, quarterOrders, quarterUsers) = Aggregate(quarterStart, todayEnd);
 
             model.TodayGmvValue = FormatCurrency(todayGmv);
             model.TodayGmvCompare = $"Hôm qua: {FormatCurrency(ydGmv)}";
@@ -552,12 +641,47 @@ namespace ChauThanhEV.Services
                 new() { IconKey = "users",  IconBg = "purple", Title = "Người dùng hoạt động",   Value = FormatNumber(monthUsers),      CompareLabel = $"Tháng trước: {FormatNumber(pmUsers)}",      ChangePercent = PercentChange(monthUsers, pmUsers) },
             };
 
+            // Số liệu 3 tháng (Kỳ kinh doanh quý)
+            model.QuarterGmvValue = FormatCurrency(quarterGmv);
+            model.QuarterRevenueValue = FormatCurrency(quarterRevenue);
+            model.QuarterEnergyValue = FormatEnergy(quarterEnergy);
+            model.QuarterOrdersCount = quarterOrders;
+            model.QuarterActiveUsersCount = quarterUsers;
+
             model.RevenueToday = BuildRevenueSeries(DashboardRange.Today);
             model.Revenue7Days = BuildRevenueSeries(DashboardRange.Last7Days);
             model.Revenue30Days = BuildRevenueSeries(DashboardRange.Last30Days);
+            model.Revenue90Days = BuildRevenueSeries(DashboardRange.Last90Days);
             model.ActiveUsersToday = BuildActiveUserSeries(DashboardRange.Today);
             model.ActiveUsers7Days = BuildActiveUserSeries(DashboardRange.Last7Days);
             model.ActiveUsers30Days = BuildActiveUserSeries(DashboardRange.Last30Days);
+            model.ActiveUsers90Days = BuildActiveUserSeries(DashboardRange.Last90Days);
+
+            // Giám sát 5 Trạm sạc Châu Thành
+            model.StationsList = Stations.Select(s =>
+            {
+                var sChargers = Chargers.Where(c => c.StationId == s.Id).ToList();
+                var sConnectors = sChargers.SelectMany(c => c.Connectors).ToList();
+                int avail = sConnectors.Count(c => c.Status == ConnectorStatus.Available);
+                int chg = sConnectors.Count(c => c.Status == ConnectorStatus.Charging);
+                int flt = sConnectors.Count(c => c.Status == ConnectorStatus.Fault || c.Status == ConnectorStatus.Maintenance);
+                double pwr = sChargers.Where(c => c.Status == ChargerStatus.Online && c.Connectors.Any(cn => cn.Status == ConnectorStatus.Charging)).Sum(c => c.PowerKw * 0.75);
+
+                return new StationQuickView
+                {
+                    Id = s.Id,
+                    Code = s.Code,
+                    Name = s.Name,
+                    Address = s.Address,
+                    TotalChargers = sChargers.Count,
+                    TotalConnectors = sConnectors.Count,
+                    AvailableConnectors = avail,
+                    ChargingConnectors = chg,
+                    FaultConnectors = flt,
+                    ActivePowerKw = Math.Round(pwr, 1),
+                    Active = s.Active
+                };
+            }).ToList();
 
             return model;
         }
@@ -587,7 +711,19 @@ namespace ChauThanhEV.Services
                     var to = h == 24 ? Now.Date.AddDays(1) : Now.Date.AddHours(h + 2);
                     decimal sum = ChargingOrders.Where(o => o.StartTime >= from && o.StartTime < to && o.Status == ChargingOrderStatus.Completed).Sum(o => o.Amount);
                     data.Labels.Add(h == 24 ? "24:00" : $"{h:00}:00");
-                    data.Values.Add((double)sum / 1_000_000.0); // triệu đồng
+                    data.Values.Add(Math.Round((double)sum / 1_000_000.0, 2)); // triệu đồng
+                }
+            }
+            else if (range == DashboardRange.Last90Days)
+            {
+                // Gom nhóm 3 ngày 1 điểm cho 90 ngày (30 điểm rõ ràng)
+                for (int i = 90; i > 0; i -= 3)
+                {
+                    var from = Now.Date.AddDays(-i);
+                    var to = from.AddDays(3);
+                    decimal sum = ChargingOrders.Where(o => o.StartTime >= from && o.StartTime < to && o.Status == ChargingOrderStatus.Completed).Sum(o => o.Amount);
+                    data.Labels.Add(to.ToString("dd/MM"));
+                    data.Values.Add(Math.Round((double)sum / 1_000_000.0, 2));
                 }
             }
             else
@@ -599,7 +735,7 @@ namespace ChauThanhEV.Services
                     var next = day.AddDays(1);
                     decimal sum = ChargingOrders.Where(o => o.StartTime >= day && o.StartTime < next && o.Status == ChargingOrderStatus.Completed).Sum(o => o.Amount);
                     data.Labels.Add(day.ToString("dd/MM"));
-                    data.Values.Add((double)sum / 1_000_000.0);
+                    data.Values.Add(Math.Round((double)sum / 1_000_000.0, 2));
                 }
             }
             return data;
@@ -618,6 +754,19 @@ namespace ChauThanhEV.Services
                         .Concat(TopUpOrders.Where(o => o.CreatedAt >= from && o.CreatedAt < to).Select(o => o.CustomerId))
                         .Distinct().Count();
                     data.Labels.Add(h == 24 ? "24:00" : $"{h:00}:00");
+                    data.Values.Add(users);
+                }
+            }
+            else if (range == DashboardRange.Last90Days)
+            {
+                for (int i = 90; i > 0; i -= 3)
+                {
+                    var from = Now.Date.AddDays(-i);
+                    var to = from.AddDays(3);
+                    var users = ChargingOrders.Where(o => o.StartTime >= from && o.StartTime < to).Select(o => o.CustomerId)
+                        .Concat(TopUpOrders.Where(o => o.CreatedAt >= from && o.CreatedAt < to).Select(o => o.CustomerId))
+                        .Distinct().Count();
+                    data.Labels.Add(to.ToString("dd/MM"));
                     data.Values.Add(users);
                 }
             }

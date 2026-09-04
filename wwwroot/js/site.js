@@ -196,26 +196,26 @@ function initDashboardCharts() {
         if (!series) return;
         if (revenueChart) revenueChart.destroy();
         var ctx = el.getContext('2d');
-        var isToday = key === 'today';
+        var isLine = key === 'today' || key === 'd90';
 
         revenueChart = new Chart(ctx, {
-            type: isToday ? 'line' : 'bar',
+            type: isLine ? 'line' : 'bar',
             data: {
                 labels: series.labels,
                 datasets: [{
                     label: 'Doanh thu (triệu VNĐ)',
                     data: series.values,
                     borderColor: blue,
-                    backgroundColor: isToday ? makeGradient(ctx, '37, 99, 235', 0.28, 0.01) : blue,
-                    fill: isToday,
-                    tension: 0.38,
-                    pointRadius: isToday ? 3 : 0,
+                    backgroundColor: isLine ? makeGradient(ctx, '37, 99, 235', 0.28, 0.01) : blue,
+                    fill: isLine,
+                    tension: 0.35,
+                    pointRadius: key === 'today' ? 3 : (key === 'd90' ? 2 : 0),
                     pointHoverRadius: 6,
                     pointBackgroundColor: '#ffffff',
                     pointBorderColor: blue,
                     pointBorderWidth: 2,
                     borderWidth: 2.4,
-                    borderRadius: isToday ? 0 : 6,
+                    borderRadius: isLine ? 0 : 6,
                     maxBarThickness: 28
                 }]
             },
@@ -370,7 +370,7 @@ function initDashboardCharts() {
     renderActiveUserChart('today');
     renderDoughnut();
 
-    var rangeMap = { 'today': 'today', '7d': 'd7', '30d': 'd30' };
+    var rangeMap = { 'today': 'today', '7d': 'd7', '30d': 'd30', '90d': 'd90' };
     document.querySelectorAll('.range-tabs').forEach(function (group) {
         var target = group.getAttribute('data-target');
         group.querySelectorAll('button').forEach(function (btn) {
