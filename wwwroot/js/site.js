@@ -177,16 +177,115 @@ function initDashboardCharts() {
     var data = window.__dashboardData;
     var blue = '#2563eb';
     var purple = '#7c3aed';
+    var cyan = '#00b4d8';
+    var teal = '#0d9488';
+    var blue = '#2563eb';
     Chart.defaults.font.family = "'Inter', -apple-system, BlinkMacSystemFont, sans-serif";
     Chart.defaults.color = '#64748b';
 
     var revenueChart, activeUserChart, doughnutChart;
+    var todaySparklineChart, monthSparklineChart;
 
     function makeGradient(ctx, colorRgb, alphaTop, alphaBottom) {
         var g = ctx.createLinearGradient(0, 0, 0, 240);
         g.addColorStop(0, 'rgba(' + colorRgb + ',' + (alphaTop || 0.35) + ')');
         g.addColorStop(1, 'rgba(' + colorRgb + ',' + (alphaBottom || 0.0) + ')');
         return g;
+    }
+
+    // Sparklines cho GMV Today và GMV Monthly
+    function renderSparklines() {
+        var tEl = document.getElementById('todayGmvSparkline');
+        if (tEl && data.todayGmvSparkline && data.todayGmvSparkline.labels) {
+            if (todaySparklineChart) todaySparklineChart.destroy();
+            var ctxT = tEl.getContext('2d');
+            todaySparklineChart = new Chart(ctxT, {
+                type: 'line',
+                data: {
+                    labels: data.todayGmvSparkline.labels,
+                    datasets: [{
+                        data: data.todayGmvSparkline.values,
+                        borderColor: '#00d2ff',
+                        backgroundColor: makeGradient(ctxT, '0, 210, 255', 0.22, 0.0),
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 0,
+                        pointHoverRadius: 4,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function (c) { return ' GMV: ' + c.parsed.y.toFixed(2) + ' M'; }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { size: 9 }, maxTicksLimit: 6, color: '#94a3b8' },
+                            border: { display: false }
+                        },
+                        y: {
+                            grid: { color: '#f1f5f9' },
+                            ticks: { font: { size: 9 }, maxTicksLimit: 3, color: '#94a3b8' },
+                            border: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        var mEl = document.getElementById('monthGmvSparkline');
+        if (mEl && data.monthGmvSparkline && data.monthGmvSparkline.labels) {
+            if (monthSparklineChart) monthSparklineChart.destroy();
+            var ctxM = mEl.getContext('2d');
+            monthSparklineChart = new Chart(ctxM, {
+                type: 'line',
+                data: {
+                    labels: data.monthGmvSparkline.labels,
+                    datasets: [{
+                        data: data.monthGmvSparkline.values,
+                        borderColor: '#00d2ff',
+                        backgroundColor: makeGradient(ctxM, '0, 210, 255', 0.22, 0.0),
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 0,
+                        pointHoverRadius: 4,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function (c) { return ' GMV: ' + c.parsed.y.toFixed(2) + ' M'; }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { size: 9 }, maxTicksLimit: 6, color: '#94a3b8' },
+                            border: { display: false }
+                        },
+                        y: {
+                            grid: { color: '#f1f5f9' },
+                            ticks: { font: { size: 9 }, maxTicksLimit: 3, color: '#94a3b8' },
+                            border: { display: false }
+                        }
+                    }
+                }
+            });
+        }
     }
 
     function renderRevenueChart(key) {
@@ -205,24 +304,24 @@ function initDashboardCharts() {
                 datasets: [{
                     label: 'Doanh thu (triệu VNĐ)',
                     data: series.values,
-                    borderColor: blue,
-                    backgroundColor: isLine ? makeGradient(ctx, '37, 99, 235', 0.28, 0.01) : blue,
+                    borderColor: cyan,
+                    backgroundColor: isLine ? makeGradient(ctx, '0, 180, 216', 0.25, 0.01) : cyan,
                     fill: isLine,
                     tension: 0.35,
                     pointRadius: key === 'today' ? 3 : (key === 'd90' ? 2 : 0),
                     pointHoverRadius: 6,
                     pointBackgroundColor: '#ffffff',
-                    pointBorderColor: blue,
+                    pointBorderColor: cyan,
                     pointBorderWidth: 2,
-                    borderWidth: 2.4,
-                    borderRadius: isLine ? 0 : 6,
-                    maxBarThickness: 28
+                    borderWidth: 2.2,
+                    borderRadius: isLine ? 0 : 4,
+                    maxBarThickness: 26
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                animation: { duration: 600 },
+                animation: { duration: 500 },
                 plugins: {
                     legend: { display: false },
                     tooltip: {
@@ -232,7 +331,7 @@ function initDashboardCharts() {
                         padding: 10,
                         titleFont: { size: 12, weight: 'bold' },
                         bodyFont: { size: 12 },
-                        cornerRadius: 8,
+                        cornerRadius: 6,
                         callbacks: {
                             label: function (ctx2) {
                                 return ' Doanh thu: ' + ctx2.parsed.y.toFixed(2) + ' triệu VNĐ';
@@ -244,7 +343,7 @@ function initDashboardCharts() {
                     x: {
                         grid: { display: false },
                         border: { display: false },
-                        ticks: { font: { size: 11 } }
+                        ticks: { font: { size: 11 }, maxTicksLimit: 12 }
                     },
                     y: {
                         grid: { color: '#f1f5f9' },
@@ -260,7 +359,7 @@ function initDashboardCharts() {
     }
 
     function renderActiveUserChart(key) {
-        var el = document.getElementById('activeUserChart');
+        var el = document.getElementById('activeUsersChart') || document.getElementById('activeUserChart');
         if (!el) return;
         var series = data.activeUsers[key];
         if (!series) return;
@@ -274,22 +373,22 @@ function initDashboardCharts() {
                 datasets: [{
                     label: 'Người dùng hoạt động',
                     data: series.values,
-                    borderColor: purple,
-                    backgroundColor: makeGradient(ctx, '124, 58, 237', 0.25, 0.01),
+                    borderColor: teal,
+                    backgroundColor: makeGradient(ctx, '13, 148, 136', 0.22, 0.01),
                     fill: true,
-                    tension: 0.38,
-                    pointRadius: 3,
+                    tension: 0.35,
+                    pointRadius: 2.5,
                     pointHoverRadius: 6,
                     pointBackgroundColor: '#ffffff',
-                    pointBorderColor: purple,
+                    pointBorderColor: teal,
                     pointBorderWidth: 2,
-                    borderWidth: 2.4
+                    borderWidth: 2.2
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                animation: { duration: 600 },
+                animation: { duration: 500 },
                 plugins: {
                     legend: { display: false },
                     tooltip: {
@@ -297,7 +396,7 @@ function initDashboardCharts() {
                         padding: 10,
                         titleFont: { size: 12, weight: 'bold' },
                         bodyFont: { size: 12 },
-                        cornerRadius: 8,
+                        cornerRadius: 6,
                         callbacks: {
                             label: function (ctx2) { return ' Khách hàng: ' + ctx2.parsed.y; }
                         }
@@ -307,7 +406,7 @@ function initDashboardCharts() {
                     x: {
                         grid: { display: false },
                         border: { display: false },
-                        ticks: { font: { size: 11 } }
+                        ticks: { font: { size: 11 }, maxTicksLimit: 12 }
                     },
                     y: {
                         grid: { color: '#f1f5f9' },
@@ -322,55 +421,28 @@ function initDashboardCharts() {
         });
     }
 
-    function renderDoughnut() {
-        var el = document.getElementById('connectorDoughnut');
-        if (!el || !data.doughnut) return;
-        if (doughnutChart) doughnutChart.destroy();
-
-        doughnutChart = new Chart(el.getContext('2d'), {
-            type: 'doughnut',
-            data: {
-                labels: data.doughnut.labels,
-                datasets: [{
-                    data: data.doughnut.values,
-                    backgroundColor: ['#16a34a', '#2563eb', '#ef4444'],
-                    hoverBackgroundColor: ['#15803d', '#1d4ed8', '#dc2626'],
-                    borderWidth: 3,
-                    borderColor: '#ffffff',
-                    hoverOffset: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '72%',
-                animation: { animateRotate: true, animateScale: true, duration: 800 },
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                        padding: 10,
-                        titleFont: { size: 12, weight: 'bold' },
-                        bodyFont: { size: 12 },
-                        cornerRadius: 8,
-                        callbacks: {
-                            label: function (ctx2) {
-                                var total = ctx2.dataset.data.reduce(function (a, b) { return a + b; }, 0);
-                                var pct = total ? (ctx2.parsed / total * 100).toFixed(1) : '0.0';
-                                return ' ' + ctx2.label + ': ' + ctx2.parsed + ' cổng (' + pct + '%)';
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    }
-
+    renderSparklines();
     renderRevenueChart('today');
     renderActiveUserChart('today');
-    renderDoughnut();
 
     var rangeMap = { 'today': 'today', '7d': 'd7', '30d': 'd30', '90d': 'd90' };
+
+    // BENY Template Tabs
+    document.querySelectorAll('.beny-tab-group').forEach(function (group) {
+        var chartName = group.getAttribute('data-chart');
+        group.querySelectorAll('.beny-tab-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                group.querySelectorAll('.beny-tab-btn').forEach(function (b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+                var period = btn.getAttribute('data-period');
+                var key = rangeMap[period] || period;
+                if (chartName === 'revenueChart') renderRevenueChart(key);
+                if (chartName === 'activeUsersChart') renderActiveUserChart(key);
+            });
+        });
+    });
+
+    // Cũ / Dự phòng
     document.querySelectorAll('.range-tabs').forEach(function (group) {
         var target = group.getAttribute('data-target');
         group.querySelectorAll('button').forEach(function (btn) {

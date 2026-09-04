@@ -33,6 +33,8 @@ namespace ChauThanhEV.Controllers
             ViewBag.ActiveUsers7DaysJson = JsonSerializer.Serialize(model.ActiveUsers7Days, JsonOptions);
             ViewBag.ActiveUsers30DaysJson = JsonSerializer.Serialize(model.ActiveUsers30Days, JsonOptions);
             ViewBag.ActiveUsers90DaysJson = JsonSerializer.Serialize(model.ActiveUsers90Days, JsonOptions);
+            ViewBag.TodayGmvSparklineJson = JsonSerializer.Serialize(model.TodayGmvSparkline, JsonOptions);
+            ViewBag.MonthGmvSparklineJson = JsonSerializer.Serialize(model.MonthGmvSparkline, JsonOptions);
             ViewBag.DoughnutJson = JsonSerializer.Serialize(new
             {
                 labels = new[] { "Available", "Charging", "Fault" },

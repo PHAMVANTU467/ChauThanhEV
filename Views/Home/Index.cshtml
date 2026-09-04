@@ -1,367 +1,303 @@
-@model DashboardViewModel
+@model ChauThanhEV.Models.DashboardViewModel
 @{
-    ViewData["Title"] = "Trung tâm điều hành - Dashboard";
-    var todayRevenue = Model.TodayOverview.FirstOrDefault(c => c.IconKey == "wallet");
-    var todayOrders = Model.TodayOverview.FirstOrDefault(c => c.IconKey == "doc");
-    var todayEnergy = Model.TodayOverview.FirstOrDefault(c => c.IconKey == "bolt2");
-    var todayUsers = Model.TodayOverview.FirstOrDefault(c => c.IconKey == "users");
-
-    var monthRevenue = Model.MonthOverview.FirstOrDefault(c => c.IconKey == "wallet");
-    var monthOrders = Model.MonthOverview.FirstOrDefault(c => c.IconKey == "doc");
-    var monthEnergy = Model.MonthOverview.FirstOrDefault(c => c.IconKey == "bolt2");
-    var monthUsers = Model.MonthOverview.FirstOrDefault(c => c.IconKey == "users");
+    ViewData["Title"] = "Home Page";
 }
 
-<!-- 1. Executive Top Header & Network Health Strip -->
-<div class="dash-exec-header">
-    <div class="dash-exec-title-group">
-        <div class="dash-live-badge">
-            <span class="pulse-dot"></span> GIÁM SÁT MẠNG LƯỚI TRỰC TIẾP
-        </div>
-        <h2>Trung tâm Điều hành Mạng lưới Trạm sạc Châu Thành EV</h2>
-        <p class="dash-exec-subtitle">
-            Giám sát thời gian thực chuẩn OCPP • <strong>@Model.TotalStations trạm cao tốc</strong> • <strong>@Model.TotalChargers trụ sạc DC</strong> (8 trụ/trạm) • <strong>@Model.TotalConnectors cổng sạc CCS2</strong>
-        </p>
-    </div>
-    <div class="dash-exec-actions">
-        <div class="power-quick-badge">
-            <span class="pq-label">Công suất lưới tức thời</span>
-            <span class="pq-val">@Model.ActivePowerKw.ToString("N1") <small>kW</small></span>
-        </div>
-        <button type="button" class="btn btn-secondary btn-sm" onclick="location.reload();">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
-            Làm mới
-        </button>
-    </div>
-</div>
+<div class="beny-dashboard-container">
 
-<!-- 2. Core Executive KPI Cards (Tập trung, tinh gọn, đầy đủ Hôm nay / Tháng này / 3 Tháng) -->
-<div class="exec-kpi-grid">
-    <!-- Card 1: Doanh thu & GMV -->
-    <div class="exec-kpi-card kpi-blue">
-        <div class="exec-kpi-top">
-            <span class="exec-kpi-icon bg-blue">@await Html.PartialAsync("_Icon", "wallet2")</span>
-            <span class="exec-kpi-tag">Dòng tiền &amp; GMV</span>
-        </div>
-        <div class="exec-kpi-main">
-            <p class="exec-kpi-label">Tổng GMV hôm nay</p>
-            <h3 class="exec-kpi-value">@Model.TodayGmvValue</h3>
-        </div>
-        <div class="exec-kpi-compare">
-            <span class="change-pill @(Model.TodayGmvChange >= 0 ? "positive" : "negative")">
-                @(Model.TodayGmvChange >= 0 ? "▲ +" : "▼ ")@Math.Abs(Model.TodayGmvChange).ToString("0.00", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))%
-            </span>
-            <span class="comp-label">so với hôm qua</span>
-        </div>
-        <div class="exec-kpi-breakdown">
-            <div class="breakdown-item">
-                <span>Tháng này</span>
-                <strong>@Model.MonthGmvValue</strong>
+    <!-- ================================================================
+         SECTION 1: STATUS OF EV CHARGER
+         ================================================================ -->
+    <div class="beny-section-group">
+        <h2 class="beny-sec-title">Status of EV Charger</h2>
+        <div class="status-charger-strip">
+            <div class="scs-col">
+                <div class="scs-label">Number of EV Chargers</div>
+                <div class="scs-value color-cyan"><a href="@Url.Action("Index", "Chargers")">@Model.TotalChargers</a></div>
             </div>
-            <div class="breakdown-item">
-                <span>3 tháng qua</span>
-                <strong class="text-cyan">@Model.QuarterGmvValue</strong>
+            <div class="scs-col">
+                <div class="scs-label">Number of Off-line EV Charger</div>
+                <div class="scs-value color-orange"><a href="@Url.Action("Index", "Operations", new { tab = "offline" })">@Model.OfflineChargers</a></div>
+            </div>
+            <div class="scs-col">
+                <div class="scs-label">Number of Available Connector</div>
+                <div class="scs-value color-teal"><a href="@Url.Action("Index", "Chargers")">@Model.AvailableConnectors</a></div>
+            </div>
+            <div class="scs-col">
+                <div class="scs-label">Number of Charging Connector</div>
+                <div class="scs-value color-green"><a href="@Url.Action("Index", "Orders")">@Model.ChargingConnectors</a></div>
+            </div>
+            <div class="scs-col">
+                <div class="scs-label">Number of Reservation Connector</div>
+                <div class="scs-value color-blue"><a href="@Url.Action("Index", "Reservations")">@Model.ReservationConnectors</a></div>
+            </div>
+            <div class="scs-col">
+                <div class="scs-label">Number of Fault Connector</div>
+                <div class="scs-value color-red"><a href="@Url.Action("Index", "Operations")">@Model.FaultConnectors</a></div>
             </div>
         </div>
     </div>
 
-    <!-- Card 2: Năng lượng & Phụ tải lưới -->
-    <div class="exec-kpi-card kpi-orange">
-        <div class="exec-kpi-top">
-            <span class="exec-kpi-icon bg-orange">@await Html.PartialAsync("_Icon", "bolt2")</span>
-            <span class="exec-kpi-tag">Năng lượng điện</span>
-        </div>
-        <div class="exec-kpi-main">
-            <p class="exec-kpi-label">Điện tiêu thụ hôm nay</p>
-            <h3 class="exec-kpi-value">@(todayEnergy?.Value ?? "0 kWh")</h3>
-        </div>
-        <div class="exec-kpi-compare">
-            <span class="change-pill @((todayEnergy?.IsPositive ?? true) ? "positive" : "negative")">
-                @((todayEnergy?.IsPositive ?? true) ? "▲ +" : "▼ ")@Math.Abs(todayEnergy?.ChangePercent ?? 0).ToString("0.00", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))%
-            </span>
-            <span class="comp-label">so với hôm qua</span>
-        </div>
-        <div class="exec-kpi-breakdown">
-            <div class="breakdown-item">
-                <span>Tháng này</span>
-                <strong>@(monthEnergy?.Value ?? "0 kWh")</strong>
-            </div>
-            <div class="breakdown-item">
-                <span>3 tháng qua</span>
-                <strong class="text-orange">@Model.QuarterEnergyValue</strong>
-            </div>
-        </div>
-    </div>
-
-    <!-- Card 3: Hạ tầng 40 Trụ & 80 Cổng sạc -->
-    <div class="exec-kpi-card kpi-green">
-        <div class="exec-kpi-top">
-            <span class="exec-kpi-icon bg-green">@await Html.PartialAsync("_Icon", "station")</span>
-            <span class="exec-kpi-tag">Mạng lưới hạ tầng</span>
-        </div>
-        <div class="exec-kpi-main">
-            <p class="exec-kpi-label">Tổng quy mô mạng lưới</p>
-            <h3 class="exec-kpi-value">@Model.TotalChargers <small>Trụ</small> / @Model.TotalConnectors <small>Cổng</small></h3>
-        </div>
-        <div class="exec-kpi-compare">
-            <span class="util-rate-pill">Hiệu suất: <strong>@Model.UtilizationRate.ToString("N1")%</strong></span>
-            <span class="comp-label">tỷ lệ cổng đang sạc</span>
-        </div>
-        <div class="exec-kpi-breakdown">
-            <div class="breakdown-item">
-                <span class="dot-label"><i class="dot bg-green"></i> Sẵn sàng: <strong>@Model.AvailableConnectors</strong></span>
-            </div>
-            <div class="breakdown-item">
-                <span class="dot-label"><i class="dot bg-blue"></i> Đang sạc: <strong>@Model.ChargingConnectors</strong></span>
-            </div>
-            <div class="breakdown-item">
-                <span class="dot-label"><i class="dot bg-red"></i> Sự cố: <strong>@(Model.FaultConnectors + Model.OfflineChargers)</strong></span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Card 4: Lượt sạc & Khách hàng -->
-    <div class="exec-kpi-card kpi-purple">
-        <div class="exec-kpi-top">
-            <span class="exec-kpi-icon bg-purple">@await Html.PartialAsync("_Icon", "users")</span>
-            <span class="exec-kpi-tag">Giao dịch &amp; Khách</span>
-        </div>
-        <div class="exec-kpi-main">
-            <p class="exec-kpi-label">Đơn giao dịch hôm nay</p>
-            <h3 class="exec-kpi-value">@(todayOrders?.Value ?? "0") <small>đơn</small></h3>
-        </div>
-        <div class="exec-kpi-compare">
-            <span class="change-pill @((todayOrders?.IsPositive ?? true) ? "positive" : "negative")">
-                @((todayOrders?.IsPositive ?? true) ? "▲ +" : "▼ ")@Math.Abs(todayOrders?.ChangePercent ?? 0).ToString("0.00", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))%
-            </span>
-            <span class="comp-label">@(todayUsers?.Value ?? "0") khách sạc</span>
-        </div>
-        <div class="exec-kpi-breakdown">
-            <div class="breakdown-item">
-                <span>Tháng này</span>
-                <strong>@(monthOrders?.Value ?? "0") đơn</strong>
-            </div>
-            <div class="breakdown-item">
-                <span>3 tháng qua</span>
-                <strong class="text-purple">@Model.QuarterOrdersCount.ToString("N0") đơn</strong>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- 3. Mạng lưới 5 Địa điểm Trạm Sạc (Mỗi địa điểm 8 trụ sạc x 2 cổng sạc = 16 cổng) -->
-<div class="dash-section-wrap">
-    <div class="dash-section-head">
-        <div>
-            <h2 class="dash-section-title">Giám sát 5 Địa điểm Trạm sạc Cao tốc</h2>
-            <p class="dash-section-desc">Mỗi trạm quy hoạch chuẩn hóa <strong>8 trụ sạc DC Fast Charging</strong> (4 trụ 160 kW + 4 trụ 240 kW) với <strong>16 cổng sạc CCS2</strong></p>
-        </div>
-        <a href="@Url.Action("Index", "Stations")" class="btn btn-outline btn-sm">Quản lý trạm →</a>
-    </div>
-
-    <div class="station-fleet-grid">
-        @foreach (var st in Model.StationsList)
-        {
-            var total = st.TotalConnectors > 0 ? st.TotalConnectors : 16;
-            var pctAvail = Math.Round(st.AvailableConnectors * 100.0 / total, 1);
-            var pctChg = Math.Round(st.ChargingConnectors * 100.0 / total, 1);
-            var pctFault = Math.Round(st.FaultConnectors * 100.0 / total, 1);
-
-            <div class="station-fleet-card">
-                <div class="sfc-top">
-                    <div class="sfc-meta">
-                        <span class="sfc-code">@st.Code</span>
-                        <h4 class="sfc-name">@st.Name</h4>
-                    </div>
-                    <span class="sfc-badge @(st.FaultConnectors > 0 ? "badge-warn" : "badge-ok")">
-                        <span class="pulse-dot-sm"></span> @(st.FaultConnectors > 0 ? $"{st.FaultConnectors} cổng lỗi" : "Hoạt động")
-                    </span>
+    <!-- ================================================================
+         SECTION 2: OVERVIEW TODAY
+         ================================================================ -->
+    <div class="beny-section-group">
+        <h2 class="beny-sec-title">Overview Today</h2>
+        <div class="overview-tri-grid">
+            <!-- Left: GMV with mini sparkline chart -->
+            <div class="beny-card gmv-spark-card">
+                <div class="bc-head-row">
+                    <span class="bc-title">GMV</span>
                 </div>
+                <div class="bc-big-val color-red">@Model.TodayGmvValue</div>
+                <div class="bc-subline">
+                    <span class="sub-compare">Yesterday: @Model.TodayGmvCompare.Replace("Hôm qua: ", "")</span>
+                    <span class="sub-ratio">Compared to Yesterday: <b class="@(Model.TodayGmvChange >= 0 ? "text-green" : "text-red")">@(Model.TodayGmvChange >= 0 ? "↑ +" : "↓ ")@(Model.TodayGmvChange.ToString("0.00"))%</b></span>
+                </div>
+                <div class="mini-sparkline-wrap">
+                    <canvas id="todayGmvSparkline" height="95"></canvas>
+                </div>
+            </div>
 
-                <p class="sfc-address">@st.Address</p>
-
-                <div class="sfc-metrics">
-                    <div class="sfc-metric-item">
-                        <span class="sfc-metric-lbl">Trụ sạc</span>
-                        <span class="sfc-metric-val"><strong>@st.TotalChargers</strong> trụ</span>
+            <!-- Middle: Stacked Total Income & Total Electricity -->
+            <div class="stacked-card-col">
+                <div class="beny-card stacked-item-card">
+                    <div class="bc-head-row">
+                        <span class="bc-title">Total Income</span>
                     </div>
-                    <div class="sfc-metric-item">
-                        <span class="sfc-metric-lbl">Cổng sạc</span>
-                        <span class="sfc-metric-val"><strong>@st.TotalConnectors</strong> CCS2</span>
-                    </div>
-                    <div class="sfc-metric-item">
-                        <span class="sfc-metric-lbl">Tải tức thời</span>
-                        <span class="sfc-metric-val text-cyan"><strong>@st.ActivePowerKw.ToString("N1")</strong> kW</span>
+                    <div class="bc-big-val color-teal">@Model.TotalIncomeToday.Value</div>
+                    <div class="bc-subline">
+                        <span class="sub-compare">Yesterday: @Model.TotalIncomeToday.CompareLabel</span>
+                        <span class="sub-ratio">Compared to Yesterday: <b class="@(Model.TotalIncomeToday.IsPositive ? "text-green" : "text-red")">@(Model.TotalIncomeToday.IsPositive ? "↑ +" : "↓ ")@(Model.TotalIncomeToday.ChangePercent.ToString("0.00"))%</b></span>
                     </div>
                 </div>
-
-                <!-- Visual Progress Bar trạng thái cổng sạc -->
-                <div class="connector-progress-bar" title="Sẵn sàng: @st.AvailableConnectors | Đang sạc: @st.ChargingConnectors | Sự cố: @st.FaultConnectors">
-                    <div class="cpb-segment bg-green" style="width: @pctAvail%"></div>
-                    <div class="cpb-segment bg-blue" style="width: @pctChg%"></div>
-                    <div class="cpb-segment bg-red" style="width: @pctFault%"></div>
-                </div>
-
-                <div class="sfc-legend">
-                    <span><i class="dot bg-green"></i> @st.AvailableConnectors rảnh</span>
-                    <span><i class="dot bg-blue"></i> @st.ChargingConnectors sạc</span>
-                    @if (st.FaultConnectors > 0)
-                    {
-                        <span class="text-red"><i class="dot bg-red"></i> @st.FaultConnectors lỗi</span>
-                    }
-                </div>
-
-                <div class="sfc-footer">
-                    <a href="@Url.Action("Index", "Chargers", new { keyword = st.Name })" class="sfc-link">Xem chi tiết trụ →</a>
+                <div class="beny-card stacked-item-card">
+                    <div class="bc-head-row">
+                        <span class="bc-title">Total Electricity</span>
+                    </div>
+                    <div class="bc-big-val color-cyan">@Model.TotalElectricityToday.Value</div>
+                    <div class="bc-subline">
+                        <span class="sub-compare">Yesterday: @Model.TotalElectricityToday.CompareLabel</span>
+                        <span class="sub-ratio">Compared to Yesterday: <b class="@(Model.TotalElectricityToday.IsPositive ? "text-green" : "text-red")">@(Model.TotalElectricityToday.IsPositive ? "↑ +" : "↓ ")@(Model.TotalElectricityToday.ChangePercent.ToString("0.00"))%</b></span>
+                    </div>
                 </div>
             </div>
-        }
-    </div>
-</div>
 
-<!-- 4. Khối Biểu đồ Phân tích Đa kỳ (Doanh thu 3 tháng + Phân bổ 80 Cổng sạc) -->
-<div class="dash-section-wrap">
-    <div class="dash-section-head">
-        <div>
-            <h2 class="dash-section-title">Biểu đồ Phân tích &amp; Thống kê Hoạt động</h2>
-            <p class="dash-section-desc">Theo dõi chu kỳ kinh doanh 3 tháng, công suất phát và tỷ lệ sử dụng cổng sạc</p>
-        </div>
-    </div>
-
-    <div class="bottom-grid three-col">
-        <!-- Biểu đồ Doanh thu (Chiếm 2 cột) -->
-        <div class="chart-card span-2">
-            <div class="chart-card-head">
-                <div>
-                    <h3><span class="stat-icon bg-blue small">@await Html.PartialAsync("_Icon", "wallet2")</span> Xu hướng Doanh thu (Triệu VNĐ)</h3>
-                    <span class="chart-sub">Dòng tiền thu từ các phiên sạc xe điện thành công</span>
+            <!-- Right: Stacked Numbers of Order & Active Users -->
+            <div class="stacked-card-col">
+                <div class="beny-card stacked-item-card">
+                    <div class="bc-head-row">
+                        <span class="bc-title">Numbers of Order</span>
+                    </div>
+                    <div class="bc-big-val color-cyan">@Model.NumbersOfOrderToday.Value</div>
+                    <div class="bc-subline">
+                        <span class="sub-compare">Yesterday: @Model.NumbersOfOrderToday.CompareLabel</span>
+                        <span class="sub-ratio">Compared to Yesterday: <b class="@(Model.NumbersOfOrderToday.IsPositive ? "text-green" : "text-red")">@(Model.NumbersOfOrderToday.IsPositive ? "↑ +" : "↓ ")@(Model.NumbersOfOrderToday.ChangePercent.ToString("0.00"))%</b></span>
+                    </div>
                 </div>
-                <div class="range-tabs" data-target="revenue">
-                    <button type="button" class="active" data-range="today">Hôm nay</button>
-                    <button type="button" data-range="7d">7 ngày qua</button>
-                    <button type="button" data-range="30d">30 ngày qua</button>
-                    <button type="button" data-range="90d">3 tháng qua</button>
+                <div class="beny-card stacked-item-card">
+                    <div class="bc-head-row">
+                        <span class="bc-title">Active Users</span>
+                    </div>
+                    <div class="bc-big-val color-cyan">@Model.ActiveUsersTodayCard.Value</div>
+                    <div class="bc-subline">
+                        <span class="sub-compare">Yesterday: @Model.ActiveUsersTodayCard.CompareLabel</span>
+                        <span class="sub-ratio">Compared to Yesterday: <b class="@(Model.ActiveUsersTodayCard.IsPositive ? "text-green" : "text-red")">@(Model.ActiveUsersTodayCard.IsPositive ? "↑ +" : "↓ ")@(Model.ActiveUsersTodayCard.ChangePercent.ToString("0.00"))%</b></span>
+                    </div>
                 </div>
-            </div>
-            <div class="chart-canvas-wrap"><canvas id="revenueChart"></canvas></div>
-        </div>
-
-        <!-- Biểu đồ Phân bổ Cổng sạc (Chiếm 1 cột) -->
-        <div class="chart-card">
-            <div class="chart-card-head">
-                <div>
-                    <h3><span class="stat-icon bg-purple small">@await Html.PartialAsync("_Icon", "bolt")</span> Phân bổ @Model.TotalConnectors Cổng sạc</h3>
-                    <span class="chart-sub">Trạng thái cổng CCS2 toàn mạng lưới</span>
-                </div>
-            </div>
-            <div class="chart-canvas-wrap chart-canvas-wrap-sm"><canvas id="connectorDoughnut"></canvas></div>
-            <ul class="legend-list">
-                <li><span class="dot bg-green"></span> Sẵn sàng (Available): <strong>@Model.AvailableConnectors</strong></li>
-                <li><span class="dot bg-blue"></span> Đang sạc (Charging): <strong>@Model.ChargingConnectors</strong></li>
-                <li><span class="dot bg-red"></span> Lỗi / Bảo trì (Fault): <strong>@Model.FaultConnectors</strong></li>
-            </ul>
-        </div>
-    </div>
-
-    <div class="bottom-grid">
-        <!-- Biểu đồ Người dùng hoạt động -->
-        <div class="chart-card">
-            <div class="chart-card-head">
-                <div>
-                    <h3><span class="stat-icon bg-purple small">@await Html.PartialAsync("_Icon", "users")</span> Khách hàng hoạt động</h3>
-                    <span class="chart-sub">Lưu lượng tài xế sạc pin và nạp ví</span>
-                </div>
-                <div class="range-tabs" data-target="users">
-                    <button type="button" class="active" data-range="today">Hôm nay</button>
-                    <button type="button" data-range="7d">7 ngày qua</button>
-                    <button type="button" data-range="30d">30 ngày qua</button>
-                    <button type="button" data-range="90d">3 tháng qua</button>
-                </div>
-            </div>
-            <div class="chart-canvas-wrap"><canvas id="activeUserChart"></canvas></div>
-        </div>
-
-        <!-- Bảng Phiên sạc thời gian thực -->
-        <div class="chart-card">
-            <div class="chart-card-head">
-                <div>
-                    <h3><span class="stat-icon bg-green small">⚡</span> Phiên sạc gần đây</h3>
-                    <span class="chart-sub">Giám sát các phiên cấp điện trực tiếp trên các trụ</span>
-                </div>
-                <a href="@Url.Action("Index", "Orders")" class="btn-ghost btn-sm">Tất cả đơn →</a>
-            </div>
-            <div class="table-scroll" style="max-height: 275px;">
-                <table class="data-table dashboard-mini-table">
-                    <thead>
-                        <tr>
-                            <th>Mã đơn</th>
-                            <th>Khách hàng</th>
-                            <th>Trạm &amp; Trụ sạc</th>
-                            <th>Điện năng</th>
-                            <th>Số tiền</th>
-                            <th>Trạng thái</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model.RecentSessions != null && Model.RecentSessions.Any())
-                        {
-                            @foreach (var session in Model.RecentSessions)
-                            {
-                                <tr>
-                                    <td><strong>@session.Code</strong></td>
-                                    <td>@session.CustomerName</td>
-                                    <td>
-                                        <div class="session-station-info">
-                                            <span class="ss-name">@session.StationName</span>
-                                            <small class="ss-charger text-muted">@session.ChargerCode / Cổng @session.ConnectorLabel</small>
-                                        </div>
-                                    </td>
-                                    <td><span class="text-cyan font-bold">@session.EnergyKwh.ToString("N1") kWh</span></td>
-                                    <td>@session.FormattedAmount</td>
-                                    <td>
-                                        @if (session.Status == ChargingOrderStatus.Charging)
-                                        {
-                                            <span class="pill pill-blue"><span class="pulse-dot-sm"></span> Đang sạc</span>
-                                        }
-                                        else if (session.Status == ChargingOrderStatus.Completed)
-                                        {
-                                            <span class="pill pill-green">Hoàn tất</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="pill pill-orange">Chờ thanh toán</span>
-                                        }
-                                    </td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr class="empty-row"><td colspan="6">Chưa có phiên sạc nào gần đây.</td></tr>
-                        }
-                    </tbody>
-                </table>
             </div>
         </div>
     </div>
+
+    <!-- ================================================================
+         SECTION 3: OVERVIEW MONTHLY
+         ================================================================ -->
+    <div class="beny-section-group">
+        <h2 class="beny-sec-title">Overview Monthly</h2>
+        <div class="overview-tri-grid">
+            <!-- Left: GMV Monthly with mini sparkline chart -->
+            <div class="beny-card gmv-spark-card">
+                <div class="bc-head-row">
+                    <span class="bc-title">GMV</span>
+                </div>
+                <div class="bc-big-val color-red">@Model.MonthGmvValue</div>
+                <div class="bc-subline">
+                    <span class="sub-compare">Last Month: @Model.MonthGmvCompare.Replace("Tháng trước: ", "")</span>
+                    <span class="sub-ratio">Compared to Last Month: <b class="@(Model.MonthGmvChange >= 0 ? "text-green" : "text-red")">@(Model.MonthGmvChange >= 0 ? "↑ +" : "↓ ")@(Model.MonthGmvChange.ToString("0.00"))%</b></span>
+                </div>
+                <div class="mini-sparkline-wrap">
+                    <canvas id="monthGmvSparkline" height="95"></canvas>
+                </div>
+            </div>
+
+            <!-- Middle: Stacked Total Income & Total Electricity -->
+            <div class="stacked-card-col">
+                <div class="beny-card stacked-item-card">
+                    <div class="bc-head-row">
+                        <span class="bc-title">Total Income</span>
+                    </div>
+                    <div class="bc-big-val color-teal">@Model.TotalIncomeMonth.Value</div>
+                    <div class="bc-subline">
+                        <span class="sub-compare">Last Month: @Model.TotalIncomeMonth.CompareLabel</span>
+                        <span class="sub-ratio">Compared to Last Month: <b class="@(Model.TotalIncomeMonth.IsPositive ? "text-green" : "text-red")">@(Model.TotalIncomeMonth.IsPositive ? "↑ +" : "↓ ")@(Model.TotalIncomeMonth.ChangePercent.ToString("0.00"))%</b></span>
+                    </div>
+                </div>
+                <div class="beny-card stacked-item-card">
+                    <div class="bc-head-row">
+                        <span class="bc-title">Total Electricity</span>
+                    </div>
+                    <div class="bc-big-val color-cyan">@Model.TotalElectricityMonth.Value</div>
+                    <div class="bc-subline">
+                        <span class="sub-compare">Last Month: @Model.TotalElectricityMonth.CompareLabel</span>
+                        <span class="sub-ratio">Compared to Last Month: <b class="@(Model.TotalElectricityMonth.IsPositive ? "text-green" : "text-red")">@(Model.TotalElectricityMonth.IsPositive ? "↑ +" : "↓ ")@(Model.TotalElectricityMonth.ChangePercent.ToString("0.00"))%</b></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Stacked Numbers of Order & Active Users -->
+            <div class="stacked-card-col">
+                <div class="beny-card stacked-item-card">
+                    <div class="bc-head-row">
+                        <span class="bc-title">Numbers of Order</span>
+                    </div>
+                    <div class="bc-big-val color-cyan">@Model.NumbersOfOrderMonth.Value</div>
+                    <div class="bc-subline">
+                        <span class="sub-compare">Last Month: @Model.NumbersOfOrderMonth.CompareLabel</span>
+                        <span class="sub-ratio">Compared to Last Month: <b class="@(Model.NumbersOfOrderMonth.IsPositive ? "text-green" : "text-red")">@(Model.NumbersOfOrderMonth.IsPositive ? "↑ +" : "↓ ")@(Model.NumbersOfOrderMonth.ChangePercent.ToString("0.00"))%</b></span>
+                    </div>
+                </div>
+                <div class="beny-card stacked-item-card">
+                    <div class="bc-head-row">
+                        <span class="bc-title">Active Users</span>
+                    </div>
+                    <div class="bc-big-val color-cyan">@Model.ActiveUsersMonthCard.Value</div>
+                    <div class="bc-subline">
+                        <span class="sub-compare">Last Month: @Model.ActiveUsersMonthCard.CompareLabel</span>
+                        <span class="sub-ratio">Compared to Last Month: <b class="@(Model.ActiveUsersMonthCard.IsPositive ? "text-green" : "text-red")">@(Model.ActiveUsersMonthCard.IsPositive ? "↑ +" : "↓ ")@(Model.ActiveUsersMonthCard.ChangePercent.ToString("0.00"))%</b></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================================================================
+         SECTION 4: INCOME & ACTIVE USERS CHARTS
+         ================================================================ -->
+    <div class="beny-charts-grid">
+        <!-- Income Chart Card -->
+        <div class="beny-card chart-large-card">
+            <div class="clc-head">
+                <h3 class="clc-title">Income</h3>
+                <div class="beny-tab-group" data-chart="revenueChart">
+                    <button type="button" class="beny-tab-btn active" data-period="today">Today</button>
+                    <button type="button" class="beny-tab-btn" data-period="7d">Last 7 days</button>
+                    <button type="button" class="beny-tab-btn" data-period="30d">Last 30 days</button>
+                    <button type="button" class="beny-tab-btn" data-period="90d">Last 90 days</button>
+                </div>
+            </div>
+            <div class="clc-body">
+                <canvas id="revenueChart" height="240"></canvas>
+            </div>
+        </div>
+
+        <!-- Active Users Chart Card -->
+        <div class="beny-card chart-large-card">
+            <div class="clc-head">
+                <h3 class="clc-title">Active Users</h3>
+                <div class="beny-tab-group" data-chart="activeUsersChart">
+                    <button type="button" class="beny-tab-btn active" data-period="today">Today</button>
+                    <button type="button" class="beny-tab-btn" data-period="7d">Last 7 days</button>
+                    <button type="button" class="beny-tab-btn" data-period="30d">Last 30 days</button>
+                    <button type="button" class="beny-tab-btn" data-period="90d">Last 90 days</button>
+                </div>
+            </div>
+            <div class="clc-body">
+                <canvas id="activeUsersChart" height="240"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================================================================
+         SECTION 5: 5 STATIONS FLEET MONITORING (40 CHARGERS - 80 PORTS)
+         ================================================================ -->
+    <div class="beny-section-group" style="margin-top: 28px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+            <h2 class="beny-sec-title" style="margin-bottom: 0;">Station Fleet Overview (5 Stations • 40 Chargers • 80 Ports)</h2>
+            <a href="@Url.Action("Index", "Stations")" class="btn btn-sm btn-outline-light" style="color: #00d2ff; border-color: rgba(0,210,255,0.4); background: rgba(0,210,255,0.08); font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 6px; text-decoration: none;">View All Stations &rarr;</a>
+        </div>
+        <div class="station-fleet-grid">
+            @foreach (var station in Model.StationsList)
+            {
+                var total = station.TotalConnectors > 0 ? station.TotalConnectors : 16;
+                var chgPct = (station.ChargingConnectors * 100.0) / total;
+                var avlPct = (station.AvailableConnectors * 100.0) / total;
+                var fltPct = (station.FaultConnectors * 100.0) / total;
+
+                <div class="station-fleet-card">
+                    <div class="sfc-head">
+                        <div class="sfc-title">
+                            <h4>@station.Name</h4>
+                            <p class="sfc-addr">@station.Address</p>
+                        </div>
+                        <div class="sfc-power">1.600 kW</div>
+                    </div>
+
+                    <div class="sfc-metrics">
+                        <div class="sfc-col">
+                            <div class="lbl">Chargers</div>
+                            <div class="val">@station.TotalChargers Trụ DC</div>
+                        </div>
+                        <div class="sfc-col">
+                            <div class="lbl">Connectors</div>
+                            <div class="val">@station.TotalConnectors Súng CCS2</div>
+                        </div>
+                        <div class="sfc-col">
+                            <div class="lbl">Active Load</div>
+                            <div class="val text-cyan">@station.ActivePowerKw.ToString("N0") kW</div>
+                        </div>
+                    </div>
+
+                    <div class="sfc-connector-box">
+                        <div class="scb-header">
+                            <span class="scb-title">Ports Status</span>
+                            <span class="scb-count">@station.ChargingConnectors Charging / @station.TotalConnectors Total</span>
+                        </div>
+                        <div class="connector-progress-bar">
+                            <div class="cpb-seg charging" style="width: @chgPct.ToString("0.0")%" title="Charging: @station.ChargingConnectors"></div>
+                            <div class="cpb-seg available" style="width: @avlPct.ToString("0.0")%" title="Available: @station.AvailableConnectors"></div>
+                            <div class="cpb-seg offline" style="width: @fltPct.ToString("0.0")%" title="Offline/Fault: @station.FaultConnectors"></div>
+                        </div>
+                        <div class="sfc-legend">
+                            <span><i class="leg-dot charging"></i> Charging (@station.ChargingConnectors)</span>
+                            <span><i class="leg-dot available"></i> Available (@station.AvailableConnectors)</span>
+                            <span><i class="leg-dot offline"></i> Maintenance (@station.FaultConnectors)</span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
 </div>
 
 @section Scripts {
     <script>
         window.__dashboardData = {
             revenue: {
-                today: @Html.Raw(ViewBag.RevenueTodayJson),
-                d7:    @Html.Raw(ViewBag.Revenue7DaysJson),
-                d30:   @Html.Raw(ViewBag.Revenue30DaysJson),
-                d90:   @Html.Raw(ViewBag.Revenue90DaysJson)
+                today: @Html.Raw(ViewBag.RevenueTodayJson ?? "{}"),
+                d7:    @Html.Raw(ViewBag.Revenue7DaysJson ?? "{}"),
+                d30:   @Html.Raw(ViewBag.Revenue30DaysJson ?? "{}"),
+                d90:   @Html.Raw(ViewBag.Revenue90DaysJson ?? "{}")
             },
             activeUsers: {
-                today: @Html.Raw(ViewBag.ActiveUsersTodayJson),
-                d7:    @Html.Raw(ViewBag.ActiveUsers7DaysJson),
-                d30:   @Html.Raw(ViewBag.ActiveUsers30DaysJson),
-                d90:   @Html.Raw(ViewBag.ActiveUsers90DaysJson)
+                today: @Html.Raw(ViewBag.ActiveUsersTodayJson ?? "{}"),
+                d7:    @Html.Raw(ViewBag.ActiveUsers7DaysJson ?? "{}"),
+                d30:   @Html.Raw(ViewBag.ActiveUsers30DaysJson ?? "{}"),
+                d90:   @Html.Raw(ViewBag.ActiveUsers90DaysJson ?? "{}")
             },
-            doughnut: @Html.Raw(ViewBag.DoughnutJson)
+            todayGmvSparkline: @Html.Raw(ViewBag.TodayGmvSparklineJson ?? "{}"),
+            monthGmvSparkline: @Html.Raw(ViewBag.MonthGmvSparklineJson ?? "{}"),
+            doughnut: @Html.Raw(ViewBag.DoughnutJson ?? "{}")
         };
         if (typeof window.initDashboardCharts === 'function') {
             window.initDashboardCharts();

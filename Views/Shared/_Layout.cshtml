@@ -28,56 +28,56 @@
             </div>
 
             <nav class="sidebar-nav" aria-label="Điều hướng chính">
-                <a class="@NavClass("Home")" href="@Url.Action("Index", "Home")"><span class="nav-icon">⌂</span><span class="nav-label">Trang chủ</span></a>
+                <a class="@NavClass("Home")" href="@Url.Action("Index", "Home")"><span class="nav-icon">⌂</span><span class="nav-label">Home Page</span></a>
 
                 <div class="nav-group @(IsGroupActive("Stations", "Chargers", "UnregisteredChargers", "Reservations") ? "expanded" : "")">
-                    <button class="nav-parent" type="button" aria-expanded="@(IsGroupActive("Stations", "Chargers", "UnregisteredChargers", "Reservations") ? "true" : "false")"><span class="nav-icon">⚡</span><span class="nav-label">Quản lý trạm sạc</span><span class="nav-chevron">⌄</span></button>
+                    <button class="nav-parent" type="button" aria-expanded="@(IsGroupActive("Stations", "Chargers", "UnregisteredChargers", "Reservations") ? "true" : "false")"><span class="nav-icon">⚡</span><span class="nav-label">EV Charger Management</span><span class="nav-chevron">⌄</span></button>
                     <div class="nav-submenu">
-                        <a class="@NavClass("Stations")" href="@Url.Action("Index", "Stations")">Quản lý trạm</a>
-                        <a class="@NavClass("Chargers")" href="@Url.Action("Index", "Chargers")">Quản lý trụ sạc</a>
-                        <a class="@NavClass("UnregisteredChargers")" href="@Url.Action("Index", "UnregisteredChargers")">Trụ sạc chưa đăng ký</a>
-                        <a class="@NavClass("Reservations")" href="@Url.Action("Index", "Reservations")">Quản lý đặt trước</a>
+                        <a class="@NavClass("Stations")" href="@Url.Action("Index", "Stations")">Management of Stations</a>
+                        <a class="@NavClass("Chargers")" href="@Url.Action("Index", "Chargers")">Management of EV Chargers</a>
+                        <a class="@NavClass("UnregisteredChargers")" href="@Url.Action("Index", "UnregisteredChargers")">Unregistered EV Chargers</a>
+                        <a class="@NavClass("Reservations")" href="@Url.Action("Index", "Reservations")">Reservations Management</a>
                     </div>
                 </div>
 
                 <div class="nav-group @(IsGroupActive("Orders", "TopUpOrders", "Invoices") ? "expanded" : "")">
-                    <button class="nav-parent" type="button" aria-expanded="@(IsGroupActive("Orders", "TopUpOrders", "Invoices") ? "true" : "false")"><span class="nav-icon">▤</span><span class="nav-label">Quản lý đơn hàng</span><span class="nav-chevron">⌄</span></button>
+                    <button class="nav-parent" type="button" aria-expanded="@(IsGroupActive("Orders", "TopUpOrders", "Invoices") ? "true" : "false")"><span class="nav-icon">▤</span><span class="nav-label">Order Management</span><span class="nav-chevron">⌄</span></button>
                     <div class="nav-submenu">
-                        <a class="@NavClass("Orders")" href="@Url.Action("Index", "Orders")">Đơn sạc</a>
-                        <a class="@NavClass("TopUpOrders")" href="@Url.Action("Index", "TopUpOrders")">Đơn nạp tiền</a>
-                        <a class="@NavClass("Invoices")" href="@Url.Action("Index", "Invoices")">Thông tin hóa đơn</a>
+                        <a class="@NavClass("Orders")" href="@Url.Action("Index", "Orders")">Charging Orders</a>
+                        <a class="@NavClass("TopUpOrders")" href="@Url.Action("Index", "TopUpOrders")">Top-up Orders</a>
+                        <a class="@NavClass("Invoices")" href="@Url.Action("Index", "Invoices")">Invoices</a>
                     </div>
                 </div>
 
                 <div class="nav-group @(IsGroupActive("FinancialManagement", "InternalTransactions", "TopUpPackages") ? "expanded" : "")">
-                    <button class="nav-parent" type="button" aria-expanded="@(IsGroupActive("FinancialManagement", "InternalTransactions", "TopUpPackages") ? "true" : "false")"><span class="nav-icon">◫</span><span class="nav-label">Quản lý tài khoản</span><span class="nav-chevron">⌄</span></button>
+                    <button class="nav-parent" type="button" aria-expanded="@(IsGroupActive("FinancialManagement", "InternalTransactions", "TopUpPackages") ? "true" : "false")"><span class="nav-icon">◫</span><span class="nav-label">Account Management</span><span class="nav-chevron">⌄</span></button>
                     <div class="nav-submenu">
-                        <a class="@NavClass("FinancialManagement")" href="@Url.Action("Index", "FinancialManagement")">Quản lý tài chính</a>
-                        <a class="@NavClass("InternalTransactions")" href="@Url.Action("Index", "InternalTransactions")">Lịch sử giao dịch nội bộ</a>
-                        <a class="@NavClass("TopUpPackages")" href="@Url.Action("Index", "TopUpPackages")">Gói nạp tiền</a>
+                        <a class="@NavClass("FinancialManagement")" href="@Url.Action("Index", "FinancialManagement")">Financial Management</a>
+                        <a class="@NavClass("InternalTransactions")" href="@Url.Action("Index", "InternalTransactions")">Local Transaction Record</a>
+                        <a class="@NavClass("TopUpPackages")" href="@Url.Action("Index", "TopUpPackages")">TOP UP Packages</a>
                     </div>
                 </div>
 
-                <a class="@NavClass("Customers")" href="@Url.Action("Index", "Customers")"><span class="nav-icon">◎</span><span class="nav-label">Quản lý người dùng</span></a>
-                <a class="@NavClass("RfidCards")" href="@Url.Action("Index", "RfidCards")"><span class="nav-icon">▣</span><span class="nav-label">Quản lý thẻ</span></a>
+                <a class="@NavClass("Customers")" href="@Url.Action("Index", "Customers")"><span class="nav-icon">◎</span><span class="nav-label">User Management</span></a>
+                <a class="@NavClass("RfidCards")" href="@Url.Action("Index", "RfidCards")"><span class="nav-icon">▣</span><span class="nav-label">Card Management</span></a>
 
                 <div class="nav-group @(IsGroupActive("Operations") ? "expanded" : "")">
-                    <button class="nav-parent" type="button" aria-expanded="@(IsGroupActive("Operations") ? "true" : "false")"><span class="nav-icon">⚙</span><span class="nav-label">Vận hành &amp; Bảo trì</span><span class="nav-chevron">⌄</span></button>
+                    <button class="nav-parent" type="button" aria-expanded="@(IsGroupActive("Operations") ? "true" : "false")"><span class="nav-icon">⚙</span><span class="nav-label">Platform O&amp;M</span><span class="nav-chevron">⌄</span></button>
                     <div class="nav-submenu">
-                        <a class="@NavClass("Operations")" href="@Url.Action("Index", "Operations")">Lịch sử lỗi</a>
-                        <a class="@NavClass("Operations")" href="@Url.Action("Index", "Operations", new { tab = "offline" })">Quản lý trụ sạc Offline</a>
-                        <a class="@NavClass("Operations")" href="@Url.Action("Index", "Operations", new { tab = "abnormal" })">Quản lý đơn hàng bất thường</a>
+                        <a class="@NavClass("Operations")" href="@Url.Action("Index", "Operations")">Faults History</a>
+                        <a class="@NavClass("Operations")" href="@Url.Action("Index", "Operations", new { tab = "offline" })">Offline Management of the EV Charger</a>
+                        <a class="@NavClass("Operations")" href="@Url.Action("Index", "Operations", new { tab = "abnormal" })">Abnormal Orders</a>
                     </div>
                 </div>
             </nav>
         </aside>
 
         <div class="main-col">
-            <header class="topbar">
+            <header class="topbar topbar-dark">
                 <button class="icon-btn menu-toggle" type="button" aria-label="Thu gọn menu">
                     <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
                 </button>
-                <h1 class="page-title">@ViewData["Title"]</h1>
+                <div class="topbar-platform-title">EV Charger Management Platform</div>
 
                 <div class="topbar-right">
                     <button class="icon-btn bell-btn" type="button" aria-label="Thông báo">
@@ -88,11 +88,8 @@
                     <form asp-controller="Account" asp-action="Logout" method="post" class="user-menu-form">
                         @Html.AntiForgeryToken()
                         <div class="user-menu">
-                            <span class="avatar">AD</span>
-                            <span class="user-info">
-                                <strong>@displayName</strong>
-                                <small>@displayRole</small>
-                            </span>
+                            <span class="user-display-tag">BENY_EXAM</span>
+                            <span class="avatar avatar-beny">🧑‍💼</span>
                             <button type="submit" class="icon-btn logout-btn" title="Đăng xuất" aria-label="Đăng xuất">
                                 <svg viewBox="0 0 24 24" fill="none"><path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 8l4 4-4 4M19 12H9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             </button>

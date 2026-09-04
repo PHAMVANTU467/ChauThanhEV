@@ -52,6 +52,23 @@ namespace ChauThanhEV.Models
         public int ChargingConnectors { get; set; }
         public int FaultConnectors { get; set; }
         public int OfflineChargers { get; set; }
+        public int ReservationConnectors { get; set; } = 0;
+
+        // Sparklines cho GMV Today và GMV Monthly
+        public ChartSeriesData TodayGmvSparkline { get; set; } = new();
+        public ChartSeriesData MonthGmvSparkline { get; set; } = new();
+
+        // Thẻ riêng cho Overview Today
+        public OverviewCard TotalIncomeToday { get; set; } = new();
+        public OverviewCard TotalElectricityToday { get; set; } = new();
+        public OverviewCard NumbersOfOrderToday { get; set; } = new();
+        public OverviewCard ActiveUsersTodayCard { get; set; } = new();
+
+        // Thẻ riêng cho Overview Monthly
+        public OverviewCard TotalIncomeMonth { get; set; } = new();
+        public OverviewCard TotalElectricityMonth { get; set; } = new();
+        public OverviewCard NumbersOfOrderMonth { get; set; } = new();
+        public OverviewCard ActiveUsersMonthCard { get; set; } = new();
 
         // Tổng quan hôm nay / tháng này / 3 tháng
         public string TodayGmvValue { get; set; } = "";

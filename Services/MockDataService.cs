@@ -622,24 +622,88 @@ namespace ChauThanhEV.Services
             model.TodayGmvValue = FormatCurrency(todayGmv);
             model.TodayGmvCompare = $"Hôm qua: {FormatCurrency(ydGmv)}";
             model.TodayGmvChange = PercentChange(todayGmv, ydGmv);
+
+            model.TotalIncomeToday = new OverviewCard
+            {
+                Title = "Total Income",
+                Value = FormatCurrency(todayRevenue),
+                CompareLabel = FormatCurrency(ydRevenue),
+                ChangePercent = PercentChange(todayRevenue, ydRevenue)
+            };
+            model.TotalElectricityToday = new OverviewCard
+            {
+                Title = "Total Electricity",
+                Value = FormatEnergy(todayEnergy),
+                CompareLabel = FormatEnergy(ydEnergy),
+                ChangePercent = PercentChange((decimal)todayEnergy, (decimal)ydEnergy)
+            };
+            model.NumbersOfOrderToday = new OverviewCard
+            {
+                Title = "Numbers of Order",
+                Value = FormatNumber(todayOrders),
+                CompareLabel = FormatNumber(ydOrders),
+                ChangePercent = PercentChange(todayOrders, ydOrders)
+            };
+            model.ActiveUsersTodayCard = new OverviewCard
+            {
+                Title = "Active Users",
+                Value = FormatNumber(todayUsers),
+                CompareLabel = FormatNumber(ydUsers),
+                ChangePercent = PercentChange(todayUsers, ydUsers)
+            };
+
             model.TodayOverview = new List<OverviewCard>
             {
-                new() { IconKey = "wallet", IconBg = "green",  Title = "Tổng thu nhập",          Value = FormatCurrency(todayRevenue), CompareLabel = $"Hôm qua: {FormatCurrency(ydRevenue)}", ChangePercent = PercentChange(todayRevenue, ydRevenue) },
-                new() { IconKey = "doc",    IconBg = "blue",   Title = "Số đơn hàng",            Value = FormatNumber(todayOrders),     CompareLabel = $"Hôm qua: {FormatNumber(ydOrders)}",     ChangePercent = PercentChange(todayOrders, ydOrders) },
-                new() { IconKey = "bolt2",  IconBg = "orange", Title = "Tổng điện năng tiêu thụ", Value = FormatEnergy(todayEnergy),     CompareLabel = $"Hôm qua: {FormatEnergy(ydEnergy)}",     ChangePercent = PercentChange((decimal)todayEnergy, (decimal)ydEnergy) },
-                new() { IconKey = "users",  IconBg = "purple", Title = "Người dùng hoạt động",   Value = FormatNumber(todayUsers),      CompareLabel = $"Hôm qua: {FormatNumber(ydUsers)}",      ChangePercent = PercentChange(todayUsers, ydUsers) },
+                model.TotalIncomeToday,
+                model.NumbersOfOrderToday,
+                model.TotalElectricityToday,
+                model.ActiveUsersTodayCard
             };
 
             model.MonthGmvValue = FormatCurrency(monthGmv);
             model.MonthGmvCompare = $"Tháng trước: {FormatCurrency(pmGmv)}";
             model.MonthGmvChange = PercentChange(monthGmv, pmGmv);
+
+            model.TotalIncomeMonth = new OverviewCard
+            {
+                Title = "Total Income",
+                Value = FormatCurrency(monthRevenue),
+                CompareLabel = FormatCurrency(pmRevenue),
+                ChangePercent = PercentChange(monthRevenue, pmRevenue)
+            };
+            model.TotalElectricityMonth = new OverviewCard
+            {
+                Title = "Total Electricity",
+                Value = FormatEnergy(monthEnergy),
+                CompareLabel = FormatEnergy(pmEnergy),
+                ChangePercent = PercentChange((decimal)monthEnergy, (decimal)pmEnergy)
+            };
+            model.NumbersOfOrderMonth = new OverviewCard
+            {
+                Title = "Numbers of Order",
+                Value = FormatNumber(monthOrders),
+                CompareLabel = FormatNumber(pmOrders),
+                ChangePercent = PercentChange(monthOrders, pmOrders)
+            };
+            model.ActiveUsersMonthCard = new OverviewCard
+            {
+                Title = "Active Users",
+                Value = FormatNumber(monthUsers),
+                CompareLabel = FormatNumber(pmUsers),
+                ChangePercent = PercentChange(monthUsers, pmUsers)
+            };
+
             model.MonthOverview = new List<OverviewCard>
             {
-                new() { IconKey = "wallet", IconBg = "green",  Title = "Tổng thu nhập",          Value = FormatCurrency(monthRevenue), CompareLabel = $"Tháng trước: {FormatCurrency(pmRevenue)}", ChangePercent = PercentChange(monthRevenue, pmRevenue) },
-                new() { IconKey = "doc",    IconBg = "blue",   Title = "Số đơn hàng",            Value = FormatNumber(monthOrders),     CompareLabel = $"Tháng trước: {FormatNumber(pmOrders)}",     ChangePercent = PercentChange(monthOrders, pmOrders) },
-                new() { IconKey = "bolt2",  IconBg = "orange", Title = "Tổng điện năng tiêu thụ", Value = FormatEnergy(monthEnergy),     CompareLabel = $"Tháng trước: {FormatEnergy(pmEnergy)}",     ChangePercent = PercentChange((decimal)monthEnergy, (decimal)pmEnergy) },
-                new() { IconKey = "users",  IconBg = "purple", Title = "Người dùng hoạt động",   Value = FormatNumber(monthUsers),      CompareLabel = $"Tháng trước: {FormatNumber(pmUsers)}",      ChangePercent = PercentChange(monthUsers, pmUsers) },
+                model.TotalIncomeMonth,
+                model.NumbersOfOrderMonth,
+                model.TotalElectricityMonth,
+                model.ActiveUsersMonthCard
             };
+
+            // Sinh dữ liệu Sparkline Canvas cho Today và Monthly GMV
+            model.TodayGmvSparkline = BuildTodayGmvSparkline();
+            model.MonthGmvSparkline = BuildMonthGmvSparkline();
 
             // Số liệu 3 tháng (Kỳ kinh doanh quý)
             model.QuarterGmvValue = FormatCurrency(quarterGmv);
@@ -783,6 +847,37 @@ namespace ChauThanhEV.Services
                     data.Labels.Add(day.ToString("dd/MM"));
                     data.Values.Add(users);
                 }
+            }
+            return data;
+        }
+
+        private ChartSeriesData BuildTodayGmvSparkline()
+        {
+            var data = new ChartSeriesData();
+            for (int h = 0; h < 24; h++)
+            {
+                var from = Now.Date.AddHours(h);
+                var to = from.AddHours(1);
+                decimal chargingSum = ChargingOrders.Where(o => o.StartTime >= from && o.StartTime < to && o.Status == ChargingOrderStatus.Completed).Sum(o => o.Amount);
+                decimal topupSum = TopUpOrders.Where(o => o.CreatedAt >= from && o.CreatedAt < to && o.Status == TopUpStatus.Success).Sum(o => o.Amount);
+                data.Labels.Add($"{h}:00");
+                data.Values.Add(Math.Round((double)(chargingSum + topupSum) / 1_000_000.0, 2));
+            }
+            return data;
+        }
+
+        private ChartSeriesData BuildMonthGmvSparkline()
+        {
+            var data = new ChartSeriesData();
+            int daysInMonth = DateTime.DaysInMonth(Now.Year, Now.Month);
+            for (int d = 1; d <= daysInMonth; d++)
+            {
+                var day = new DateTime(Now.Year, Now.Month, d);
+                var next = day.AddDays(1);
+                decimal chargingSum = ChargingOrders.Where(o => o.StartTime >= day && o.StartTime < next && o.Status == ChargingOrderStatus.Completed).Sum(o => o.Amount);
+                decimal topupSum = TopUpOrders.Where(o => o.CreatedAt >= day && o.CreatedAt < next && o.Status == TopUpStatus.Success).Sum(o => o.Amount);
+                data.Labels.Add($"{Now.Month}.{d}");
+                data.Values.Add(Math.Round((double)(chargingSum + topupSum) / 1_000_000.0, 2));
             }
             return data;
         }
