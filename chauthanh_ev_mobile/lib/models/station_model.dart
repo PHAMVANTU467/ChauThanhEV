@@ -55,7 +55,9 @@ class ChargerModel {
     var rawList = json['connectors'] ?? json['Connectors'] ?? [];
     List<ConnectorModel> conns = [];
     if (rawList is List) {
-      conns = rawList.map((c) => ConnectorModel.fromJson(c as Map<String, dynamic>)).toList();
+      conns = rawList
+          .map((c) => ConnectorModel.fromJson(c as Map<String, dynamic>))
+          .toList();
     }
     return ChargerModel(
       id: json['id'] ?? json['Id'] ?? 0,
@@ -94,7 +96,13 @@ class StationModel {
     this.availableConnectors = 12,
     this.chargingConnectors = 4,
     required this.chargers,
-    this.amenities = const ['Trạm dừng chân', 'Cà phê 24/7', 'WC sạch sẽ', 'Mái che', 'Wifi miễn phí'],
+    this.amenities = const [
+      'Trạm dừng chân',
+      'Cà phê 24/7',
+      'WC sạch sẽ',
+      'Mái che',
+      'Wifi miễn phí',
+    ],
   });
 
   double get maxPowerKw {
@@ -106,17 +114,26 @@ class StationModel {
     var rawChargers = json['chargers'] ?? json['Chargers'] ?? [];
     List<ChargerModel> chList = [];
     if (rawChargers is List) {
-      chList = rawChargers.map((c) => ChargerModel.fromJson(c as Map<String, dynamic>)).toList();
+      chList = rawChargers
+          .map((c) => ChargerModel.fromJson(c as Map<String, dynamic>))
+          .toList();
     }
 
     int total = json['totalConnectors'] ?? json['TotalConnectors'] ?? 0;
     int avail = json['availableConnectors'] ?? json['AvailableConnectors'] ?? 0;
-    int charging = json['chargingConnectors'] ?? json['ChargingConnectors'] ?? 0;
+    int charging =
+        json['chargingConnectors'] ?? json['ChargingConnectors'] ?? 0;
 
     if (total == 0 && chList.isNotEmpty) {
       total = chList.fold(0, (sum, c) => sum + c.connectors.length);
-      avail = chList.fold(0, (sum, c) => sum + c.connectors.where((cn) => cn.isAvailable).length);
-      charging = chList.fold(0, (sum, c) => sum + c.connectors.where((cn) => cn.isCharging).length);
+      avail = chList.fold(
+        0,
+        (sum, c) => sum + c.connectors.where((cn) => cn.isAvailable).length,
+      );
+      charging = chList.fold(
+        0,
+        (sum, c) => sum + c.connectors.where((cn) => cn.isCharging).length,
+      );
     }
 
     return StationModel(
@@ -125,7 +142,11 @@ class StationModel {
       name: json['name'] ?? json['Name'] ?? '',
       address: json['address'] ?? json['Address'] ?? '',
       distanceKm: (json['distanceKm'] ?? (json['id'] ?? 1) * 2.3).toDouble(),
-      defaultElectricityPrice: (json['defaultElectricityPrice'] ?? json['DefaultElectricityPrice'] ?? 3800.0).toDouble(),
+      defaultElectricityPrice:
+          (json['defaultElectricityPrice'] ??
+                  json['DefaultElectricityPrice'] ??
+                  3800.0)
+              .toDouble(),
       active: json['active'] ?? json['Active'] ?? true,
       totalConnectors: total,
       availableConnectors: avail,
@@ -134,4 +155,3 @@ class StationModel {
     );
   }
 }
-

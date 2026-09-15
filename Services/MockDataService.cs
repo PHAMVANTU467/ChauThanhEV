@@ -9,6 +9,7 @@ namespace ChauThanhEV.Services
     public class MockDataService
     {
         private static readonly CultureInfo Vi = new("vi-VN");
+        private readonly object _stopChargingLock = new();
 
         // Mốc thời gian "hiện tại" được cố định tại thời điểm khởi động ứng dụng,
         // để các số liệu "hôm nay/tháng này" ổn định trong suốt phiên chạy demo.
@@ -1649,30 +1650,36 @@ namespace ChauThanhEV.Services
 
         public ChargingOrder? StopUserCharging(int orderId, double finalKwh, decimal finalAmount)
         {
-            var order = ChargingOrders.FirstOrDefault(o => o.Id == orderId);
-            if (order == null) return null;
+            if (!double.IsFinite(finalKwh) || finalKwh < 0 || finalAmount < 0)
+                return null;
 
-            order.EndTime = DateTime.Now;
-            order.EnergyKwh = Math.Round(finalKwh, 2);
-            order.Amount = Math.Round(finalAmount, 0);
-            order.Status = ChargingOrderStatus.Completed;
-
-            // Giải phóng cổng sạc
-            var charger = Chargers.FirstOrDefault(c => c.Id == order.ChargerId);
-            var connector = charger?.Connectors.FirstOrDefault(cn => cn.Id == order.ConnectorId);
-            if (connector != null && connector.Status == ConnectorStatus.Charging)
+            // A retry (including concurrent requests) must never debit the wallet twice.
+            lock (_stopChargingLock)
             {
-                connector.Status = ConnectorStatus.Available;
-            }
+                var order = ChargingOrders.FirstOrDefault(o => o.Id == orderId);
+                if (order == null || order.Status != ChargingOrderStatus.Charging) return null;
 
-            // Trừ số dư ví khách hàng
-            var customer = Customers.FirstOrDefault(c => c.Id == order.CustomerId);
-            if (customer != null)
-            {
-                customer.WalletBalance = Math.Max(0, customer.WalletBalance - finalAmount);
-            }
+                var customer = Customers.FirstOrDefault(c => c.Id == order.CustomerId);
+                if (customer == null) return null;
 
-            return order;
+                order.EndTime = DateTime.Now;
+                order.EnergyKwh = Math.Round(finalKwh, 2);
+                order.Amount = Math.Round(finalAmount, 0);
+                order.Status = ChargingOrderStatus.Completed;
+
+                // Giải phóng cổng sạc
+                var charger = Chargers.FirstOrDefault(c => c.Id == order.ChargerId);
+                var connector = charger?.Connectors.FirstOrDefault(cn => cn.Id == order.ConnectorId);
+                if (connector != null && connector.Status == ConnectorStatus.Charging)
+                {
+                    connector.Status = ConnectorStatus.Available;
+                }
+
+                // Trừ số dư ví khách hàng
+                customer.WalletBalance = Math.Max(0, customer.WalletBalance - order.Amount);
+
+                return order;
+            }
         }
 
         public TopUpOrder? TopUpUserWallet(int customerId, decimal amount, string method)

@@ -248,6 +248,9 @@ namespace ChauThanhEV.Controllers
         [HttpPost("charging/stop")]
         public IActionResult StopCharging([FromBody] StopChargingRequest req)
         {
+            if (!double.IsFinite(req.EnergyKwh) || req.EnergyKwh < 0 || req.Amount < 0)
+                return BadRequest(new { success = false, message = "Điện năng và số tiền phải là số không âm hợp lệ." });
+
             var order = _data.StopUserCharging(req.OrderId, req.EnergyKwh, req.Amount);
             if (order == null)
                 return BadRequest(new { success = false, message = "Không tìm thấy phiên sạc hoặc phiên sạc đã kết thúc." });
