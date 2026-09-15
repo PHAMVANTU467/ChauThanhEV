@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
   // Brand Colors
-  static const Color primary = Color(0xFF2563EB);        // Electric Royal Blue
+  static const Color primary = Color(0xFF2563EB); // Electric Royal Blue
   static const Color primaryLight = Color(0xFF3B82F6);
   static const Color primaryDark = Color(0xFF1D4ED8);
-  static const Color accentCyan = Color(0xFF00E5FF);       // Neon Cyan / EV Pulse
-  static const Color accentGreen = Color(0xFF10B981);      // Ready / Charging Green
-  static const Color accentOrange = Color(0xFFF59E0B);     // Warning / Busy
-  static const Color accentRed = Color(0xFFEF4444);        // Error / Fault
+  static const Color accentCyan = Color(0xFF00E5FF); // Neon Cyan / EV Pulse
+  static const Color accentGreen = Color(0xFF10B981); // Ready / Charging Green
+  static const Color accentOrange = Color(0xFFF59E0B); // Warning / Busy
+  static const Color accentRed = Color(0xFFEF4444); // Error / Fault
 
   // Dark Luxury EV Palette
-  static const Color background = Color(0xFF0A0F1D);       // Deep space navy
-  static const Color cardBg = Color(0xFF131D31);           // Card surface
-  static const Color surfaceLight = Color(0xFF1B2742);     // Hover / elevated
-  static const Color border = Color(0xFF233252);           // Subtle border
+  static const Color background = Color(0xFF0A0F1D); // Deep space navy
+  static const Color cardBg = Color(0xFF131D31); // Card surface
+  static const Color surfaceLight = Color(0xFF1B2742); // Hover / elevated
+  static const Color border = Color(0xFF233252); // Subtle border
   static const Color borderGlow = Color(0xFF2E436E);
 
   // Text Colors
@@ -64,7 +64,7 @@ class AppTheme {
         ),
         iconTheme: IconThemeData(color: textPrimary),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: cardBg,
         elevation: 4,
         shape: RoundedRectangleBorder(
@@ -78,11 +78,16 @@ class AppTheme {
         unselectedItemColor: textMuted,
         type: BottomNavigationBarType.fixed,
         elevation: 12,
-        selectedLabelStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: 11),
-        unselectedLabelStyle: TextStyle(fontWeight: FontWeight.w500, fontSize: 11),
+        selectedLabelStyle: TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 11,
+        ),
+        unselectedLabelStyle: TextStyle(
+          fontWeight: FontWeight.w500,
+          fontSize: 11,
+        ),
       ),
       fontFamily: 'Segoe UI',
     );
   }
 }
-
