@@ -3,9 +3,6 @@ name: Deploy Android APK to GitHub Pages
 on:
   push:
     branches: [main]
-    paths:
-      - 'chauthanh_ev_mobile/**'
-      - '.github/workflows/deploy-mobile-pages.yml'
   workflow_dispatch:
     inputs:
       apk_url:
