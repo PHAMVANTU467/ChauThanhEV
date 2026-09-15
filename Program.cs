@@ -18,6 +18,14 @@ foreach (var source in builder.Configuration.Sources.OfType<Microsoft.Extensions
 
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+    });
+});
+
 // Nguồn dữ liệu mock DUY NHẤT dùng chung cho toàn bộ hệ thống (Dashboard + các trang quản lý).
 builder.Services.AddSingleton<MockDataService>();
 
@@ -48,28 +56,36 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+var contentTypeProvider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
+contentTypeProvider.Mappings[".apk"] = "application/vnd.android.package-archive";
+contentTypeProvider.Mappings[".json"] = "application/json";
+
+app.UseDefaultFiles();
 app.UseStaticFiles(new StaticFileOptions
 {
+    ContentTypeProvider = contentTypeProvider,
     OnPrepareResponse = ctx =>
     {
         var fileName = ctx.File.Name.ToLowerInvariant();
-        if (fileName.EndsWith(".png") || fileName.EndsWith(".jpg") || fileName.EndsWith(".jpeg") ||
+        if (fileName.EndsWith(".apk"))
+        {
+            ctx.Context.Response.Headers["Content-Disposition"] = "attachment; filename=\"ChauThanhEV.apk\"";
+        }
+        else if (fileName.EndsWith(".png") || fileName.EndsWith(".jpg") || fileName.EndsWith(".jpeg") ||
             fileName.EndsWith(".svg") || fileName.EndsWith(".webp") || fileName.EndsWith(".ico") ||
             fileName.EndsWith(".woff") || fileName.EndsWith(".woff2"))
         {
-            // Cho phép browser và CDN cache tài nguyên ảnh, font (1 năm)
-            // Nhờ asp-append-version, khi file thay đổi query ?v=... sẽ tự động cập nhật ngay
             ctx.Context.Response.Headers["Cache-Control"] = "public, max-age=31536000, immutable";
         }
         else
         {
-            // Với CSS/JS, dùng no-cache để trình duyệt kiểm tra ETag 304 Not Modified thay vì tải lại toàn bộ
             ctx.Context.Response.Headers["Cache-Control"] = "no-cache";
             ctx.Context.Response.Headers["Pragma"] = "no-cache";
         }
     }
 });
 
+app.UseCors();
 app.UseRouting();
 
 app.UseAuthentication();

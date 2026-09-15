@@ -1611,5 +1611,123 @@ namespace ChauThanhEV.Services
                 : note;
             return true;
         }
+
+        // ============================================================
+        // USER MOBILE APP API EXTENSIONS
+        // ============================================================
+        public ChargingOrder? StartUserCharging(int customerId, int connectorId, double targetKwh = 0, decimal targetAmount = 0)
+        {
+            var customer = Customers.FirstOrDefault(c => c.Id == customerId);
+            if (customer == null) return null;
+
+            var charger = Chargers.FirstOrDefault(c => c.Connectors.Any(cn => cn.Id == connectorId));
+            if (charger == null) return null;
+            var connector = charger.Connectors.FirstOrDefault(cn => cn.Id == connectorId);
+            if (connector == null || connector.Status != ConnectorStatus.Available) return null;
+
+            connector.Status = ConnectorStatus.Charging;
+
+            var id = _nextChargingOrderId++;
+            var order = new ChargingOrder
+            {
+                Id = id,
+                Code = $"SC-{id:000000}",
+                CustomerId = customer.Id,
+                ChargerId = charger.Id,
+                ConnectorId = connector.Id,
+                StationId = charger.StationId,
+                StartTime = DateTime.Now,
+                EndTime = null,
+                EnergyKwh = 0,
+                Amount = 0,
+                PaymentMethod = "Ví điện tử",
+                Status = ChargingOrderStatus.Charging
+            };
+            ChargingOrders.Insert(0, order);
+            return order;
+        }
+
+        public ChargingOrder? StopUserCharging(int orderId, double finalKwh, decimal finalAmount)
+        {
+            var order = ChargingOrders.FirstOrDefault(o => o.Id == orderId);
+            if (order == null) return null;
+
+            order.EndTime = DateTime.Now;
+            order.EnergyKwh = Math.Round(finalKwh, 2);
+            order.Amount = Math.Round(finalAmount, 0);
+            order.Status = ChargingOrderStatus.Completed;
+
+            // Giải phóng cổng sạc
+            var charger = Chargers.FirstOrDefault(c => c.Id == order.ChargerId);
+            var connector = charger?.Connectors.FirstOrDefault(cn => cn.Id == order.ConnectorId);
+            if (connector != null && connector.Status == ConnectorStatus.Charging)
+            {
+                connector.Status = ConnectorStatus.Available;
+            }
+
+            // Trừ số dư ví khách hàng
+            var customer = Customers.FirstOrDefault(c => c.Id == order.CustomerId);
+            if (customer != null)
+            {
+                customer.WalletBalance = Math.Max(0, customer.WalletBalance - finalAmount);
+            }
+
+            return order;
+        }
+
+        public TopUpOrder? TopUpUserWallet(int customerId, decimal amount, string method)
+        {
+            var customer = Customers.FirstOrDefault(c => c.Id == customerId);
+            if (customer == null || amount <= 0) return null;
+
+            customer.WalletBalance += amount;
+
+            var id = _nextTopUpOrderId++;
+            var order = new TopUpOrder
+            {
+                Id = id,
+                Code = $"NT-{id:000000}",
+                CustomerId = customer.Id,
+                Amount = amount,
+                Method = string.IsNullOrWhiteSpace(method) ? "VietQR Chuyển khoản" : method,
+                CreatedAt = DateTime.Now,
+                Status = TopUpStatus.Success
+            };
+            TopUpOrders.Insert(0, order);
+            return order;
+        }
+
+        public FaultRecord? ReportUserFault(int customerId, int chargerId, int? connectorId, string description, FaultSeverity severity)
+        {
+            var charger = Chargers.FirstOrDefault(c => c.Id == chargerId);
+            if (charger == null) return null;
+
+            var id = _nextFaultId++;
+            var fault = new FaultRecord
+            {
+                Id = id,
+                Code = $"LOI-{id:0000}",
+                ChargerId = chargerId,
+                ConnectorId = connectorId,
+                Description = $"[Khách hàng phản ánh]: {description}",
+                Severity = severity,
+                Status = FaultStatus.New,
+                ReportedAt = DateTime.Now
+            };
+
+            if (connectorId.HasValue)
+            {
+                var conn = charger.Connectors.FirstOrDefault(c => c.Id == connectorId);
+                if (conn != null) conn.Status = ConnectorStatus.Fault;
+            }
+
+            Faults.Insert(0, fault);
+            return fault;
+        }
+
+        public ChargingOrder? GetActiveChargingOrder(int customerId)
+        {
+            return ChargingOrders.FirstOrDefault(o => o.CustomerId == customerId && o.Status == ChargingOrderStatus.Charging);
+        }
     }
 }

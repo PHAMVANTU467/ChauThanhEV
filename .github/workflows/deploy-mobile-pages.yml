@@ -1,0 +1,96 @@
+name: Deploy Android APK to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'chauthanh_ev_mobile/**'
+      - '.github/workflows/deploy-mobile-pages.yml'
+  workflow_dispatch:
+    inputs:
+      apk_url:
+        description: 'Link HTTPS trực tiếp tới APK; để trống để dùng APK vừa build'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+env:
+  FLUTTER_VERSION: '3.41.9'
+  UPDATE_BASE_URL: 'https://phamvantu467.github.io/ChauThanhEV'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read app version
+        id: version
+        shell: bash
+        run: |
+          VERSION=$(sed -n "s/^version: \([^+]*\)+.*$/\1/p" chauthanh_ev_mobile/pubspec.yaml)
+          BUILD=$(sed -n "s/^version: .*+\([0-9]*\)$/\1/p" chauthanh_ev_mobile/pubspec.yaml)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "build=$BUILD" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        working-directory: chauthanh_ev_mobile
+        run: flutter pub get
+
+      - name: Analyze and test
+        working-directory: chauthanh_ev_mobile
+        run: |
+          flutter analyze
+          flutter test
+
+      - name: Build APK
+        working-directory: chauthanh_ev_mobile
+        env:
+          UPDATE_URL: https://phamvantu467.github.io/ChauThanhEV/update.json
+        run: |
+          flutter build apk --debug --dart-define=APP_UPDATE_MANIFEST_URL=$UPDATE_URL
+
+      - name: Prepare Pages files
+        shell: bash
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          BUILD: ${{ steps.version.outputs.build }}
+          INPUT_APK_URL: ${{ inputs.apk_url }}
+        run: |
+          mkdir -p pages
+          cp chauthanh_ev_mobile/build/app/outputs/flutter-apk/app-debug.apk "pages/chauthanh-ev-${VERSION}+${BUILD}.apk"
+          cp "pages/chauthanh-ev-${VERSION}+${BUILD}.apk" pages/chauthanh-ev-latest.apk
+          APK_URL="$INPUT_APK_URL"
+          if [ -z "$APK_URL" ]; then
+            APK_URL="https://phamvantu467.github.io/ChauThanhEV/chauthanh-ev-${VERSION}+${BUILD}.apk"
+          fi
+          cat > pages/update.json <<EOF
+          {
+            "version": "${VERSION}",
+            "buildNumber": ${BUILD},
+            "apkUrl": "${APK_URL}",
+            "releaseNotes": "Bản cập nhật từ nhánh main.",
+            "mandatory": false
+          }
+          EOF
+          touch pages/.nojekyll
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./pages
+          force_orphan: true
