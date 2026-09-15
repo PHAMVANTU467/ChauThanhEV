@@ -14,13 +14,13 @@ Sau khi đã push workflow lên GitHub và bật Pages một lần:
 Manifest cập nhật cố định là:
 
 ```text
-https://phamvantu467.github.io/ChauThanhEV/update.json
+https://github.com/PHAMVANTU467/ChauThanhEV/releases/latest/download/update.json
 ```
 
 Link APK mặc định là:
 
 ```text
-https://phamvantu467.github.io/ChauThanhEV/chauthanh-ev-latest.apk
+https://github.com/PHAMVANTU467/ChauThanhEV/releases/latest/download/chauthanh-ev-latest.apk
 ```
 
 Lưu ý: link APK phải là link tải trực tiếp qua HTTPS, không phải link trang GitHub/Google Drive preview.

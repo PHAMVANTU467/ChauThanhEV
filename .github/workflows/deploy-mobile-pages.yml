@@ -14,9 +14,7 @@ on:
         type: string
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 env:
   FLUTTER_VERSION: '3.41.9'
@@ -25,9 +23,6 @@ env:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -61,25 +56,27 @@ jobs:
       - name: Build APK
         working-directory: chauthanh_ev_mobile
         env:
-          UPDATE_URL: https://phamvantu467.github.io/ChauThanhEV/update.json
+          UPDATE_URL: https://github.com/PHAMVANTU467/ChauThanhEV/releases/latest/download/update.json
         run: |
           flutter build apk --debug --dart-define=APP_UPDATE_MANIFEST_URL=$UPDATE_URL
 
-      - name: Prepare Pages files
+      - name: Prepare release files
         shell: bash
         env:
           VERSION: ${{ steps.version.outputs.version }}
           BUILD: ${{ steps.version.outputs.build }}
           INPUT_APK_URL: ${{ inputs.apk_url }}
         run: |
-          mkdir -p pages
-          cp chauthanh_ev_mobile/build/app/outputs/flutter-apk/app-debug.apk "pages/chauthanh-ev-${VERSION}+${BUILD}.apk"
-          cp "pages/chauthanh-ev-${VERSION}+${BUILD}.apk" pages/chauthanh-ev-latest.apk
+          mkdir -p release
+          APK_NAME="chauthanh-ev-${VERSION}+${BUILD}.apk"
+          cp chauthanh_ev_mobile/build/app/outputs/flutter-apk/app-debug.apk "release/${APK_NAME}"
+          cp "release/${APK_NAME}" release/chauthanh-ev-latest.apk
+          TAG="android-v${VERSION}-build${BUILD}"
           APK_URL="$INPUT_APK_URL"
           if [ -z "$APK_URL" ]; then
-            APK_URL="https://phamvantu467.github.io/ChauThanhEV/chauthanh-ev-${VERSION}+${BUILD}.apk"
+            APK_URL="https://github.com/PHAMVANTU467/ChauThanhEV/releases/download/${TAG}/${APK_NAME}"
           fi
-          cat > pages/update.json <<EOF
+          cat > release/update.json <<EOF
           {
             "version": "${VERSION}",
             "buildNumber": ${BUILD},
@@ -88,18 +85,11 @@ jobs:
             "mandatory": false
           }
           EOF
-          touch pages/.nojekyll
 
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          enablement: true
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./pages
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          tag_name: android-v${{ steps.version.outputs.version }}-build${{ steps.version.outputs.build }}
+          name: Android v${{ steps.version.outputs.version }} (build ${{ steps.version.outputs.build }})
+          body: Bản APK Android tự động từ nhánh main.
+          files: release/*
